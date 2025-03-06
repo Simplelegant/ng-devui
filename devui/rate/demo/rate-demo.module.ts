@@ -14,6 +14,7 @@ import { RateDemoCustomizeComponent } from './customize/customize.component';
 import { RateHalfComponent } from './half/rate-half.component';
 import { RateDemoOnlyReadComponent } from './onlyread/onlyread.component';
 import { RateDemoComponent } from './rate-demo.component';
+import { RateDesignComponent } from './rate-design.component';
 import { RateDemoTemplateComponent } from './template/template.component';
 import { TypeComponent } from './type/type.component';
 
@@ -27,7 +28,11 @@ import { TypeComponent } from './type/type.component';
     DevUICodeboxModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: RateDesignComponent,
+      },
       { path: 'demo', component: RateDemoComponent },
       {
         path: 'api',
@@ -42,6 +47,7 @@ import { TypeComponent } from './type/type.component';
   exports: [RateDemoComponent],
   declarations: [
     RateDemoComponent,
+    RateDesignComponent,
     RateDemoBasicComponent,
     RateDemoOnlyReadComponent,
     RateDemoCustomizeComponent,

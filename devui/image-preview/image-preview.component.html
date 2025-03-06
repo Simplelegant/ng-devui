@@ -10,7 +10,7 @@
       </g>
     </svg>
   </button>
-  <img class="devui-image-preview-main-image" [class.devui-optimal-proportion]="isOptimal" [attr.src]="targetImageSrc | safe: 'url'" />
+  <img class="devui-image-preview-main-image" [class.devui-optimal-proportion]="isOptimal" [attr.src]="targetImageSrc | safe : 'url'" />
 
   <!-- TODO: button参数化重构 -->
   <button class="devui-fixed-arrow-left" (click)="pre()" dTooltip [position]="'right'" [content]="i18nText.pre">
@@ -38,7 +38,14 @@
   </button>
 
   <div class="devui-image-preview-toolbar">
-    <button (click)="zoomIn()" dTooltip [position]="'top'" [content]="i18nText?.zoomIn">
+    <button
+      *ngIf="toolbar.zoomIn"
+      [class.disabled]="disabledZoomIn"
+      (click)="zoomIn()"
+      dTooltip
+      [position]="'top'"
+      [content]="i18nText?.zoomIn"
+    >
       <svg width="18px" height="18px" viewBox="0 0 16 16">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <g fill="#293040" fill-rule="nonzero">
@@ -49,7 +56,14 @@
         </g>
       </svg>
     </button>
-    <button (click)="zoomOut()" dTooltip [position]="'top'" [content]="i18nText.zoomOut">
+    <button
+      *ngIf="toolbar.zoomOut"
+      [class.disabled]="disabledZoomOut"
+      (click)="zoomOut()"
+      dTooltip
+      [position]="'top'"
+      [content]="i18nText.zoomOut"
+    >
       <svg width="18px" height="18px" viewBox="0 0 16 16">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <g fill="#293040" fill-rule="nonzero">
@@ -60,7 +74,7 @@
         </g>
       </svg>
     </button>
-    <button (click)="rotate()" dTooltip [position]="'top'" [content]="i18nText.rotate">
+    <button *ngIf="toolbar.rotate" (click)="rotate()" dTooltip [position]="'top'" [content]="i18nText.rotate">
       <svg width="18px" height="18px" viewBox="0 0 16 16" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <path
@@ -70,7 +84,7 @@
         </g>
       </svg>
     </button>
-    <button (click)="pre()" dTooltip [position]="'top'" [content]="i18nText.pre">
+    <button *ngIf="toolbar.prev && toolbar.next" (click)="pre()" dTooltip [position]="'top'" [content]="i18nText.pre">
       <svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <polygon
@@ -81,7 +95,7 @@
         </g>
       </svg>
     </button>
-    <span (click)="showInput = true" class="devui-image-preview-index">
+    <span *ngIf="toolbar.index" (click)="showInput = true" class="devui-image-preview-index">
       <d-input-number
         *ngIf="showInput"
         size="sm"
@@ -98,7 +112,7 @@
       <span *ngIf="!showInput">{{ targetImageIndex + 1 + ' ' }}</span>
       <span>{{ '/ ' + totalImageNum }}</span>
     </span>
-    <button class="devui-next" (click)="next()" dTooltip [position]="'top'" [content]="i18nText.next">
+    <button *ngIf="toolbar.prev && toolbar.next" class="devui-next" (click)="next()" dTooltip [position]="'top'" [content]="i18nText.next">
       <svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <polygon
@@ -110,7 +124,7 @@
         </g>
       </svg>
     </button>
-    <button (click)="setScaleBest()" dTooltip [position]="'top'" [content]="i18nText.bestScale">
+    <button *ngIf="toolbar.scaleBest" (click)="setScaleBest()" dTooltip [position]="'top'" [content]="i18nText.bestScale">
       <svg width="18px" height="18px" viewBox="0 0 16 16">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <path
@@ -121,8 +135,37 @@
         </g>
       </svg>
     </button>
-    <button (click)="setScaleOriginal()" dTooltip [position]="'top'" [content]="i18nText.originScale">
+    <button *ngIf="toolbar.scaleOriginal" (click)="setScaleOriginal()" dTooltip [position]="'top'" [content]="i18nText.originScale">
       <span>1:1</span>
+    </button>
+    <button *ngIf="toolbar.originnalImage" (click)="getOriginalImage()" dTooltip [position]="'top'" [content]="i18nText.origin">
+      <svg width="16px" height="16px" viewBox="0 0 16 16">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g transform="translate(-1196.000000, -96.000000)" fill="#293040" fill-rule="nonzero">
+            <g transform="translate(407.000000, 93.000000)">
+              <path
+                d="M804,4 L790,4 L790,11.940983 L794.058237,9.91186456 L798.536534,13.3949845 L801.014076,11.908459
+                    L804,13.8990748 L804,4 Z M803.72265,14.9160251 L800.985924,13.091541 L798.463466,14.6050155 L793.941763,11.0881354
+                    L790.223607,12.9472136 C790.151699,12.9831673 790.07527,13.000168 790,13.0001094 L790,18 L804,18 L804,15.0000529
+                    C803.90455,15.0001406 803.80803,14.9729453 803.72265,14.9160251 Z M789,19 L789,3 L805,3 L805,19 L789,19 Z M801,9
+                    C800.447715,9 800,8.55228475 800,8 C800,7.44771525 800.447715,7 801,7 C801.552285,7 802,7.44771525 802,8 C802,8.55228475
+                    801.552285,9 801,9 Z"
+              ></path>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </button>
+    <button *ngIf="toolbar.download" (click)="getOriginalImage(true)" dTooltip [position]="'top'" [content]="i18nText.download">
+      <svg width="16px" height="16px" viewBox="0 0 16 16">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g>
+            <path
+              d="M14.5,14 C14.7761424,14 15,14.2238576 15,14.5 C15,14.7761424 14.7761424,15 14.5,15 L1.5,15 C1.22385763,15 1,14.7761424 1,14.5 C1,14.2238576 1.22385763,14 1.5,14 L14.5,14 Z M8,1 C8.24545989,1 8.44960837,1.17687516 8.49194433,1.41012437 L8.5,1.5 L8.5,10.793 L11.6464466,7.64644661 C11.820013,7.47288026 12.0894374,7.45359511 12.2843055,7.58859116 L12.3535534,7.64644661 C12.5271197,7.82001296 12.5464049,8.08943736 12.4114088,8.2843055 L12.3535534,8.35355339 L8.35355339,12.3535534 L8.34128643,12.3654113 C8.32881868,12.3770608 8.31575424,12.3880797 8.30214392,12.3984173 L8.35355339,12.3535534 C8.32671912,12.3803877 8.29759357,12.4035342 8.26680652,12.422993 C8.25568247,12.4299807 8.24404667,12.4367067 8.23212724,12.4429657 C8.21827569,12.4502504 8.20453886,12.4566485 8.1905951,12.4623894 C8.17802507,12.4675915 8.16473685,12.4724419 8.15119917,12.4767316 C8.13583471,12.481552 8.12047425,12.4856039 8.10498705,12.4889143 C8.09430622,12.4912471 8.08325248,12.4932298 8.07207924,12.494843 C8.05487076,12.4972949 8.03773477,12.498877 8.02056948,12.4995793 C8.01375728,12.4998604 8.00689494,12.5 8,12.5 L7.98043349,12.4996194 C7.96293275,12.4989382 7.94546098,12.4973429 7.92809589,12.4948333 L8,12.5 C7.96390296,12.5 7.92869933,12.4961748 7.89477235,12.4889078 C7.87952575,12.4856039 7.86416529,12.481552 7.84898836,12.4767587 C7.83526315,12.4724419 7.82197493,12.4675915 7.80896344,12.4622078 C7.79546114,12.4566485 7.78172431,12.4502504 7.76824181,12.443195 C7.75595333,12.4367067 7.74431753,12.4299807 7.73298968,12.422812 C7.72729809,12.4192668 7.72146362,12.4154054 7.7156945,12.4114088 L7.69785608,12.3984173 C7.68424576,12.3880797 7.67118132,12.3770608 7.65871357,12.3654113 L7.64644661,12.3535534 L3.64644661,8.35355339 C3.45118446,8.15829124 3.45118446,7.84170876 3.64644661,7.64644661 C3.82001296,7.47288026 4.08943736,7.45359511 4.2843055,7.58859116 L4.35355339,7.64644661 L7.5,10.793 L7.5,1.5 C7.5,1.22385763 7.72385763,1 8,1 Z"
+            ></path>
+          </g>
+        </g>
+      </svg>
     </button>
   </div>
 </div>

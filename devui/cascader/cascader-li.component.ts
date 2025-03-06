@@ -26,7 +26,7 @@ export class CascaderLiComponent implements OnInit, OnDestroy {
   halfCheck: boolean;
   active: boolean;
 
-  unsubscribe$ = new Subject();
+  unsubscribe$ = new Subject<void>();
 
   @HostListener('click', ['$event'])
   onClick(event: Event) {
@@ -35,7 +35,10 @@ export class CascaderLiComponent implements OnInit, OnDestroy {
 
   @HostListener('mouseenter', ['$event'])
   onMouseEnter(event) {
-    if (this.trigger === 'hover' && this.option.children && this.option.children.length) {
+    if (this.trigger === 'hover') {
+      if (this.option.disabled) {
+        return;
+      }
       this.cascaderSrv.openColumn(this.option, this.colIndex, false);
     }
   }
@@ -75,6 +78,9 @@ export class CascaderLiComponent implements OnInit, OnDestroy {
   }
 
   clickItem(): void {
+    if (this.option.disabled) {
+      return;
+    }
     this.cascaderSrv.openColumn(this.option, this.colIndex, this.isLazyLoad);
     if (this.canSelectParent && !this.multiple) {
       this.cascaderSrv.setCurrentValue();

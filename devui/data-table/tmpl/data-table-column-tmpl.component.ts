@@ -1,6 +1,14 @@
 import {
-  ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges,
-  OnDestroy, OnInit, Output, SimpleChanges, TemplateRef
+  ChangeDetectionStrategy,
+  Component,
+  ContentChild,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  TemplateRef,
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FilterConfig } from '../data-table.model';
@@ -11,16 +19,16 @@ import { DataTableHeadCellTmplComponent } from './data-table-head-cell-tmpl.comp
 @Component({
   selector: 'd-column',
   template: '',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DataTableColumnTmplComponent implements OnChanges, OnDestroy, OnInit {
+export class DataTableColumnTmplComponent implements OnChanges, OnDestroy {
   @Input() advancedHeader: Array<{
     header: string;
     rowspan: number;
     colspan: number;
     [prop: string]: any;
   }>;
-
+  @Input() headCellApplyAll = false;
   @Input() maxWidth: string;
   @Input() minWidth: string;
   @Input() field: string;
@@ -39,8 +47,8 @@ export class DataTableColumnTmplComponent implements OnChanges, OnDestroy, OnIni
   @Input() order: number = Number.MAX_VALUE;
   @Input() nestedColumn = false;
   /**
-* 传入筛选列表
-*/
+   * 传入筛选列表
+   */
   @Input() filterList: Array<FilterConfig>;
   @Output() filterChange = new EventEmitter<FilterConfig[]>();
   @Output() filterToggle = new EventEmitter<{
@@ -68,17 +76,13 @@ export class DataTableColumnTmplComponent implements OnChanges, OnDestroy, OnIni
   // @deprecated
   @Input() fieldType = 'text';
 
-  constructor() {
-
-  }
-  ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['order']) {
-      this.orderChange.emit(changes['order'].currentValue);
+    const { order, width } = changes;
+    if (order) {
+      this.orderChange.emit(order.currentValue);
     }
-
-    if (changes['width']) {
-      this.widthChange.emit(changes['width'].currentValue);
+    if (width) {
+      this.widthChange.emit(width.currentValue);
     }
   }
 
@@ -86,17 +90,11 @@ export class DataTableColumnTmplComponent implements OnChanges, OnDestroy, OnIni
     this.orderChange.unsubscribe();
   }
 
-  // column.extraOptions?.dateFormat
-
   emitFilterData(filterData) {
     this.filterChange.emit(filterData);
   }
 
-  emitFilterToggle(data: {
-    isOpen: boolean;
-    checklist: FilterConfig[];
-  }) {
+  emitFilterToggle(data: { isOpen: boolean; checklist: FilterConfig[] }) {
     this.filterToggle.emit(data);
   }
-
 }

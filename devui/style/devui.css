@@ -40,8 +40,7 @@
 
 .grid {
   letter-spacing: -0.31em;
-
-  /* *letter-spacing: normal; */
+  *letter-spacing: normal;
   word-spacing: -0.43em;
 }
 
@@ -75,8 +74,7 @@
 .u-19-24,
 .u-23-24 {
   display: inline-block;
-
-  /* *display: inline; */
+  *display: inline;
   zoom: 1;
   letter-spacing: normal;
   word-spacing: normal;
@@ -434,7 +432,7 @@ body {
   color: var(--devui-text, #252b3a);
   font-size: 12px;
   font-size: var(--devui-font-size, 12px);
-  font-family: 'HuaweiFont', helvetica, arial, 'PingFang', 'Microsoft YaHei', 'Hiragino Sans GB', 'Microsoft JhengHei', sans-serif;
+  font-family: helvetica, arial, 'PingFang', 'Microsoft YaHei', 'HarmonyOS Sans SC', 'HarmonyOS Sans', 'Hiragino Sans GB', 'Microsoft JhengHei', sans-serif;
   font-variant: tabular-nums;
   line-height: 1.5;
 }
@@ -521,7 +519,15 @@ body > * ::-webkit-scrollbar {
   height: 8px;
 }
 
+body * {
+  scrollbar-width: thin;
+}
+
 body > * ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+body *::-moz-scrollbar-track {
   background-color: transparent;
 }
 
@@ -703,7 +709,7 @@ a:hover {
   background-color: #ffffff;
   background-color: var(--devui-connected-overlay-bg, #ffffff);
   box-shadow: 0 2px 8px 0  rgba(0, 0, 0, 0.2);
-  box-shadow: var(--devui-shadow-connected-overlay, 0 2px 8px 0) var(--devui-shadow, rgba(0, 0, 0, 0.2));
+  box-shadow: var(--devui-shadow-length-connected-overlay, 0 2px 8px 0) var(--devui-shadow, rgba(0, 0, 0, 0.2));
   outline: none;
 }
 
@@ -849,7 +855,7 @@ a:hover {
   background: #ffffff;
   background: var(--devui-connected-overlay-bg, #ffffff);
   box-shadow: 0 2px 8px 0  rgba(0, 0, 0, 0.2);
-  box-shadow: var(--devui-shadow-connected-overlay, 0 2px 8px 0) var(--devui-shadow, rgba(0, 0, 0, 0.2));
+  box-shadow: var(--devui-shadow-length-connected-overlay, 0 2px 8px 0) var(--devui-shadow, rgba(0, 0, 0, 0.2));
 }
 
 .devui-dropdown .devui-dropdown-menu > li > a:not(.disabled) {
@@ -5368,6 +5374,10 @@ ul {
   background-color: var(--devui-area, #f8f8f8);
   padding: 0.5em;
   font-size: 12px;
+}
+
+.devui-md-view pre code {
+  padding: 0;
 }
 
 .devui-md-view pre.hljs,

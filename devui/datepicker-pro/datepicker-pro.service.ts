@@ -23,9 +23,9 @@ export class DatepickerProService implements OnDestroy {
   get minDate(): Date {
     return this._minDate;
   }
-  _maxDate: Date = new Date(this.calendarRange[1], 11, 31);
+  _maxDate: Date = new Date(this.calendarRange[1], 11, 31, 23, 59, 59);
   set maxDate(value: Date) {
-    this._maxDate = new Date(value) || new Date(this.calendarRange[1], 11, 31);
+    this._maxDate = new Date(value) || new Date(this.calendarRange[1], 11, 31, 23, 59, 59);
     this.detectedChanges.next();
   }
   get maxDate(): Date {
@@ -91,6 +91,14 @@ export class DatepickerProService implements OnDestroy {
     }
     return (date.getTime() > this.minDate.getTime() && date.getTime() < this.maxDate.getTime()) ||
       date.toDateString() === this.minDate.toDateString() || date.toDateString() === this.maxDate.toDateString();
+  }
+
+  resetMin() {
+    this.minDate = new Date(this.calendarRange[0], 0, 1);
+  }
+
+  resetMax() {
+    this.maxDate = new Date(this.calendarRange[1], 11, 31);
   }
 
   // 对范围模式下一些非法的选择进行修正

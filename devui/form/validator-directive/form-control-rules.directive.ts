@@ -13,7 +13,8 @@ import {
   Output,
   Self,
   SimpleChanges,
-  SkipSelf
+  SkipSelf,
+  TemplateRef,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -22,24 +23,24 @@ import {
   ControlContainer,
   NgControl,
   ValidationErrors,
-  ValidatorFn
+  ValidatorFn,
 } from '@angular/forms';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
 import { OverlayContainerRef } from 'ng-devui/overlay-container';
 import { PopoverComponent } from 'ng-devui/popover';
-import { fromEvent, merge, Observable, Subject, timer } from 'rxjs';
+import { Observable, Subject, fromEvent, merge, timer } from 'rxjs';
 import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { FormItemComponent } from '../form-item.component';
 import {
   DAsyncValidateRule,
-  dDefaultValidators,
   DFormControlStatus,
   DPopConfig,
   DValidateErrorStatus,
   DValidateRule,
   DValidateRules,
   DValidationErrorStrategy,
-  ruleReservedWords
+  dDefaultValidators,
+  ruleReservedWords,
 } from './validate.type';
 
 @Directive()
@@ -136,7 +137,7 @@ export abstract class DAbstractControlRuleDirective implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if ('rules' in changes && !this._rules) {
       // TODO：提供外部调用可手动更新rule方法
-      this._rules = { ...this._originRules, ...this._translateRulesToObject(changes['rules'].currentValue) };
+      this._rules = { ...this._originRules, ...this._translateRulesToObject(changes.rules.currentValue) };
       this.setupOrUpdateRules();
     }
 
@@ -324,9 +325,9 @@ export abstract class DAbstractControlRuleDirective implements OnChanges {
 
   get dClassSuccess() {
     // COMMENT: 暂不默认提供
-    if (this._rules['errorStrategy'] === 'dirty') {
+    if ((this._rules as any).errorStrategy === 'dirty') {
       return this._cd.control ? this._cd.control.valid && this._cd.control.dirty : false;
-    } else if (!this._rules['errorStrategy']) {
+    } else if (!(this._rules as any).errorStrategy) {
       return false;
     } else {
       return this._cd.control ? this._cd.control.valid : false;
@@ -379,13 +380,13 @@ export abstract class DAbstractControlRuleDirective implements OnChanges {
   }
 
   private _getErrorStrategy(rule?) {
-    return (rule && rule.errorStrategy) || this._rules['errorStrategy'] || 'dirty';
+    return (rule && rule.errorStrategy) || (this._rules as any).errorStrategy || 'dirty';
   }
 
   private _getMessageFormErrorsById(errors: { [key: string]: any }, id: string): string | null {
     if (errors[id] && typeof errors[id] === 'string') {
       return errors[id];
-    } else if (errors[id] && typeof errors[id] === 'object' && (errors[id][this.locale] || errors[id]['default'])) {
+    } else if (errors[id] && typeof errors[id] === 'object' && (errors[id][this.locale] || errors[id].default)) {
       return errors[id];
     } else {
       return null;
@@ -463,7 +464,7 @@ export class DFormGroupRuleDirective extends DAbstractControlRuleDirective imple
   @Input('dValidateRules') rules: DValidateRules;
   @Output() dRulesStatusChange: EventEmitter<any> = new EventEmitter<any>();
 
-  private destroy$ = new Subject();
+  private destroy$ = new Subject<void>();
 
   constructor(@Self() cd: ControlContainer, @Optional() @Host() @SkipSelf() parentDir: DFormGroupRuleDirective, private i18n: I18nService) {
     super(cd, parentDir);
@@ -511,8 +512,9 @@ export class DFormControlRuleDirective extends DAbstractControlRuleDirective imp
   @Input('dValidatePopConfig') popConfig: DPopConfig;
 
   popoverComponentRef: ComponentRef<PopoverComponent>;
-  private destroy$ = new Subject();
-  popMessage: string; // 最终显示的message
+  popMessage: string | TemplateRef<any>; // 最终显示的message
+  private destroy$ = new Subject<void>();
+  private _prevMessage: string;
 
   get showType() {
     return (this.fullRules as { messageShowType: string }).messageShowType || 'popover';
@@ -574,8 +576,11 @@ export class DFormControlRuleDirective extends DAbstractControlRuleDirective imp
   _updatePopMessage(status: DFormControlStatus, message: string): void {
     this.popMessage = status === 'error' ? message : null; // 暂不提供除errorMessage外提示
     if (this.popoverComponentRef) {
-      this.hidePopMessage();
-      this.showPopMessage();
+      if (this._prevMessage !== this.popMessage) {
+        this.hidePopMessage();
+        this.showPopMessage();
+        this._prevMessage = this.popMessage;
+      }
     }
   }
 
@@ -588,7 +593,7 @@ export class DFormControlRuleDirective extends DAbstractControlRuleDirective imp
 
     /* 国际化适配 */
     if (message && typeof message === 'object') {
-      message = message[this.locale] || message['default'] || null;
+      message = message[this.locale] || message.default || message;
     }
 
     if (this.showType === 'popover') {
@@ -623,8 +628,10 @@ export class DFormControlRuleDirective extends DAbstractControlRuleDirective imp
       position: this.popPosition,
       popType: type,
       popMaxWidth: this.popConfig?.popMaxWidth || 200,
-      appendToBody: true,
+      scrollElement: this.popConfig?.scrollElement,
       zIndex: this.popConfig?.zIndex || 1060,
+      showAnimation: this.popConfig?.showAnimation ?? true,
+      appendToBody: true,
     });
   }
 

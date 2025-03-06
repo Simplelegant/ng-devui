@@ -24,7 +24,6 @@
     height: 305px;
     overflow: auto;
     -ms-overflow-style: none;
-    scrollbar-width: none;
 
     &::-webkit-scrollbar {
       width: 0 !important;
@@ -70,7 +69,6 @@
   width: 100%;
   overflow-x: hidden;
   -ms-overflow-style: none;
-  scrollbar-width: none;
 
   &::-webkit-scrollbar {
     width: 0 !important;
@@ -118,7 +116,7 @@
 
       &.devui-table-date-today {
         span {
-          color: $devui-brand;
+          color: $devui-info;
         }
       }
 
@@ -175,7 +173,7 @@
         }
       }
 
-      &.devui-table-date-start:not(.devui-table-date-end) {
+      &.devui-table-date-start:not(.devui-table-date-end,.devui-table-date-disable) {
         position: relative;
 
         &::after {
@@ -198,7 +196,7 @@
         }
       }
 
-      &.devui-table-date-end:not(.devui-table-date-start) {
+      &.devui-table-date-end:not(.devui-table-date-start,.devui-table-date-disable) {
         position: relative;
 
         &::after {

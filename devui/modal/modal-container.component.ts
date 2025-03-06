@@ -20,6 +20,7 @@ export class ModalContainerComponent implements OnInit {
   @Input() data: any;
   @Input() title: string;
   @Input() content: string | HTMLElement;
+  @Input() showMaximizeBtn: boolean;
   @Input() buttons: Array<{
     id?: string;
     cssClass?: IButtonStyle;
@@ -31,10 +32,12 @@ export class ModalContainerComponent implements OnInit {
   }>;
   @Input() html: boolean;
   @Input() onClose: ($event?: Event) => void;
+  @Input() onMaximize: (maximized: boolean) => void;
   @ViewChild(ModalContentDirective, { static: true }) modalContentHost: ModalContentDirective;
   @Input() dialogtype = 'standard';
   @Input() showCloseBtn: boolean;
   contentTemplate: TemplateRef<any>;
+  _oldMaxHeight: string;
 
   constructor(private sanitizer: DomSanitizer, public modalInstance: ModalComponent) {}
 
@@ -46,6 +49,18 @@ export class ModalContainerComponent implements OnInit {
 
   close(event) {
     this.onClose(event);
+  }
+
+  maximize(maximized: boolean) {
+    if (this.onMaximize) {
+      this.onMaximize(maximized);
+    }
+    if (maximized) {
+      this._oldMaxHeight = this.maxHeight;
+      this.maxHeight = '100vh';
+    } else {
+      this.maxHeight = this._oldMaxHeight;
+    }
   }
 
   updateButtonOptions(buttonOptions = []) {

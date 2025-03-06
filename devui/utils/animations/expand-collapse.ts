@@ -21,3 +21,10 @@ export const expandCollapseForDomDestroy: AnimationTriggerMetadata = trigger('co
     animate(`${duration} ${easeInOut}`, style({ opacity: 0, height: 0, overflow: 'hidden' }))
   ]),
 ]);
+
+export const collapseMotion: AnimationTriggerMetadata = trigger('collapseMotion', [
+  state('expanded', style({ height: '*' })),
+  state('collapsed', style({ height: 0 })), // overflow: 'hidden'
+  transition('expanded => collapsed', animate(`150ms ${AnimationCurves.EASE_IN_OUT}`)),
+  transition('collapsed => expanded', animate(`150ms ${AnimationCurves.EASE_IN_OUT}`)),
+]);

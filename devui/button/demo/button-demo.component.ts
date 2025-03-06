@@ -56,6 +56,7 @@ export class ButtonDemoComponent implements OnInit, OnDestroy {
   groupsSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./groups/groups.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./groups/groups.component.ts?raw') },
+    { title: 'SCSS', language: 'css', code: require('./groups/groups.component.scss?raw') },
   ];
 
   navItems = [];
@@ -82,7 +83,6 @@ export class ButtonDemoComponent implements OnInit, OnDestroy {
       { dAnchorLink: 'button-primary', value: values['button-primary'] },
       { dAnchorLink: 'button-common', value: values['button-common'] },
       { dAnchorLink: 'button-primary-and-common', value: values['button-primary-and-common'] },
-      { dAnchorLink: 'button-left-right', value: values['button-left-right'] },
       { dAnchorLink: 'button-danger', value: values['button-danger'] },
       { dAnchorLink: 'button-text', value: values['button-text'] },
       { dAnchorLink: 'button-loading', value: values['button-loading'] },

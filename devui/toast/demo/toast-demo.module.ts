@@ -9,12 +9,14 @@ import { DevUICodeboxModule } from 'ng-devui/shared/devui-codebox/devui-codebox.
 import { ToastModule } from 'ng-devui/toast';
 import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
+import { AppendComponent } from './append/append.component';
 import { BasicComponent } from './basic/basic.component';
 import { LifeComponent } from './life/life.component';
 import { ToastServiceComponent } from './service/toast-service.component';
 import { SingleComponent } from './single/single.component';
 import { StyleComponent } from './style/style.component';
 import { ToastDemoComponent } from './toast-demo.component';
+import { ToastDesignComponent } from './toast-design.component';
 
 @NgModule({
   imports: [
@@ -27,7 +29,11 @@ import { ToastDemoComponent } from './toast-demo.component';
     DevUIApiModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: ToastDesignComponent,
+      },
       { path: 'demo', component: ToastDemoComponent },
       {
         path: 'api',
@@ -40,7 +46,16 @@ import { ToastDemoComponent } from './toast-demo.component';
     ]),
   ],
   exports: [ToastDemoComponent],
-  declarations: [ToastDemoComponent, BasicComponent, LifeComponent, SingleComponent, StyleComponent, ToastServiceComponent],
+  declarations: [
+    ToastDemoComponent,
+    ToastDesignComponent,
+    BasicComponent,
+    LifeComponent,
+    SingleComponent,
+    StyleComponent,
+    AppendComponent,
+    ToastServiceComponent,
+  ],
 
 })
 export class ToastDemoModule {}

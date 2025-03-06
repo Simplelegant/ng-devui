@@ -23,7 +23,9 @@ import { ModalNoBtnComponent } from './customize/modal-no-btn.component';
 import { FixedWrapperComponent } from './fixed/fixed-wrapper.component';
 import { HideComponent } from './hide/hide.component';
 import { ModalFormComponent } from './hide/modal-form.component';
+import { MaximizeComponent } from './maximize/maximize.component';
 import { ModalDemoComponent } from './modal-demo.component';
+import { ModalDesignComponent } from './modal-design.component';
 import { ModalTestComponent } from './modal-test.component';
 import { DialogContentComponent } from './template/dialog-content/dialog-content.component';
 import { ModalContentComponent } from './template/modal-content/modal-content.component';
@@ -44,7 +46,11 @@ import { TipsComponent } from './tips/tips.component';
     DDemoNavModule,
     TextInputModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: ModalDesignComponent,
+      },
       { path: 'demo', component: ModalDemoComponent },
       {
         path: 'api',
@@ -58,10 +64,12 @@ import { TipsComponent } from './tips/tips.component';
   ],
   declarations: [
     ModalDemoComponent,
+    ModalDesignComponent,
     ModalTestComponent,
     ModalAlertComponent,
     ModalNoBtnComponent,
     BasicComponent,
+    MaximizeComponent,
     CustomizeComponent,
     TipsComponent,
     HideComponent,

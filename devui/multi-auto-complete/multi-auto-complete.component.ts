@@ -6,13 +6,14 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AutoCompleteDirective, AutoCompletePopupComponent } from 'ng-devui/auto-complete';
@@ -48,22 +49,23 @@ export class MultiAutoCompleteComponent implements OnInit, OnChanges, ControlVal
   @Input() tipsText: string; // 提示文字
   @Input() placeholder = ''; // placeholder
   @Input() disabled = false;
+  @Input() retainInputValue = false;
   @Input() source: any[];
   @Input() latestSource: any[]; // 最近输入
+  @Input() disabledKey: string; // 单个选项禁用
   @Input() width: number;
-  // @Input() isOpen: boolean;   // 未使用
-  // @Input() term: string; // 未使用
   @Input() itemTemplate: TemplateRef<any>;
   @Input() noResultItemTemplate: TemplateRef<any>;
-  // @Input() dropdown: boolean; // 未使用
-  // @Input() minLength: number; // 未使用
   @Input() delay: number;
   @Input() searchFn: (term: string) => Observable<any[]>;
   @Input() formatter: (item: any) => string;
   @Input() valueParser: (item: any) => any;
   @Input() @WithConfig() showAnimation = true;
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle() {
+    return this.showGlowStyle;
+  }
   @Output() autoSubmit = new EventEmitter<any>(); // 失焦自动提交
-
   @ViewChild('multiAutoCompleteInput') multiAutoCompleteInputElement: ElementRef;
   @ViewChild('multiAutoCompleteWrapper') multiAutoCompleteWrapperElement: ElementRef;
   @ViewChild(AutoCompleteDirective) autoCompleteDirective: AutoCompleteDirective;
@@ -133,11 +135,12 @@ export class MultiAutoCompleteComponent implements OnInit, OnChanges, ControlVal
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes && changes['overview']) {
-      this.multipleLabelClassNameSuffix = changes['overview'].currentValue;
+    const { overview, placeholder } = changes;
+    if (overview) {
+      this.multipleLabelClassNameSuffix = overview.currentValue;
     }
-    if (changes && changes['placeholder']) {
-      this.clonePlaceholder = changes['placeholder'].currentValue;
+    if (placeholder) {
+      this.clonePlaceholder = placeholder.currentValue;
     }
   }
 
@@ -184,13 +187,12 @@ export class MultiAutoCompleteComponent implements OnInit, OnChanges, ControlVal
       this.multiItems = [];
       this.multiItems.push(item);
       this.inputEdit = false;
-      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview]['blur'];
+      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview].blur;
     }
     this.setSinglePlaceholder();
     this.autoSubmit.emit(this.multiItems);
     this.onChange(this.multiItems);
-    this.inputValue = null;
-    this.multiAutoCompleteInputElement.nativeElement.value = '';
+    this.clearInputValue();
   }
 
   public removeLabel(label: any) {
@@ -207,16 +209,22 @@ export class MultiAutoCompleteComponent implements OnInit, OnChanges, ControlVal
     this.popupRef = $event.popupRef;
     this.setSinglePlaceholder();
     if ($event.focus) {
-      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview]['focus'];
+      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview].focus;
       setTimeout(() => {
         // 这里需要等待一会才能聚焦
         this.multiAutoCompleteInputElement.nativeElement.focus();
       }, 0);
     } else {
-      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview]['blur'];
+      this.multipleLabelClassNameSuffix = this.multipleLabelClassNameConfig[this.overview].blur;
+      this.clearInputValue();
+      this.autoSubmit.emit(this.multiItems);
+    }
+  }
+
+  clearInputValue() {
+    if (!this.retainInputValue) {
       this.inputValue = null;
       this.multiAutoCompleteInputElement.nativeElement.value = '';
-      this.autoSubmit.emit(this.multiItems);
     }
   }
 

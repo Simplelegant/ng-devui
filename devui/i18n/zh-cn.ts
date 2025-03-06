@@ -8,6 +8,7 @@ export default {
     loading: '加载中...',
     checkAll: '全选',
     btnOk: '确定',
+    reset: '重置',
     btnCancel: '取消',
     btnClose: '关闭',
     btnClickMe: '点击我',
@@ -15,6 +16,20 @@ export default {
   },
   autoComplete: {
     latestInput: '最近输入',
+  },
+  datatable: {
+    tableSetting: '表格设置',
+    ensure: '确认',
+    cancel: '取消',
+    compact: '紧凑',
+    standard: '标准',
+    loose: '宽松',
+    divideLine: '行分割线',
+    striped: '斑马纹填充',
+    tableShadow: '表格阴影',
+    styles: '外观',
+    colSelected: '已选列',
+    colCanSelect: '可选列',
   },
   datePicker: {
     today: '今天',
@@ -60,11 +75,14 @@ export default {
       '12月'
     ],
     getYearMonthStr(year, month) {
-      return `${year}年${month}月`;
+      return `${year}年 ${month}月`;
     },
     hour: '时',
     min: '分',
-    second: '秒'
+    second: '秒',
+    yearDisplay(year) {
+      return `${year}年`;
+    },
   },
   form: {
     required(val): string {
@@ -160,6 +178,9 @@ export default {
     getBeyondMaximalFileSizeMsg(filename, maximalSize) {
       return `最大支持上传${maximalSize}MB的文件, 您上传的文件"${filename}"超过可上传文件大小`;
     },
+    getBeyondMaximumFileCountMsg(maximalSize) {
+      return `最大支持上传${maximalSize}个文件, 您上传的文件数量超过最大限制`;
+    },
     getAllFilesBeyondMaximalFileSizeMsg(maximalSize) {
       return `最大支持上传${maximalSize}MB的文件, 您本次上传的所有文件超过可上传文件大小`;
     },
@@ -191,6 +212,8 @@ export default {
     originScale: '原始比例',
     pre: '上一张',
     next: '下一张',
+    origin: '查看原图',
+    download: '下载'
   },
   colorPicker: {
     recentlyUsed: '最近使用',
@@ -231,16 +254,25 @@ export default {
     yearsLater(num: number) {
       return num === 1 ? '明年' : `${num}年后`;
     },
-    hoursAgo: '小时前',
-    minutesAgo: '分钟前',
+    hoursAgo(num: number) {
+      return `${num}小时前`;
+    },
+    minutesAgo(num: number) {
+      return `${num}分钟前`;
+    },
+    minutesLater(num: number) {
+      return `${num}分钟后`;
+    },
+    hoursLater(num: number) {
+      return `${num}小时后`;
+    },
     justnow: '刚刚',
-    later: '稍后',
-    minutesLater: '分钟后',
-    hoursLater: '小时后',
+    later: '稍后'
   },
   tagsInput: {
     tagsReachMaxLength: '您输入的标签已达到最大长度限制',
     tagsReachMaxNumber: '已达到最大个数：',
+    create: '生成'
   },
   categorySearch: {
     confirm: '确定',

@@ -16,12 +16,13 @@ export interface IModalOptions {
   injector?: Injector;
   onClose?: Function;
   beforeHidden?: () => boolean | Promise<boolean> | Observable<boolean>;
-  placement?: 'center' | 'top' | 'bottom';
+  placement?: 'center' | 'top' | 'bottom' | 'unset';
   offsetX?: string;
   offsetY?: string;
   bodyScrollable?: boolean;
   contentTemplate?: TemplateRef<any>;
   escapable?: boolean;
+  cssClass?: string;
 }
 
 export interface IDialogOptions {
@@ -49,11 +50,13 @@ export interface IDialogOptions {
   componentFactoryResolver?: ComponentFactoryResolver;
   injector?: Injector;
   onClose?: Function;
+  onMaximize?: Function;
   beforeHidden?: () => boolean | Promise<boolean> | Observable<boolean>;
   dialogtype?: string;
   draggable?: boolean;
+  showMaximizeBtn?: boolean;
   showCloseBtn?: boolean;
-  placement?: 'center' | 'top' | 'bottom';
+  placement?: 'center' | 'top' | 'bottom' | 'unset';
   offsetX?: string;
   offsetY?: string;
   bodyScrollable?: boolean;

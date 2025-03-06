@@ -1,12 +1,25 @@
+<h4>Selected Value List</h4>
 <d-editable-select
-  [appendToBody]="true"
-  [appendToBodyDirections]="['leftDown', 'leftUp']"
+  placeholder="Search"
   [source]="languages"
   [maxHeight]="300"
-  [(ngModel)]="selectItem1"
-  (toggleChange)="toggleChange($event)"
-  name="multiple-auto"
-  placeholder="Search"
+  [allowClear]="true"
+  [enableSelectedValueList]="true"
+  [(ngModel)]="associationListLang"
 >
 </d-editable-select>
-<pre>{{ (selectItem1 | json) || 'No language select!' }}</pre>
+<pre>Selected Language: {{ associationListLang || '--' }}</pre>
+<h4>Full List</h4>
+<d-editable-select
+  placeholder="Search"
+  [source]="languages"
+  [maxHeight]="300"
+  [allowClear]="true"
+  [appendToBody]="true"
+  [appendToBodyDirections]="['leftDown', 'leftUp']"
+  [(ngModel)]="fullListLang"
+  (selectItem)="selectItem($event)"
+  (toggleChange)="toggleChange($event)"
+>
+</d-editable-select>
+<pre>Selected Language: {{ fullListLang || '--' }}</pre>

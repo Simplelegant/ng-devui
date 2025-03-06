@@ -1,5 +1,5 @@
 <div class="devui-nav-container devui-nav-{{ size }}">
-  <div *ngIf="scrollMode" class="devui-nav-scroll-ctrl">
+  <div *ngIf="scrollModeToggle" class="devui-nav-scroll-ctrl">
     <span [ngClass]="{ disable: offsetIndex === 0 }" (click)="scroll('prev')">
       <svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -13,43 +13,37 @@
   </div>
   <div
     #tabsViewport
-    [style.width]="type === 'tabs' ? '100%' : ''"
-    [ngClass]="{ 'dev-nav-scroll-container': scrollMode, 'devui-nav-shadow': isShowShadow }"
+    [style.width]="type === 'tabs' || type === 'wrapped' ? '100%' : ''"
+    [ngClass]="{ 'dev-nav-scroll-container': scrollModeToggle, 'devui-nav-shadow': isShowShadow }"
   >
     <ul
       #tabsEle
-      role="tablist"
-      class="devui-nav devui-nav-{{ type }}"
+      class="devui-nav {{ cssClass }} {{ tabs.length ? 'devui-nav-' + type : '' }}"
       [id]="id"
       [ngClass]="{
+        'devui-nav-stacked': vertical,
         'devui-nav-add-button': addable,
-        'devui-nav-overflow': scrollMode
+        'devui-nav-overflow': scrollModeToggle || scrollMode
       }"
     >
       <ng-container *ngFor="let tab of tabs">
         <li
-          role="presentation"
           class="devui-nav-tab-item"
           [id]="tab.id === undefined ? '' : tab.id"
           [class.disabled]="tab.disabled"
           [class.active]="tab.id == activeTab"
+          [class.closeable]="tab | dTabCloseablePipe : closeable : closeableIds"
           (click)="select(tab.id)"
         >
-          <a
-            role="tab"
-            data-toggle="tab"
-            [attr.aria-expanded]="tab.id == activeTab"
-            [style.width]="customWidth"
-            [ngClass]="{ 'custom-width': customWidth }"
-          >
+          <a [attr.aria-expanded]="tab.id == activeTab" [style.width]="customWidth" [ngClass]="{ 'custom-width': customWidth }">
             <ng-template
               *ngIf="!tab.title"
               [ngTemplateOutlet]="tab.titleTpl?.templateRef"
-              [ngTemplateOutletContext]="{ tab: tab }"
+              [ngTemplateOutletContext]="{ tab: tab, position: 'tab' }"
             ></ng-template>
             <span *ngIf="tab.title">{{ tab.title }}</span>
           </a>
-          <span *ngIf="checkCloseable(tab)" class="devui-tab-close-icon" (click)="addOrDeleteTab($event, tab.id)">
+          <span *ngIf="tab.closeable" class="devui-tab-close-icon" (click)="addOrDeleteTab($event, tab.id)">
             <svg
               width="12px"
               height="12px"
@@ -68,7 +62,7 @@
           </span>
         </li>
       </ng-container>
-      <li *ngIf="addable && !addTabTpl; else addTabTpl" class="devui-tab-add-icon">
+      <li *ngIf="addable && !addTabTpl; else addTabTpl" class="devui-nav-tab-item devui-tab-add-icon">
         <a [style.width]="customWidth" (click)="addOrDeleteTab($event)">
           <svg
             width="16px"
@@ -84,10 +78,15 @@
           </svg>
         </a>
       </li>
-      <div class="devui-nav-{{ type }}-animation" [style.left]="offsetLeft + 'px'" [style.width]="offsetWidth + 'px'"></div>
+      <div
+        *ngIf="activeTab !== undefined"
+        class="devui-nav-{{ type }}-animation"
+        [style.left]="offsetLeft + 'px'"
+        [style.width]="offsetWidth + 'px'"
+      ></div>
     </ul>
   </div>
-  <div dDropDown appendToBody *ngIf="scrollMode" class="devui-nav-scroll-ctrl">
+  <div dDropDown appendToBody *ngIf="scrollModeToggle" class="devui-nav-scroll-ctrl">
     <span [ngClass]="{ disable: offsetIndex === tabs.length - 1 }" (click)="scroll('next')">
       <svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -116,12 +115,21 @@
         </g>
       </svg>
     </span>
-    <ul role="menu" dDropDownMenu class="devui-nav-dropdown devui-dropdown-menu devui-dropdown-overlay">
-      <li class="devui-dropdown-item" *ngFor="let tab of tabs; index as i" (click)="scroll(null, i, tab)">
+    <span *ngIf="scrollModeOperationTpl">
+      <ng-template [ngTemplateOutlet]="scrollModeOperationTpl"></ng-template>
+    </span>
+    <ul dDropDownMenu class="devui-nav-dropdown devui-dropdown-menu devui-dropdown-overlay">
+      <li
+        *ngFor="let tab of tabs; index as i"
+        class="devui-dropdown-item"
+        [class.disabled]="tab.disabled"
+        [class.active]="tab.id == activeTab"
+        (click)="tab.disabled ? $event.stopPropagation() : scroll(null, i, tab)"
+      >
         <ng-template
           *ngIf="!tab.title"
           [ngTemplateOutlet]="tab.titleTpl?.templateRef"
-          [ngTemplateOutletContext]="{ tab: tab }"
+          [ngTemplateOutletContext]="{ tab: tab, position: 'list' }"
         ></ng-template>
         <span *ngIf="tab.title">{{ tab.title }}</span>
       </li>
@@ -130,8 +138,18 @@
 </div>
 <div class="devui-tab-content" *ngIf="showContent">
   <ng-container *ngFor="let tab of tabs">
-    <div class="devui-tab-pane fade in" role="tabpanel" *ngIf="tab.id == activeTab" [ngClass]="{ 'in active': tab.id == activeTab }">
-      <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef || tab.innerContent"></ng-template>
-    </div>
+    <ng-template [ngTemplateOutlet]="isHidden ? hiddenTpl : destroyTpl" [ngTemplateOutletContext]="{ tab: tab }"> </ng-template>
   </ng-container>
 </div>
+
+<ng-template #destroyTpl let-tab="tab">
+  <div class="devui-tab-pane fade in" *ngIf="tab.id == activeTab" [ngClass]="{ 'in active': tab.id == activeTab }">
+    <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef || tab.innerContent"></ng-template>
+  </div>
+</ng-template>
+
+<ng-template #hiddenTpl let-tab="tab">
+  <div class="devui-tab-pane fade in" [hidden]="tab.id != activeTab" [ngClass]="{ 'in active': tab.id == activeTab }">
+    <ng-template [ngTemplateOutlet]="tab.contentTpl?.templateRef || tab.innerContent"></ng-template>
+  </div>
+</ng-template>

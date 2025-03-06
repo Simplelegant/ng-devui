@@ -5,6 +5,14 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'd-demo-basic',
   templateUrl: './tags.input-demo.component.html',
+  styles: [
+    `
+      :host ::ng-deep pre {
+        margin: 8px 0;
+        border: none;
+      }
+    `,
+  ],
 })
 export class TagsInputDemoComponent implements OnInit, OnDestroy {
   basicSource: Array<DevuiSourceData> = [
@@ -17,9 +25,9 @@ export class TagsInputDemoComponent implements OnInit, OnDestroy {
     { title: 'TS', language: 'typescript', code: require('./async/async.component.ts?raw') },
   ];
 
-  ngModelSource: Array<DevuiSourceData> = [
-    { title: 'HTML', language: 'xml', code: require('./ngmodel/ngmodel.component.html?raw') },
-    { title: 'TS', language: 'typescript', code: require('./ngmodel/ngmodel.component.ts?raw') },
+  customizeSource: Array<DevuiSourceData> = [
+    { title: 'HTML', language: 'xml', code: require('./customize/customize.component.html?raw') },
+    { title: 'TS', language: 'typescript', code: require('./customize/customize.component.ts?raw') },
   ];
 
   virtualScrollSource: Array<DevuiSourceData> = [
@@ -29,6 +37,7 @@ export class TagsInputDemoComponent implements OnInit, OnDestroy {
 
   navItems = [];
   subs: Subscription = new Subscription();
+
   constructor(private translate: TranslateService) {}
 
   ngOnInit() {
@@ -49,7 +58,7 @@ export class TagsInputDemoComponent implements OnInit, OnDestroy {
   setNavValues(values) {
     this.navItems = [
       { dAnchorLink: 'basic-usage', value: values['basic-usage'] },
-      { dAnchorLink: 'ng-model', value: values['ng-model'] },
+      { dAnchorLink: 'customize', value: values.customize },
       { dAnchorLink: 'async-input', value: values['async-input'] },
       { dAnchorLink: 'virtual-scroll', value: values['virtual-scroll'] },
     ];

@@ -19,6 +19,7 @@ export class TransferDemoComponent implements OnInit, OnDestroy {
   ];
   searchSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'html', code: require('./search/transfer-demo-search.component.html?raw') },
+    { title: 'SCSS', language: 'css', code: require('./search/transfer-demo-search.component.scss?raw') },
     { title: 'TS', language: 'typescript', code: require('./search/transfer-demo-search.component.ts?raw') },
   ];
   sortSource: Array<DevuiSourceData> = [

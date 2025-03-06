@@ -8,20 +8,16 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
       d-button {
         margin-right: 4px;
       }
-      :host ::ng-deep .devui-btn-success {
-        background: #3dcca6 !important;
-        color: #fff;
-      }
-      :host ::ng-deep .devui-btn-warning {
-        background: #fa9841 !important;
-        color: #fff;
-      }
     `,
   ],
 })
 export class BasicComponent {
   @ViewChild('customTemplate') customTemplate: TemplateRef<any>;
   msgs: Array<Object> = [];
+
+  get host() {
+    return window.location.origin;
+  }
 
   showToast(type: any) {
     switch (type) {

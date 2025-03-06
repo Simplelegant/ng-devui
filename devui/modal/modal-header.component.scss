@@ -15,6 +15,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: calc(100% - 24px);
   }
 
   &.no-title {
@@ -72,5 +73,11 @@
 .modal-header-close {
   position: absolute;
   right: 20px;
+  top: 18px;
+}
+
+.modal-header-maximized {
+  position: absolute;
+  right: 56px;
   top: 18px;
 }

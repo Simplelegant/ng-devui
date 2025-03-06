@@ -4,10 +4,7 @@ import { TabTitleDirective } from './tab-title.directive';
 
 @Component({
   selector: 'd-tab',
-  template: `<ng-template #innerContent>
-    <ng-content></ng-content>
-  </ng-template>
-  `,
+  template: `<ng-template #innerContent><ng-content></ng-content></ng-template>`,
   preserveWhitespaces: false,
 })
 export class TabComponent {
@@ -27,5 +24,7 @@ export class TabComponent {
    */
   @ContentChild(TabContentDirective) contentTpl: TabContentDirective;
   @ContentChild(TabTitleDirective) titleTpl: TabTitleDirective;
-  @ViewChild('innerContent', {static: true}) innerContent: TemplateRef<any>;
+  @ViewChild('innerContent', { static: true }) innerContent: TemplateRef<any>;
+  // 是否显示关闭按钮，由父层tabs控制
+  closeable: boolean;
 }

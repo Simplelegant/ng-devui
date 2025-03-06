@@ -6,6 +6,7 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
   Input,
   OnDestroy,
   OnInit,
@@ -15,6 +16,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
+import { DevConfigService, WithConfig } from 'ng-devui/utils';
 import { fromEvent, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 
@@ -34,9 +36,6 @@ import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
   ],
 })
 export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy, AfterViewInit {
-  constructor(private renderer: Renderer2, private i18n: I18nService, private cdr: ChangeDetectorRef, private el: ElementRef) {
-  }
-
   /**
    * 【可选】下拉选框尺寸
    */
@@ -53,6 +52,11 @@ export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy,
   @Input() iconPosition = 'right';
   @Input() noBorder = false;
   @Input() autoFocus = false;
+  @Input() @WithConfig() styleType = 'default';
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle () {
+    return this.showGlowStyle;
+  };
   @Output() searchFn = new EventEmitter<string>();
   @ViewChild('filterInput', { static: true }) filterInputElement: ElementRef;
   @ViewChild('line') lineElement: ElementRef;
@@ -64,6 +68,14 @@ export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy,
   destroy$ = new Subject();
   private onChange = (_: any) => null;
   private onTouch = () => null;
+
+  constructor(
+    private renderer: Renderer2,
+    private i18n: I18nService,
+    private cdr: ChangeDetectorRef,
+    private el: ElementRef,
+    private devConfigService: DevConfigService
+  ) {}
 
   ngOnInit() {
     this.setI18nText();
@@ -84,7 +96,8 @@ export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy,
 
   setI18nText() {
     this.i18nCommonText = this.i18n.getI18nText().common;
-    this.i18nSubscription = this.i18n.langChange()
+    this.i18nSubscription = this.i18n
+      .langChange()
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
         this.i18nCommonText = data.common;
@@ -122,7 +135,8 @@ export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy,
       .pipe(
         takeUntil(this.destroy$),
         map((e: any) => e.target.value),
-        debounceTime(this.delay))
+        debounceTime(this.delay)
+      )
       .subscribe((value) => {
         this.onChange(value);
         if (this.isKeyupSearch) {
@@ -130,13 +144,15 @@ export class SearchComponent implements ControlValueAccessor, OnInit, OnDestroy,
         }
       });
 
-    fromEvent(this.filterInputElement.nativeElement, 'keydown').pipe(
-      takeUntil(this.destroy$),
-      filter((keyEvent: KeyboardEvent) => keyEvent.key === 'Enter'),
-      debounceTime(this.delay),
-    ).subscribe((keyEvent) => {
-      this.searchFn.emit(this.filterInputElement.nativeElement.value);
-    });
+    fromEvent(this.filterInputElement.nativeElement, 'keydown')
+      .pipe(
+        takeUntil(this.destroy$),
+        filter((keyEvent: KeyboardEvent) => keyEvent.key === 'Enter'),
+        debounceTime(this.delay)
+      )
+      .subscribe((keyEvent) => {
+        this.searchFn.emit(this.filterInputElement.nativeElement.value);
+      });
   }
 
   ngAfterViewInit() {

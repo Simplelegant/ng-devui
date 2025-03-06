@@ -1,5 +1,7 @@
+import { ConnectedPosition } from '@angular/cdk/overlay';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -11,12 +13,12 @@ import {
   Output,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
 import { ToggleMenuContainerComponent, ToggleMenuListComponent, ToggleMenuSearchComponent } from 'ng-devui/toggle-menu';
-import { DevConfigService, WithConfig } from 'ng-devui/utils';
+import { AppendToBodyDirection, AppendToBodyScrollStrategyType, DevConfigService, WithConfig } from 'ng-devui/utils';
 import { isEmpty } from 'lodash-es';
 import { BehaviorSubject, fromEvent, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
@@ -61,9 +63,9 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
    */
   @Input() minLength = 3;
   /**
-   * 【可选】输入标签的最大长度
+   * 【可选】输入标签的最大长度, 524288为 input 支持最大值
    */
-  @Input() maxLength: number = Number.MAX_SAFE_INTEGER;
+  @Input() maxLength = 524288;
   /**
    * 【可选】标签的最小个数
    */
@@ -80,10 +82,16 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
    * 【可选】是否appendToBody
    */
   @Input() appendToBody = false;
+  @Input() appendToBodyDirections: Array<AppendToBodyDirection | ConnectedPosition> = ['rightDown', 'leftDown', 'rightUp', 'leftUp'];
+  @Input() @WithConfig() appendToBodyScrollStrategy: AppendToBodyScrollStrategyType;
   /**
    * 【可选】是否虚拟滚动
    */
   @Input() virtualScroll = false;
+  /**
+   * 【可选】是否使用下拉列表
+   */
+  @Input() showSuggestion = true;
   /**
    * 【可选】下拉选项
    */
@@ -100,17 +108,23 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
    * 【可选】已选中标签容器最大高度
    */
   @Input() maxHeight: string;
+  @Input() generateOptionFromInput = true;
   /**
    * 【可选】大小写敏感
    */
   @Input() caseSensitivity = false;
   @Input() itemTemplate: TemplateRef<any>;
+  @Input() tagTemplate: TemplateRef<any>;
+  @Input() noResultItemTemplate: TemplateRef<any>;
+  @Input() checkBeforeGenerate: (newTag: string) => boolean;
   @Input() checkBeforeAdd: (newTag: string) => boolean | Promise<boolean> | Observable<boolean>;
   @Input() @WithConfig() showAnimation = true;
+  @Input() @WithConfig() styleType = 'default';
   /**
    * 输出函数，当选中某个选项项后，将会调用此函数，参数为当前选择项的值。如果需要获取所有选择状态的值，请参考(ngModelChange)方法
    */
   @Output() valueChange = new EventEmitter<any>();
+  @Output() searchChange = new EventEmitter<any>();
   @ViewChild('tagsInputWrapper', { static: true }) tagsInputWrapperItem: ElementRef;
   @ViewChild(ToggleMenuContainerComponent) selectBoxContainer: ToggleMenuContainerComponent;
   @ViewChild(ToggleMenuListComponent) selectBox: ToggleMenuListComponent;
@@ -137,7 +151,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
   valueParser: (item: any) => any;
   searchFn: (term: string) => Observable<Array<{ id: string | number; option: any }>>;
 
-  private DEBONCE_TIME = 300;
+  private DEBOUNCE_TIME = 300;
   private sourceSubscription: BehaviorSubject<any>;
   private KEYS: any = {
     backspace: 8,
@@ -158,9 +172,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
   private onChange = (_: any) => null;
   private onTouch = () => null;
 
-  constructor(private i18n: I18nService, private devConfigService: DevConfigService) {
-    this.valueParser = (item) => (typeof item === 'object' ? item[this.displayProperty] || '' : String(item) ? item.toString() : '');
-  }
+  constructor(private i18n: I18nService, private devConfigService: DevConfigService, private cdr: ChangeDetectorRef) {}
 
   private setI18nText() {
     this.i18nCommonText = this.i18n.getI18nText().common;
@@ -190,18 +202,25 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
 
   ngOnInit() {
     this.setI18nText();
+    this.valueParser = (item) => {
+      const str = String(item) ? item.toString() : '';
+      const obj = typeof item === 'object' ? item[this.displayProperty] || '' : str;
+      return this.tagTemplate ? item : obj;
+    };
     this.newTag = '';
     this._suggestionList = [...this.suggestionList];
     this.searchFn = (term: any) => {
-      return of(
-        (this._suggestionList ? this._suggestionList : []).filter((item) =>
-          term === ''
-            ? true
-            : this.caseSensitivity
-              ? item[this.displayProperty].indexOf(term) !== -1
-              : item[this.displayProperty].toLowerCase().indexOf(term.toLowerCase()) !== -1
-        )
+      const data = this.showSuggestion && this._suggestionList ? this._suggestionList : [];
+      const matchItem = data.find((item) =>
+        this.caseSensitivity ? item[this.displayProperty] === term : item[this.displayProperty].toLowerCase() === term.toLowerCase()
       );
+      const result = data.filter((item) => {
+        const str = this.caseSensitivity
+          ? item[this.displayProperty].indexOf(term) !== -1
+          : item[this.displayProperty].toLowerCase().indexOf(term.toLowerCase()) !== -1;
+        return term === '' ? true : str;
+      });
+      return of(matchItem ? [matchItem] : result);
     };
     this.registerFilterChange();
   }
@@ -211,12 +230,12 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       const inputDom = this.searchBox.el.nativeElement.querySelector('input');
       // input失焦不冒泡，直接监听事件处理会早于list中点击事件传递到该组件，因此增加debounceTime待下拉列表关闭后判断是否插入标签
       this.blurEventSubscription = fromEvent(inputDom, 'blur')
-        .pipe(debounceTime(this.DEBONCE_TIME))
+        .pipe(debounceTime(this.DEBOUNCE_TIME))
         .subscribe(() => {
           if (this.isOpen) {
             return;
           }
-          if (!isEmpty(this.newTag)) {
+          if (this.generateOptionFromInput && !isEmpty(this.newTag)) {
             this.addTag();
           }
         });
@@ -260,6 +279,17 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       )
       .subscribe((options) => {
         this.availableOptions = options;
+        const flag = this.checkBeforeGenerate?.(this.newTag);
+        const flags = [this.generateOptionFromInput, !!this.newTag, this.newTagValid, flag];
+        if (!flags.includes(false)) {
+          const obj = { isDevuiTagsInputCreated: true };
+          obj[this.displayProperty] = this.newTag;
+          if (this.availableOptions.length && this.availableOptions[0].isDevuiTagsInputCreated) {
+            this.availableOptions[0] = obj;
+          } else {
+            this.availableOptions.unshift(obj);
+          }
+        }
         if (this.selectBoxContainer) {
           this.selectBoxContainer.updatePosition();
         }
@@ -267,6 +297,12 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
           this.selectBox.resetIndex(!options.length);
         }
       });
+  }
+
+  checkIsIncludes(option, item, isString?) {
+    const key = this.displayProperty;
+    const value = isString ? item : item[key];
+    return this.caseSensitivity ? option[key] === value : option[key].toLowerCase() === value.toLowerCase();
   }
 
   reduceSuggestionList() {
@@ -278,13 +314,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       this.isReduce = true;
       // 使用用户最初传入的数据来进行过滤
       this._suggestionList = this.suggestionList.filter((suggestion) => {
-        return (
-          this.selectedItems.findIndex(({ option }) =>
-            this.caseSensitivity
-              ? option[this.displayProperty] === suggestion[this.displayProperty]
-              : option[this.displayProperty].toLowerCase() === suggestion[this.displayProperty].toLowerCase()
-          ) === -1
-        );
+        return this.selectedItems.findIndex(({ option }) => this.checkIsIncludes(option, suggestion)) === -1;
       });
       if (this.sourceSubscription && this.searchFn) {
         this.sourceSubscription.next('');
@@ -297,7 +327,9 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       const dom = this.searchBox.el.nativeElement.querySelector('input');
       if (dom && this.selectBox) {
         dom.focus();
-        this.selectBox.resetIndex(false);
+        if (this.selectBox.availableOptions.length) {
+          this.selectBox.resetIndex(false);
+        }
       }
     }
   }
@@ -310,7 +342,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       // keydown.enter 和 keydown 都接收会重复处理
       // 点击会聚焦input，input失焦事件不会冒泡，单独处理
       break;
-    case 'keydown':{
+    case 'keydown': {
       const hotkeys = [this.KEYS.enter, this.KEYS.tab];
       if (this.isAddBySpace) {
         hotkeys.push(this.KEYS.space);
@@ -320,7 +352,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
         event.stopPropagation();
         if (this.selectBox?.selectIndex !== -1) {
           this.addSuggestionByIndex(this.selectBox.selectIndex, this.availableOptions[this.selectBox.selectIndex]);
-        } else {
+        } else if (this.generateOptionFromInput) {
           this.addTag();
         }
       }
@@ -336,11 +368,7 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       index < 0 ||
       index >= this.availableOptions.length ||
       this.maxTags <= this.selectedItems.length ||
-      this.selectedItems.findIndex(({ option }) =>
-        this.caseSensitivity
-          ? option[this.displayProperty] === value[this.displayProperty]
-          : option[this.displayProperty].toLowerCase() === value[this.displayProperty].toLowerCase()
-      ) !== -1
+      this.selectedItems.findIndex(({ option }) => this.checkIsIncludes(option, value)) !== -1
     ) {
       return;
     }
@@ -348,15 +376,16 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       if (!result) {
         return;
       }
-      this.checkMaxTags(this.availableOptions[index]);
+      const tag = this.availableOptions[index];
+      const isCreated = tag.isDevuiTagsInputCreated;
+      delete tag.isDevuiTagsInputCreated;
+      this.checkMaxTags(tag);
       this.onChange(this.selectedItems.map((tagItem) => tagItem.option));
-      this.valueChange.emit(this.availableOptions[index]);
-      const suggestionListIndex = this._suggestionList.findIndex((item) =>
-        this.caseSensitivity
-          ? item[this.displayProperty] === value[this.displayProperty]
-          : item[this.displayProperty].toLowerCase() === value[this.displayProperty].toLowerCase()
-      );
-      this._suggestionList.splice(suggestionListIndex, 1);
+      this.valueChange.emit(tag);
+      if (!isCreated) {
+        const suggestionListIndex = this._suggestionList.findIndex((item) => this.checkIsIncludes(item, value));
+        this._suggestionList.splice(suggestionListIndex, 1);
+      }
       this.delayResetNewTag();
       this.sourceSubscription.next('');
     });
@@ -371,9 +400,12 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       }
       // onPush下 数组长度变化不会触发变更检测
       this.availableOptions = [...this.availableOptions, this.selectedItems[index]?.option];
-      this._suggestionList = this.availableOptions;
+      this._suggestionList = [...this._suggestionList, this.selectedItems[index]?.option];
       const tag = this.selectedItems[index].option;
       this.selectedItems.splice(index, 1);
+      if (this.selectedItems.length === 0) {
+        this.selectBoxContainer.updatePosition();
+      }
       this.onChange(this.selectedItems.map((tagItem) => tagItem.option));
       this.valueChange.emit(tag);
     });
@@ -381,17 +413,12 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
 
   tagIsValid() {
     const tag = this.newTag;
-    const tmp = this.displayProperty;
     const result =
       tag &&
       tag.length >= this.minLength &&
       tag.length <= this.maxLength &&
-      this._suggestionList.findIndex((item) =>
-        this.caseSensitivity ? item[tmp] === tag : item[tmp].toLowerCase() === tag.toLowerCase()
-      ) === -1 &&
-      this.selectedItems.findIndex(({ option }) =>
-        this.caseSensitivity ? option[tmp] === tag : option[tmp].toLowerCase() === tag.toLowerCase()
-      ) === -1 &&
+      (this.showSuggestion ? this._suggestionList.findIndex((item) => this.checkIsIncludes(item, tag, true)) === -1 : true) &&
+      this.selectedItems.findIndex(({ option }) => this.checkIsIncludes(option, tag, true)) === -1 &&
       !this.isEmptyString(tag);
     this.newTagValid = tag === '' || !!result;
     return result;
@@ -421,8 +448,12 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
           this.newTagValid = false;
         }
       })
-      .finally(() => this.delayResetNewTag());
-    this.sourceSubscription.next('');
+      .finally(() => {
+        if (this.newTag && this.newTagValid) {
+          this.delayResetNewTag();
+          this.sourceSubscription.next('');
+        }
+      });
   }
 
   canAdd(value?) {
@@ -458,12 +489,14 @@ export class TagsInputComponent implements ControlValueAccessor, OnInit, OnDestr
       this.selectBox.selectIndex = -1;
     }
     this.newTag = (event || '').trim();
+    this.searchChange.emit(this.newTag);
     this.sourceSubscription.next(this.newTag);
   }
 
   toggleChangeFn(event) {
     if (!event) {
       this.onTouch();
+      this.cdr.detectChanges();
     }
     this.isOpen = event;
   }

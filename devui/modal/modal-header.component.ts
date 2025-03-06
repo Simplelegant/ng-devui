@@ -21,6 +21,10 @@ export class ModalHeaderComponent implements OnInit, OnDestroy {
   @Input() showCloseBtn: boolean;
   @Output() closeEvent: EventEmitter<any> = new EventEmitter<any>();
 
+  @Input() showMaximizeBtn = false;
+  @Output() maximizeEvent = new EventEmitter<boolean>();
+  maximized = false;
+
   i18nText: I18nInterface['modal'];
   i18nSubscription: Subscription;
 
@@ -46,5 +50,10 @@ export class ModalHeaderComponent implements OnInit, OnDestroy {
     if (this.i18nSubscription) {
       this.i18nSubscription.unsubscribe();
     }
+  }
+
+  maximize() {
+    this.maximized = !this.maximized;
+    this.maximizeEvent.emit(this.maximized);
   }
 }

@@ -3,7 +3,7 @@
   <div class="btn-group g-dropdown" dDropDown (toggleEvent)="onToggle($event)">
     <a dDropDownToggle [toggleOnFocus]="true" class="devui-dropdown-default devui-dropdown-origin">
       More
-      <span class="icon-select-arrow"></span>
+      <span class="icon-chevron-down-2"></span>
     </a>
 
     <ul dDropDownMenu class="devui-dropdown-menu" role="menu">
@@ -14,25 +14,25 @@
         </div>
       </li>
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Disabled Option</a>
+        <a dDropDownMenuItem class="disabled">Disabled Option</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">New</a>
+        <a dDropDownMenuItem>New</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Delete</a>
+        <a dDropDownMenuItem>Delete</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 1</a>
+        <a dDropDownMenuItem>Item 1</a>
       </li>
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Item 2</a>
+        <a dDropDownMenuItem class="disabled">Item 2</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 3</a>
+        <a dDropDownMenuItem>Item 3</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 4</a>
+        <a dDropDownMenuItem>Item 4</a>
       </li>
     </ul>
   </div>
@@ -44,7 +44,7 @@
   <div class="btn-group g-dropdown" dDropDown (toggleEvent)="onToggle($event)" *ngIf="showExample">
     <a dDropDownToggle [autoFocus]="true" [toggleOnFocus]="true" class="devui-dropdown-default devui-dropdown-origin">
       More
-      <span class="icon-select-arrow"></span>
+      <span class="icon-chevron-down-2"></span>
     </a>
 
     <ul dDropDownMenu class="devui-dropdown-menu devui-scrollbar" role="menu">
@@ -55,25 +55,25 @@
         </div>
       </li>
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Disabled Option</a>
+        <a dDropDownMenuItem class="disabled">Disabled Option</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">New</a>
+        <a dDropDownMenuItem>New</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Delete</a>
+        <a dDropDownMenuItem>Delete</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 1</a>
+        <a dDropDownMenuItem>Item 1</a>
       </li>
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Item 2</a>
+        <a dDropDownMenuItem class="disabled">Item 2</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 3</a>
+        <a dDropDownMenuItem>Item 3</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Item 4</a>
+        <a dDropDownMenuItem>Item 4</a>
       </li>
     </ul>
   </div>

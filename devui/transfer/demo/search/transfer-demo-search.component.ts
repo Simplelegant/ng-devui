@@ -3,7 +3,8 @@ import { TransferDirection } from 'ng-devui';
 
 @Component({
   selector: 'd-transfer-demo-search',
-  templateUrl: './transfer-demo-search.component.html'
+  templateUrl: './transfer-demo-search.component.html',
+  styleUrls: ['./transfer-demo-search.component.scss']
 })
 export class TransferDemoSearchComponent {
   disabled = false;
@@ -55,7 +56,7 @@ export class TransferDemoSearchComponent {
     { name: 'Option22', value: 3, id: 22, checked: false }
   ];
   sourceOptionCopy2 = [...this.sourceOption2];
-  targetOptionCopy2 = [];
+  targetOptionCopy2 = [...this.targetOption2];
 
   onChange(event) {
     this.disabled = event;
@@ -85,7 +86,7 @@ export class TransferDemoSearchComponent {
     this[`${TransferDirection[1 - event].toLocaleLowerCase()}OptionCopy2`] =
       this[`${TransferDirection[1 - event].toLocaleLowerCase()}OptionCopy2`].filter(item => !currentCheck.some(cur => cur.id === item.id));
 
-    currentCheck.map(item => {item.checked = false;});
+    currentCheck.forEach(item => {item.checked = false;});
     this[`${TransferDirection[event].toLocaleLowerCase()}Option2`] =
       this[`${TransferDirection[event].toLocaleLowerCase()}Option2`].concat(currentCheck);
     this[`${TransferDirection[event].toLocaleLowerCase()}OptionCopy2`] =

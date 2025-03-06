@@ -9,18 +9,24 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { BasicComponent } from './basic/basic.component';
 import { CustomComponent } from './custom/custom.component';
+import { HideComponent } from './hide/hide.component';
 import { TagsDemoComponent } from './tags-demo.component';
+import { TagsDesignComponent } from './tags-design.component';
 
 @NgModule({
   imports: [
+    TagsModule,
     TranslateModule,
     CommonModule,
-    TagsModule,
     DevUICodeboxModule,
     DevUIApiModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: TagsDesignComponent,
+      },
       { path: 'demo', component: TagsDemoComponent },
       {
         path: 'api',
@@ -33,7 +39,6 @@ import { TagsDemoComponent } from './tags-demo.component';
     ]),
   ],
   exports: [TagsDemoComponent],
-  declarations: [TagsDemoComponent, BasicComponent, CustomComponent],
-
+  declarations: [TagsDemoComponent, TagsDesignComponent, BasicComponent, CustomComponent, HideComponent],
 })
 export class TagsDemoModule {}

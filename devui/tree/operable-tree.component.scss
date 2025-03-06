@@ -65,6 +65,7 @@
 
 .devui-drop-inner {
   color: $devui-brand;
+  background-color: $devui-blue-5;
 }
 
 .toggle-disabled {
@@ -89,12 +90,29 @@
   cursor: not-allowed !important;
 }
 
-.tree-node-highlight {
+.devui-tree-node-highlight {
   color: $devui-brand;
   font-weight: bold;
+}
+
+.devui-tree-icons-container {
+  display: inline-flex;
+
+  &.align-end {
+    margin-left: auto;
+  }
 }
 
 :host ::ng-deep .devui-tree-node__title d-highlight .devui-match-highlight {
   color: $devui-brand;
   font-weight: bold;
+}
+
+::ng-deep .devui-tree-drag-ghost-container {
+  position: fixed;
+  left: -10000px;
+  top: -10000px;
+  width: 100%;
+  height: auto;
+  background: transparent;
 }

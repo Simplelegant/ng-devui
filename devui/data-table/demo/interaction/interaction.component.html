@@ -48,6 +48,7 @@
         [filterable]="true"
         [filterMultiple]="false"
         [filterList]="filterListRadio"
+        [filterBoxWidth]="'200px'"
         (filterChange)="filterChangeRadio($event)"
       >
         Gender
@@ -69,7 +70,6 @@
             dTooltip
             [content]="rowItem.$checkBoxTips"
             [position]="['top', 'right', 'bottom', 'left']"
-            [showAnimation]="false"
           >
           </d-checkbox>
         </td>
@@ -80,7 +80,7 @@
         </td>
         <td dTableCell>{{ rowItem?.lastName }}</td>
         <td dTableCell>{{ rowItem?.gender }}</td>
-        <td dTableCell>{{ rowItem?.dob | i18nDate: 'short':false }}</td>
+        <td dTableCell>{{ rowItem?.dob | i18nDate : 'short' : false }}</td>
         <td dTableCell>{{ rowItem?.description }}</td>
       </tr>
     </ng-template>

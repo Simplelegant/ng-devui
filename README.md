@@ -23,7 +23,7 @@ To see more in [devui.design](https://devui.design/home).
 
 ## Angular Support
 
-Now supports Angular <font color=red>`^13.0.0`</font>
+Now supports Angular <font color=red>`^18.0.0`</font>
 
 ## Getting Started
 
@@ -99,9 +99,13 @@ Modern browsers and Internet Explorer 11+.
 | --------- | --------- | --------- | --------- | --------- |
 | Edge| last 2 versions| last 2 versions| last 2 versions| last 2 versions
 
+## Partner project
+
+- [H5-Dooring - 让H5制作，更简单](http://h5.dooring.cn/)
+
 ## Who use it
 
-<p><a href="https://devcloud.huaweicloud.com/" target="_blank" rel="noopener noreferrer"><img alt="DevCloud Logo" src="devcloud-logo.png" width="150" style="max-width:100%;"></a></p>
+<p><a href="https://www.huaweicloud.com/devcloud/" target="_blank" rel="noopener noreferrer"><img alt="CodeArts Logo" src="CodeArts-logo.png" width="150" style="max-width:100%;"></a></p>
 
 ## LICENSE
 

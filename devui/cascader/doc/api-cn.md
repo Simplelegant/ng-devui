@@ -36,6 +36,9 @@ import { CascaderModule } from 'ng-devui/cascader';
 |  dropdownPanelClass  |                                     `string`                                     |                -                 |                        下拉面板的 class,用于用户选中某个面板                        | [基本用法](demo#basic-usage)       |
 |    showAnimation     |                                    `boolean`                                     |               true               |                                 可选，是否开启动画                                  |                                    | ✔          |
 |    appendToBody     |                                    `boolean`                                     |               true               |                                 可选，将下拉附着到body                                |                                   |
+|    hostTemplate     |                                     `templateRef<any>`                                     |               -               |                                 自定义下拉的宿主，暴露参数value，为当前选中的值                                |            [基本用法](demo#basic-usage)                       |
+|   showGlowStyle    |       `boolean`        |   true   |       可选，是否显示悬浮发光效果    |
+|   tagMaxWidth    |       `string`        |   '200px'   |       可选，多选模式开启显示路径时，每个选项tag的最大宽度    |
 
 ## d-cascader 事件
 

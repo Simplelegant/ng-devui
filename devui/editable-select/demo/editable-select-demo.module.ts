@@ -10,11 +10,14 @@ import { DevUIApiModule } from 'ng-devui/shared/devui-api/devui-api.module';
 import { DevUICodeboxModule } from 'ng-devui/shared/devui-codebox/devui-codebox.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
-import { AsyncDataWithFuncitionComponent } from './async-data-function/async-data-with-function.component';
+import { AsyncDataWithFunctionComponent } from './async-data-function/async-data-with-function.component';
 import { WithSourceComponent } from './basic/with-source.component';
+import { CustomAreaComponent } from './custom-area/custom-area.component';
 import { DisableDataWithSourceComponent } from './disable-data/disable-data-with-source.component';
 import { EditableSelectDemoComponent } from './editable-select-demo.component';
+import { EditableSelectDesignComponent } from './editable-select-design.component';
 import { LazyLoadComponent } from './lazy-load/lazy-load.component';
+import { ObjectSourceComponent } from './object/object-source.component';
 import { WithSearchFunctionComponent } from './search-function/with-search-function.component';
 
 @NgModule({
@@ -29,7 +32,11 @@ import { WithSearchFunctionComponent } from './search-function/with-search-funct
     ButtonModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: EditableSelectDesignComponent,
+      },
       { path: 'demo', component: EditableSelectDemoComponent },
       {
         path: 'api',
@@ -44,13 +51,15 @@ import { WithSearchFunctionComponent } from './search-function/with-search-funct
   exports: [EditableSelectDemoComponent],
   declarations: [
     EditableSelectDemoComponent,
-    AsyncDataWithFuncitionComponent,
+    EditableSelectDesignComponent,
+    AsyncDataWithFunctionComponent,
     DisableDataWithSourceComponent,
     WithSearchFunctionComponent,
     WithSourceComponent,
     LazyLoadComponent,
+    CustomAreaComponent,
+    ObjectSourceComponent,
   ],
   providers: [],
-
 })
 export class EditableSelectDemoModule {}

@@ -1,4 +1,5 @@
 import { TemplateRef } from '@angular/core';
+import { OperableTreeComponent } from 'ng-devui/tree';
 
 export type CategorySearchTagType = 'radio' | 'checkbox' | 'dateRange' | 'label' | 'textInput' | 'numberRange' | 'treeSelect' | 'keyword';
 
@@ -42,20 +43,100 @@ export interface ICategorySearchTagItem {
   /**
    * 用于显示的label类型中色值的键值，如未设置默认取color
    */
-  colorKey?: 'color';
+  colorKey?: string | 'color';
   /**
-   * 自定义下拉模板的展示内容
+   * 自定义下拉模板
    */
   customTemplate?: TemplateRef<any>;
+  /**
+   * 自定义已选标签内容模板
+   */
+  tagCustomTemplate?: TemplateRef<any>;
+  /**
+   * 当前分类选中后是否可以删除
+   */
+  deletable?: boolean;
   /**
    * 已选中值
    */
   value?: {
     label?: string;
-    value?: string | Array<ITagOption | number | string>;
-    cache?: string | Array<ITagOption | number | string>;
+    value?: string | ITagOption | Array<ITagOption | number | string | Date>;
+    cache?: string | ITagOption | Array<ITagOption | number | string | Date>;
     [propName: string]: any;
   };
+  /**
+   * checkbox | label 类型是否显示全选
+   */
+  showSelectAll?: boolean;
+  /**
+   * dateRange 类型是否显示时分秒
+   */
+  showTime?: boolean;
+  /**
+   * dateRange 类型默认激活开始或者结束日期
+   */
+  activeRangeType?: 'start' | 'end';
+  /**
+   * textInput | numberRange 类型设置最大长度，numberRange 需传入对象分别设置左右
+   */
+  maxLength?: number | { left?: number; right?: number };
+  /**
+   * textInput | numberRange 类型设置占位符，numberRange 需传入对象分别设置左右
+   */
+  placeholder?: string | { left?: string; right?: string };
+  /**
+   * numberRange 步进值，需传入对象分别设置左右
+   */
+  step?: { left?: number; right?: number };
+  /**
+   * numberRange 最大值，需传入对象分别设置左右
+   */
+  max?: { left?: number; right?: number };
+  /**
+   * numberRange 最小值，需传入对象分别设置左右
+   */
+  min?: { left?: number; right?: number };
+  /**
+   * numberRange 限制输入的正则或正则字符串，需传入对象分别设置左右
+   */
+  reg?: { left?: RegExp | string; right?: RegExp | string };
+  /**
+   * numberRange 限制小数点后的位数，需传入对象分别设置左右
+   */
+  decimalLimit?: { left?: number; right?: number };
+  /**
+   * numberRange 校验方法，点击确定时执行，返回 true 通过
+   */
+  validateFunc?: (start: number, end: number, tag: ICategorySearchTagItem) => boolean;
+  /**
+   * treeSelect 类型是否为多选，并显示已选择列表
+   */
+  multiple?: boolean;
+  /**
+   * treeSelect 类型是否显示搜索框
+   */
+  searchable?: boolean;
+  /**
+   * treeSelect 类型设置搜索框占位符
+   */
+  searchPlaceholder?: string;
+  /**
+   * treeSelect 类型自定义搜索方法，参数为搜索关键字和 d-operable-tree 组件实例
+   */
+  searchFn?: (value: string, treeInstance: OperableTreeComponent) => boolean | Array<any>;
+  /**
+   * treeSelect 类型相关配置，请参考treeSelect组件API中同名配置
+   */
+  checkableRelation?: 'upward' | 'downward' | 'both' | 'none';
+  treeNodeIdKey?: string;
+  treeNodeChildrenKey?: string;
+  treeNodeTitleKey?: string;
+  disabledKey?: string;
+  leafOnly?: boolean;
+  iconParentOpen?: string;
+  iconParentClose?: string;
+  iconLeaf?: string;
   [propName: string]: any;
 }
 
@@ -83,9 +164,37 @@ export interface SearchConfig {
   fieldDescription?: (label: string) => string;
   category?: boolean;
   categoryDescription?: string;
+  noCategoriesAvailableTip?: boolean;
+  searchInputMaxLength?: number;
 }
 
-export const ALLOWED_SEARCH_FIELD_TYPES = ['radio', 'checkbox', 'label'];
+export interface TextConfig {
+  keywordName?: string;
+  createFilter?: string;
+  filterTitle?: string;
+  labelConnector?: string;
+  noCategoriesAvailable?: string;
+}
+
+export interface ExtendedConfig {
+  show?: boolean;
+  clear?: {
+    show?: boolean;
+    disabled?: boolean;
+    template?: TemplateRef<any>;
+  };
+  save?: {
+    show?: boolean;
+    disabled?: boolean;
+    template?: TemplateRef<any>;
+  };
+  more?: {
+    show?: boolean;
+    disabled?: boolean;
+    template?: TemplateRef<any>;
+  };
+  customTemplate?: TemplateRef<any>;
+}
 
 export const COLORS = [
   '#f2f5fc',

@@ -7,6 +7,13 @@
       <d-with-source demo></d-with-source>
     </d-codebox>
   </div>
+  <div class="devui-demo-example" [dAnchor]="'object-source'">
+    <div class="devui-demo-title">{{ 'components.editable-select.objectDemo.title' | translate }}</div>
+    <div class="devui-demo-text">{{ 'components.editable-select.objectDemo.description' | translate }}</div>
+    <d-codebox [sourceData]="ObjectSource">
+      <d-object-source demo></d-object-source>
+    </d-codebox>
+  </div>
   <div class="devui-demo-example" [dAnchor]="'disable-data-with-source'">
     <div class="devui-demo-title">{{ 'components.editable-select.disableDataDemo.title' | translate }}</div>
     <div class="devui-demo-text">{{ 'components.editable-select.disableDataDemo.description' | translate }}</div>
@@ -33,6 +40,16 @@
     <div class="devui-demo-text">{{ 'components.editable-select.lazyLoadDemo.description' | translate }}</div>
     <d-codebox [sourceData]="LazyLoadComponentSource">
       <d-lazy-load demo></d-lazy-load>
+    </d-codebox>
+  </div>
+
+  <div class="devui-demo-example" [dAnchor]="'custom-area-usage'">
+    <div class="devui-demo-title">{{ 'components.editable-select.customAreaDemo.title' | translate }}</div>
+    <div class="devui-demo-text">
+      {{ 'components.editable-select.customAreaDemo.description' | translate }}
+    </div>
+    <d-codebox id="components-editable-select-custom-area" [sourceData]="customAreaSourceData">
+      <d-editable-select-custom-area demo></d-editable-select-custom-area>
     </d-codebox>
   </div>
 </div>

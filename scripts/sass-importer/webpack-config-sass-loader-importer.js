@@ -9,7 +9,7 @@ function getAngularCompilerTsConfigPath(config) {
   return undefined;
 }
 function webpackConfigSassImporterAlias(config) {
-  const tsconfigPath = getAngularCompilerTsConfigPath(config) || 'tsconfig.base.json';
+  const tsconfigPath = getAngularCompilerTsConfigPath(config) || 'tsconfig.json';
   [{
     ruleTest: /\.(?:sass)$/i,
     loaderName: 'sass-loader'
@@ -23,9 +23,17 @@ function webpackConfigSassImporterAlias(config) {
         var insertPosition = styleRule.rules[1].use.findIndex(loaderUse => loaderUse.loader === loaderName
           || loaderUse.loader === require.resolve(loaderName));
         if (insertPosition > -1) {
-          styleRule.rules[1].use[insertPosition].options.sassOptions.importer = [
-            getTsConfigAlias(tsconfigPath)
-          ];
+          styleRule.rules[1].use[insertPosition].options = {
+            sourceMap: true,
+            api: 'legacy',
+            sassOptions: {
+              importer: [
+                getTsConfigAlias(tsconfigPath)
+              ],
+              precision: 8,
+              outputStyle: 'expanded',
+            },
+          };
         }
 
       }

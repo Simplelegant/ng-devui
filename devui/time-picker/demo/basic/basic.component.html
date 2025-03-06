@@ -2,10 +2,10 @@
   <div class="row">
     <h5>basic</h5>
     <div class="col-md-6">
-      <div class="devui-input-group devui-dropdown-origin">
+      <div class="devui-input-group devui-dropdown-origin" dActiveFormControl>
         <input
           class="devui-input devui-form-control"
-          placeholder="y/MM/dd"
+          placeholder="y-MM-dd"
           autocomplete="off"
           dTimePicker
           [(ngModel)]="selectedTime1"
@@ -13,7 +13,7 @@
           #timePicker1="timePicker"
           (selectedTimeChange)="timeChange($event)"
           (ngModelChange)="modelChange($event)"
-          [timePickerWidth]="300"
+          [timePickerWidth]="250"
         />
         <div *ngIf="selectedTime1" class="devui-input-group-addon close-icon-wrapper" (click)="timePicker1.clearAll()">
           <i class="icon icon-close"></i>
@@ -27,10 +27,10 @@
   <div class="row">
     <h5>default open</h5>
     <div class="col-md-6">
-      <div class="devui-input-group devui-dropdown-origin">
+      <div class="devui-input-group devui-dropdown-origin" dActiveFormControl>
         <input
           class="devui-input devui-form-control"
-          placeholder="y/MM/dd"
+          placeholder="y-MM-dd"
           autocomplete="off"
           dTimePicker
           [(ngModel)]="selectedTime2"
@@ -55,7 +55,7 @@
       <div class="devui-input-group devui-dropdown-origin devui-disabled">
         <input
           class="devui-input devui-form-control"
-          placeholder="y/MM/dd"
+          placeholder="y-MM-dd"
           autocomplete="off"
           dTimePicker
           [(ngModel)]="selectedTime3"

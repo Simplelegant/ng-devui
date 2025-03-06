@@ -4,6 +4,18 @@ body {
   background: $devui-base-bg;
 }
 
+body[ui-theme='galaxy-theme'] {
+  .devui-component-icon {
+    background-color: rgba(26, 26, 28, 0.6);
+  }
+}
+
+body[ui-theme='galaxy-theme'] {
+  .devui-nav-slider {
+    background-color: rgba(26, 26, 28, 0.6) !important;
+  }
+}
+
 @mixin font-content() {
   font-size: $devui-font-size;
   font-weight: $devui-font-content-weight;
@@ -432,7 +444,7 @@ body {
 .devui-demo-example.active.anchor-active-by-anchor-link,
 .devui-demo-example.active.anchor-active-by-fragment {
   animation: hightlight-and-disapear 1 3s linear;
-  outline-offset: 8px;
+  outline-offset: 4px;
 }
 
 @keyframes hightlight-and-disapear {

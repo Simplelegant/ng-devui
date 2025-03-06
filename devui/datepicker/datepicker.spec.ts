@@ -1,5 +1,5 @@
 import { Component, DebugElement, ElementRef, TemplateRef, ViewChild } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -215,14 +215,17 @@ describe('datePicker', () => {
 
         closeDatePicker(fixture);
         expect(datePicker.style.display).toBe('none');
+        flush();
       }));
 
       it('should ngModel works, should change year and month works', fakeAsync(() => {
         testNgModelAndYearMonth(fixture, debugEl.nativeElement, component);
+        flush();
       }));
 
       it('should @Input works', fakeAsync(() => {
         testInputParam(fixture, debugEl.nativeElement, component);
+        flush();
       }));
     });
 
@@ -253,10 +256,12 @@ describe('datePicker', () => {
           expect(datePicker.style.bottom).not.toBe('none');
 
           closeDatePicker(fixture);
+          flush();
         }));
 
         it('should showTime works', fakeAsync(() => {
           testTimePicker(fixture, debugEl.nativeElement, component);
+          flush();
         }));
       });
 
@@ -279,6 +284,7 @@ describe('datePicker', () => {
 
         it('should dateConfig works', fakeAsync(() => {
           testDateConfig(fixture, debugEl.nativeElement, component);
+          flush();
         }));
       });
 
@@ -297,6 +303,7 @@ describe('datePicker', () => {
           fixture.detectChanges();
           expect(document.querySelector('.devui-time')).toBeFalsy();
           closeDatePicker(fixture);
+          flush();
         }));
       });
     });
@@ -346,14 +353,17 @@ describe('datePicker', () => {
         closeDatePicker(fixture);
         datePicker = document.querySelector('d-datepicker');
         expect(datePicker).toBeFalsy();
+        flush();
       }));
 
       it('should ngModel works, should change year and month works', fakeAsync(() => {
         testNgModelAndYearMonth(fixture, document, component);
+        flush();
       }));
 
       it('should @Input works', fakeAsync(() => {
         testInputParam(fixture, document, component);
+        flush();
       }));
     });
 
@@ -380,10 +390,12 @@ describe('datePicker', () => {
           expect(datePicker).toBeTruthy();
 
           closeDatePicker(fixture);
+          flush();
         }));
 
         it('should showTime works', fakeAsync(() => {
           testTimePicker(fixture, document, component);
+          flush();
         }));
       });
 
@@ -406,6 +418,7 @@ describe('datePicker', () => {
 
         it('should dateConfig works', fakeAsync(() => {
           testDateConfig(fixture, document, component);
+          flush();
         }));
       });
 
@@ -424,6 +437,7 @@ describe('datePicker', () => {
           fixture.detectChanges();
           expect(document.querySelector('.devui-time')).toBeFalsy();
           closeDatePicker(fixture);
+          flush();
         }));
       });
     });
@@ -462,6 +476,7 @@ describe('datePicker', () => {
           '.time-picker-view'
         ];
         expect(domHelper.judgeAppendToBodyStyleClasses(classList)).toBeTruthy();
+        flush();
       }));
 
       it('should @Input param works', fakeAsync(() => {
@@ -488,7 +503,7 @@ describe('datePicker', () => {
         nextMonthIndex = (nowMonthIndex + 1) % 12;
 
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(nowYear);
+        expect(yearEl.innerText.trim()).toBe(nowYear);
 
         component.customViewTemplate = component.myCustomView;
         fixture.detectChanges();
@@ -503,26 +518,27 @@ describe('datePicker', () => {
         const singleLeftEl = debugEl.queryAll(By.css('.devui-btn-link'))[1].nativeElement;
         const singleRightEl = debugEl.queryAll(By.css('.devui-btn-link'))[2].nativeElement;
         const doubleRightEl = debugEl.queryAll(By.css('.devui-btn-link'))[3].nativeElement;
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nowMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nowMonthIndex]);
         singleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).not.toBe(monthTextList[lastMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).not.toBe(monthTextList[lastMonthIndex]);
         singleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nowMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nowMonthIndex]);
         singleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).not.toBe(monthTextList[nextMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).not.toBe(monthTextList[nextMonthIndex]);
 
         doubleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).not.toBe(lastYear);
+        expect(yearEl.innerText.trim()).not.toBe(lastYear);
         doubleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(nowYear);
+        expect(yearEl.innerText.trim()).toBe(nowYear);
         doubleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).not.toBe(nextYear);
+        expect(yearEl.innerText.trim()).not.toBe(nextYear);
+        flush();
       }));
 
       describe('test selectedDate bigger than max or smaller than min', () => {
@@ -535,7 +551,8 @@ describe('datePicker', () => {
           fixture.detectChanges();
           expect(
             debugEl.query(By.css('.devui-day.active')).query(By.css('.devui-calendar-date')
-            ).nativeElement.innerText).toBe((String(now.getDate())).padStart(2, '0'));
+            ).nativeElement.innerText.trim()).toBe((String(now.getDate())).padStart(2, '0'));
+          flush();
         }));
 
         it('test selectedDate smaller than min', fakeAsync(() => {
@@ -545,7 +562,8 @@ describe('datePicker', () => {
           fixture.detectChanges();
           expect(
             debugEl.query(By.css('.devui-day.active')).query(By.css('.devui-calendar-date')
-            ).nativeElement.innerText).toBe((String(now.getDate())).padStart(2, '0'));
+            ).nativeElement.innerText.trim()).toBe((String(now.getDate())).padStart(2, '0'));
+          flush();
         }));
       });
 
@@ -576,33 +594,33 @@ describe('datePicker', () => {
         const singleLeftEl = debugEl.queryAll(By.css('.devui-btn-link'))[1].nativeElement;
         const singleRightEl = debugEl.queryAll(By.css('.devui-btn-link'))[2].nativeElement;
         const doubleRightEl = debugEl.queryAll(By.css('.devui-btn-link'))[3].nativeElement;
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nowMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nowMonthIndex]);
         singleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[lastMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[lastMonthIndex]);
         singleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nowMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nowMonthIndex]);
         singleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nextMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nextMonthIndex]);
         singleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText).toBe(monthTextList[nowMonthIndex]);
+        expect(debugEl.queryAll(By.css('.devui-date-title'))[1].nativeElement.innerText.trim()).toBe(monthTextList[nowMonthIndex]);
 
-        expect(yearEl.innerText).toBe(nowYear);
+        expect(yearEl.innerText.trim()).toBe(nowYear);
         doubleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(lastYear);
+        expect(yearEl.innerText.trim()).toBe(lastYear);
         doubleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(nowYear);
+        expect(yearEl.innerText.trim()).toBe(nowYear);
         doubleRightEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(nextYear);
+        expect(yearEl.innerText.trim()).toBe(nextYear);
         doubleLeftEl.dispatchEvent(new Event('click'));
         fixture.detectChanges();
-        expect(yearEl.innerText).toBe(nowYear);
+        expect(yearEl.innerText.trim()).toBe(nowYear);
 
         expect(debugEl.query(By.css('.devui-yearOption')).styles.display).toBe('none');
         yearEl.dispatchEvent(new Event('click'));
@@ -620,6 +638,7 @@ describe('datePicker', () => {
         document.dispatchEvent(new Event('click'));
         fixture.detectChanges();
         expect(debugEl.query(By.css('.devui-yearOption')).styles.display).toBe('none');
+        flush();
       }));
     });
 
@@ -644,6 +663,7 @@ describe('datePicker', () => {
         it('should not wrong dateConfig works', fakeAsync(() => {
           fixture.detectChanges();
           expect(debugEl.query(By.css('.devui-time'))).toBeFalsy();
+          flush();
         }));
 
         it('test click disabled year', fakeAsync(() => {
@@ -661,7 +681,7 @@ describe('datePicker', () => {
           fixture.detectChanges();
           doubleRightEl.dispatchEvent(new Event('click'));
           fixture.detectChanges();
-          expect(yearEl.innerText).toBe(nowYear);
+          expect(yearEl.innerText.trim()).toBe(nowYear);
           debugEl.query(By.css('.devui-yearOption')).query(By.css('.disabled')).nativeElement.dispatchEvent(new Event('click'));
           expect(debugEl.query(By.css('.devui-yearOption')).styles.display).toBe('block');
           document.dispatchEvent(new Event('click'));
@@ -708,6 +728,7 @@ describe('datePicker', () => {
             document.dispatchEvent(new Event('click'));
             fixture.detectChanges();
             expect(debugEl.query(By.css('.devui-yearOption')).styles.display).toBe('none');
+            flush();
           }));
         });
 
@@ -733,6 +754,7 @@ describe('datePicker', () => {
             document.dispatchEvent(new Event('click'));
             fixture.detectChanges();
             expect(debugEl.query(By.css('.devui-yearOption')).styles.display).toBe('none');
+            flush();
           }));
         });
       });

@@ -11,13 +11,14 @@
     <div
       #selectHost
       class="devui-select-input devui-form-control devui-tree-select-input devui-dropdown-origin"
+      [class.devui-gray-style]="styleType === 'gray'"
       (click)="toggle()"
       autocomplete="off"
       [ngClass]="{ disabled: disabled, 'devui-select-no-label': !enableLabelization }"
       readonly
       popper-activator
     >
-      {{ !valueType ? placeholder : '' }}
+      <span class="devui-tree-select-placeholder">{{ !valueType ? placeholder : '' }}</span>
       <div class="devui-select-item" *ngIf="valueType === 'object' && enableLabelization && !customItemTemplate">
         <span class="devui-select-item-content">{{ value[treeNodeTitleKey] }}</span>
         <span *ngIf="!disabled" class="devui-select-item-clear-icon" (click)="clearValue($event, value)">
@@ -81,28 +82,7 @@
       </ul>
     </div>
     <div popper-prepend class="devui-tree-select devui-search-container devui-form-group devui-has-feedback" *ngIf="searchable">
-      <input class="devui-input devui-search-in-dropdown" [(ngModel)]="searchString" #searchInputModel="ngModel" #searchInput />
-      <span class="devui-form-control-feedback">
-        <svg
-          width="14px"
-          height="14px"
-          viewBox="0 0 14 14"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          class="svg-icon-search"
-          style="vertical-align: middle"
-        >
-          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-            <g transform="translate(-1.000000, -1.000000)">
-              <path
-                d="M7.30811922,1 C10.7919973,1 13.6162384,3.82424117 13.6162384,7.30811922 C13.6162384,8.72507634 13.149053,10.0329164 12.3603151,11.0860065 L14.7360564,13.4616238 C15.0879812,13.8135487 15.0879812,14.3841316 14.7360564,14.7360564 C14.3841316,15.0879812 13.8135487,15.0879812 13.4616238,14.7360564 L11.0860065,12.3603151 C10.0329164,13.149053 8.72507634,13.6162384 7.30811922,13.6162384 C3.82424117,13.6162384 1,10.7919973 1,7.30811922 C1,3.82424117 3.82424117,1 7.30811922,1 Z M7.31,2.51 C4.6590332,2.51 2.51,4.6590332 2.51,7.31 C2.51,9.9609668 4.6590332,12.11 7.31,12.11 C9.9609668,12.11 12.11,9.9609668 12.11,7.31 C12.11,4.6590332 9.9609668,2.51 7.31,2.51 Z"
-                fill-rule="nonzero"
-              ></path>
-            </g>
-          </g>
-        </svg>
-      </span>
+      <d-search #searchInputModel="ngModel" #searchInput [(ngModel)]="searchString" [placeholder]="searchPlaceholder"></d-search>
     </div>
     <div
       class="devui-tree-select devui-options-container"
@@ -143,12 +123,11 @@
           </ng-template>
         </ng-template>
       </d-operable-tree>
-      <div *ngIf="!treeData || treeData.length <= 0" class="devui-no-data-tip">
-        {{ i18nCommonText?.noData }}
-      </div>
-      <div *ngIf="noRecord" class="devui-no-data-tip">
-        {{ i18nCommonText?.noRecordsFound }}
-      </div>
+      <ng-template
+        *ngIf="!treeData || treeData.length <= 0 || noRecord"
+        [ngTemplateOutlet]="customNoDataTemplate || defaultNoResult"
+        [ngTemplateOutletContext]="{ $implicit: this, isSearchResult: noRecord }"
+      ></ng-template>
     </div>
 
     <!-- 自定义区域 -->
@@ -166,8 +145,8 @@
     [ngClass]="{ disabled: disabled, 'allow-clear': allowClear, 'devui-select-chevron-icon-animation': showAnimation }"
   >
     <svg
-      width="14px"
-      height="14px"
+      width="16px"
+      height="16px"
       viewBox="0 0 16 16"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -175,10 +154,15 @@
     >
       <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <path
-          d="M12.1464466,6.85355339 L8.35355339,10.6464466 C8.15829124,10.8417088 7.84170876,10.8417088 7.64644661,10.6464466 L3.85355339,6.85355339 C3.65829124,6.65829124 3.65829124,6.34170876 3.85355339,6.14644661 C3.94732158,6.05267842 4.07449854,6 4.20710678,6 L11.7928932,6 C12.0690356,6 12.2928932,6.22385763 12.2928932,6.5 C12.2928932,6.63260824 12.2402148,6.7597852 12.1464466,6.85355339 Z"
-          fill-rule="nonzero"
+          d="M3.64644661,5.64644661 C3.82001296,5.47288026 4.08943736,5.45359511 4.2843055,5.58859116 L4.35355339,5.64644661 L8,9.293 L11.6464466,5.64644661 C11.820013,5.47288026 12.0894374,5.45359511 12.2843055,5.58859116 L12.3535534,5.64644661 C12.5271197,5.82001296 12.5464049,6.08943736 12.4114088,6.2843055 L12.3535534,6.35355339 L8.35355339,10.3535534 C8.17998704,10.5271197 7.91056264,10.5464049 7.7156945,10.4114088 L7.64644661,10.3535534 L3.64644661,6.35355339 C3.45118446,6.15829124 3.45118446,5.84170876 3.64644661,5.64644661 Z"
         ></path>
       </g>
     </svg>
   </span>
 </div>
+
+<ng-template #defaultNoResult>
+  <div class="devui-no-data-tip">
+    {{ noRecord ? i18nCommonText?.noRecordsFound : i18nCommonText?.noData }}
+  </div>
+</ng-template>

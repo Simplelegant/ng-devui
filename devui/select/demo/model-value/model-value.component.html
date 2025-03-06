@@ -5,6 +5,7 @@
         [options]="options"
         [isSearch]="true"
         [filterKey]="'name'"
+        [appendToBody]="true"
         [ngModel]="currentOption | parseFrom: 'value':options"
         (ngModelChange)="modelChange($event)"
         [placeholder]="'Search'"

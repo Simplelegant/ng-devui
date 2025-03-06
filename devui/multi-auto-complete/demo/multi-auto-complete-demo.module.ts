@@ -14,6 +14,7 @@ import { MultiAutoCompleteDemoArrayComponent } from './array/multi-auto-complete
 import { MultiAutoCompleteDemoDefaultComponent } from './default/multi-auto-complete-demo-default.component';
 import { MultiAutoCompleteDemoDisabledComponent } from './disabled/multi-auto-complete-demo-disabled.component';
 import { MultiAutoCompleteDemoComponent } from './multi-auto-complete-demo.component';
+import { MultiAutoCompleteDesignComponent } from './multi-auto-complete-design.component';
 
 @NgModule({
   imports: [
@@ -27,7 +28,11 @@ import { MultiAutoCompleteDemoComponent } from './multi-auto-complete-demo.compo
     DevUICodeboxModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: MultiAutoCompleteDesignComponent,
+      },
       { path: 'demo', component: MultiAutoCompleteDemoComponent },
       {
         path: 'api',
@@ -42,6 +47,7 @@ import { MultiAutoCompleteDemoComponent } from './multi-auto-complete-demo.compo
   exports: [MultiAutoCompleteDemoComponent],
   declarations: [
     MultiAutoCompleteDemoComponent,
+    MultiAutoCompleteDesignComponent,
     MultiAutoCompleteDemoDefaultComponent,
     MultiAutoCompleteDemoArrayComponent,
     MultiAutoCompleteDemoDisabledComponent,

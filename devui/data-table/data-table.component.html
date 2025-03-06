@@ -1,12 +1,21 @@
 <div class="devui-data-table {{ cssClass }}">
-  <div class="devui-table-view {{ containFixHeaderHeight ? 'contain-fix-height' : '' }}" #tableView>
+  <div
+    class="devui-table-view {{ containFixHeaderHeight ? 'contain-fix-height' : '' }}"
+    [ngClass]="{
+      'has-width-scroll': hasWidthScroll,
+      'has-height-scroll': hasHeightScroll
+    }"
+    #tableView
+  >
     <div
       *ngIf="fixHeader"
       #fixHeaderContainerRef
-      class="table-wrap"
-      [style.overflow-x]="'hidden'"
-      [style.scrollbar-width]="'none'"
-      [style.overflow-y]="tableOverflowType === 'overlay' ? 'overlay' : 'scroll'"
+      class="table-wrap devui-fix-header"
+      [ngClass]="{
+        'shadow-fix-header': headerBg
+      }"
+      [style.overflow-x]="dataSource?.length ? 'hidden' : 'auto'"
+      [style.overflow-y]="dataSource?.length ? 'scroll' : 'hidden'"
       [style.max-height]="maxHeight ? maxHeight : null"
       [style.max-width]="maxWidth ? maxWidth : null"
       [style.width]="!maxWidth ? tableWidth : null"
@@ -34,12 +43,11 @@
       (loadMore)="onLoadMore($event)"
       *ngIf="!virtualScroll; else scrollViewTpl"
       class="devui-scrollbar"
+      [style.overflow-x]="dataSource?.length || !fixHeader ? 'auto' : 'hidden'"
       [ngClass]="{
         'scroll-view': scrollable,
         'overflow-overlay': tableOverflowType === 'overlay',
-        'table-wrap': !fixHeader,
-        'has-width-scroll': hasWidthScroll,
-        'has-height-scroll': hasHeightScroll
+        'table-wrap': !fixHeader
       }"
       [style.height]="tableHeight ? tableHeight : null"
       [style.max-height]="maxHeight ? maxHeight : null"
@@ -101,7 +109,11 @@
   </div>
 </div>
 
-<div class="devui-no-result-wrapper" *ngIf="!dataSource?.length && noResultTemplate != null">
+<div
+  class="devui-no-result-wrapper"
+  [ngClass]="{ 'overlay-table-no-result': tableOverflowType === 'overlay' || !scrollable }"
+  *ngIf="!dataSource?.length && noResultTemplate != null"
+>
   <ng-template [ngTemplateOutlet]="noResultTemplate" [ngTemplateOutletContext]="{ $implicit: this }"></ng-template>
 </div>
 
@@ -118,9 +130,7 @@
     [ngClass]="{
       'scroll-view': scrollable,
       'overflow-overlay': tableOverflowType === 'overlay',
-      'virtual-scroll-wrap': !fixHeader,
-      'has-width-scroll': hasWidthScroll,
-      'has-height-scroll': hasHeightScroll
+      'virtual-scroll-wrap': !fixHeader
     }"
     [style.height]="virtualBodyHeight"
     [style.max-height]="maxHeight ? maxHeight : null"
@@ -185,6 +195,7 @@
   <thead
     dDataTableHead
     [resizeable]="resizeable"
+    [checkOptionsIndex]="checkOptionsIndex"
     [tableViewRefElement]="tableViewRefElement"
     [tableBodyEl]="tableBodyEl"
     [multiSort]="multiSort"
@@ -192,6 +203,7 @@
     [pageAllChecked]="_pageAllChecked"
     [checkable]="checkable"
     [checkOptions]="checkOptions"
+    [selectOptionOnCheckbox]="selectOptionOnCheckbox"
     [headerCheckDisabled]="headerCheckDisabled"
     [headerCheckVisible]="headerCheckVisible"
     [showExpandToggle]="showExpandToggle"

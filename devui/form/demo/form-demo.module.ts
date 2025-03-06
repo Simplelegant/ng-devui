@@ -33,6 +33,7 @@ import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { BasicComponent } from './basic/basic.component';
 import { CustomStatusComponent } from './custom-status/custom-status.component';
 import { FormDemoComponent } from './form-demo.component';
+import { FormDesignComponent } from './form-design.component';
 import { LabelHorizontalComponent } from './label-horizontal/label-horizontal.component';
 import { ModalOneComponent } from './modal-one/modal-one.component';
 import { ModalComponent } from './modal/modal.component';
@@ -84,7 +85,11 @@ import { ValidateUpdateComponent } from './validate-update/validate-update.compo
     EditableSelectModule,
     DatepickerModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: FormDesignComponent,
+      },
       { path: 'demo', component: FormDemoComponent },
       {
         path: 'api',
@@ -99,6 +104,7 @@ import { ValidateUpdateComponent } from './validate-update/validate-update.compo
   exports: [FormDemoComponent, ChildUserComponent, ChildFormComponent],
   declarations: [
     FormDemoComponent,
+    FormDesignComponent,
     BasicComponent,
     LabelHorizontalComponent,
     ModalComponent,

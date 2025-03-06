@@ -42,6 +42,14 @@ export class MutilStylesComponent implements OnInit {
   activeSizeTab: any = 'sm';
   sizeItems = [
     {
+      id: 'mini',
+      title: 'Mini'
+    },
+    {
+      id: 'xs',
+      title: 'Small'
+    },
+    {
       id: 'sm',
       title: 'Normal'
     },
@@ -98,7 +106,7 @@ export class MutilStylesComponent implements OnInit {
   tableWidthConfig: TableWidthConfig[] = [
     {
       field: 'checkbox',
-      width: '30px'
+      width: '41px'
     },
     {
       field: '#',

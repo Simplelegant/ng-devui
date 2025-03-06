@@ -20,12 +20,20 @@
     padding: 0;
 
     &:hover {
-      color: $devui-light-text;
       background-color: $devui-brand;
+
+      svg path {
+        fill: $devui-light-text;
+      }
     }
 
-    i {
+    svg {
+      display: block;
       cursor: pointer;
+
+      path {
+        fill: $devui-text;
+      }
     }
   }
 
@@ -47,10 +55,20 @@
     justify-content: space-between;
     width: 100%;
     color: $devui-text;
+    height: 32px;
     line-height: 32px;
     font-weight: bold;
     font-size: $devui-font-size-card-title;
-    border-bottom: 1px solid $devui-dividing-line;
+
+    &.devui-nav-sprite-header-with-title {
+      border-bottom: 1px solid $devui-dividing-line;
+    }
+
+    .devui-nav-sprite-header-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .devui-nav-spiri-close {
       cursor: pointer;

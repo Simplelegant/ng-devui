@@ -1,6 +1,7 @@
 @import '../style/theme/color';
 @import '../style/core/_font';
 @import '../style/core/animation';
+@import '../style/theme/corner';
 
 .devui-dropdown-menu {
   padding-bottom: 0;
@@ -28,15 +29,22 @@
 
   .devui-tags-input-wrapper {
     border-color: $devui-brand;
+    border-radius: $devui-border-radius;
   }
 }
 
 .devui-input {
-  padding-right: 16px;
+  padding-right: 36px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   cursor: default;
+}
+
+:host ::ng-deep .devui-tag-item.tag-disabled {
+  cursor: not-allowed;
+  background-color: $devui-disabled-bg;
+  color: $devui-disabled-text;
 }
 
 .devui-search-cascader {
@@ -82,21 +90,15 @@
 }
 
 .devui-drop-no-data {
-  height: 36px;
-  background-color: $devui-disabled-bg;
-  padding: 8px;
+  height: auto;
   display: block;
-
-  span {
-    color: $devui-disabled-text;
-  }
 }
 
 .devui-drop-icon {
-  width: 1em;
-  height: 1em;
+  width: 16px;
+  height: 16px;
   display: inline-block;
-  line-height: 1em;
+  line-height: 16px;
   vertical-align: middle;
 
   svg path {
@@ -140,15 +142,25 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  right: 4px;
-  width: 1em;
+  right: 12px;
+  width: 16px;
   display: flex;
+
+  .devui-cascader-close-icon {
+    position: relative;
+    left: 2px;
+  }
+}
+
+:host:not(.devui-glow-style) .devui-tags-input-wrapper:hover {
+  border-color: $devui-aide-text;
 }
 
 .devui-tags-input-wrapper {
   border: 1px solid $devui-line;
   display: inline-flex;
   width: 100%;
+  border-radius: $devui-border-radius;
 
   .devui-tags-input {
     flex: 1;
@@ -165,8 +177,8 @@
   }
 
   .devui-drop-icon-wrapper {
-    flex: 0 0 20px;
-    padding: 0;
+    flex: 0 0 40px;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -181,10 +193,6 @@
     color: $devui-text;
     padding: 0 8px;
   }
-
-  &:hover {
-    border-color: $devui-aide-text;
-  }
 }
 
 .devui-dropdown-placeholder {
@@ -196,4 +204,10 @@
 .devui-drop-menu-wrapper {
   white-space: nowrap;
   font-size: 0;
+}
+
+:host ::ng-deep {
+  .devui-max-width-tag {
+    height: 16px;
+  }
 }

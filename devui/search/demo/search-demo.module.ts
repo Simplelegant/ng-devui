@@ -15,6 +15,7 @@ import { IconLeftComponent } from './icon-left/icon-left.component';
 import { NgmodelComponent } from './ngmodel/ngmodel.component';
 import { SearchNoBorderComponent } from './no-border/search-no-border.component';
 import { SearchDemoComponent } from './search-demo.component';
+import { SearchDesignComponent } from './search-design.component';
 
 @NgModule({
   imports: [
@@ -27,7 +28,11 @@ import { SearchDemoComponent } from './search-demo.component';
     DDemoNavModule,
     FormModule,
     RouterModule.forChild([
-      { path: '',  redirectTo: 'demo' },
+      { path: '',  redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: SearchDesignComponent,
+      },
       { path: 'demo', component: SearchDemoComponent},
       { path: 'api', component: DevUIApiComponent, data: {
         'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
@@ -38,6 +43,7 @@ import { SearchDemoComponent } from './search-demo.component';
   exports: [SearchDemoComponent],
   declarations: [
     SearchDemoComponent,
+    SearchDesignComponent,
     BasicComponent,
     IconLeftComponent,
     NgmodelComponent,

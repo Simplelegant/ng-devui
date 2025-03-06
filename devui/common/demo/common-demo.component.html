@@ -1,10 +1,26 @@
 <div class="devui-demo-container" dAnchorBox dAnchorHashSupport [view]="{ top: 180, bottom: 0 }">
   <d-demo-nav [navItems]="navItems"></d-demo-nav>
   <div class="devui-demo-example" [dAnchor]="'date-pipe'">
-    <div class="devui-demo-title">{{ 'components.common.pipeDemo.title' | translate }}</div>
+    <div class="devui-demo-title">{{ 'components.common.pipeDemo.dDatePipe.title' | translate }}</div>
     <div class="devui-demo-text"></div>
-    <d-codebox id="common-basic-usage" [sourceData]="pipeSource">
-      <d-common-pipe demo></d-common-pipe>
+    <d-codebox id="common-basic-usage" [sourceData]="datePipeSource">
+      <d-date-pipe demo></d-date-pipe>
+    </d-codebox>
+  </div>
+  <div class="devui-demo-example" [dAnchor]="'safe-null-pipe'">
+    <div class="devui-demo-title">{{ 'components.common.pipeDemo.dSafeNullPipe.title' | translate }}</div>
+    <div class="devui-demo-text">{{ 'components.common.pipeDemo.dSafeNullPipe.description' | translate }}</div>
+    <div class="devui-demo-text"></div>
+    <d-codebox id="common-basic-usage" [sourceData]="safeNullPipeSource">
+      <d-safe-null-pipe demo></d-safe-null-pipe>
+    </d-codebox>
+  </div>
+
+  <div class="devui-demo-example" [dAnchor]="'browser-version'">
+    <div class="devui-demo-title">{{ 'components.common.browserDemo.title' | translate }}</div>
+
+    <d-codebox id="common-helper-browser" [sourceData]="helperBrowserSource">
+      <d-common-helper-browser demo></d-common-helper-browser>
     </d-codebox>
   </div>
 
@@ -41,6 +57,15 @@
       <d-common-clipboard demo></d-common-clipboard>
     </d-codebox>
   </div>
+
+  <div class="devui-demo-example" [dAnchor]="'shapeIconHoverable'">
+    <div class="devui-demo-title">{{ 'components.common.shapeIconHoverableDemo.title' | translate }}</div>
+    <div class="devui-demo-text"></div>
+    <d-codebox id="common-shapeIconHoverable" [sourceData]="shapeIconHoverableSource">
+      <d-shape-icon-hover demo></d-shape-icon-hover>
+    </d-codebox>
+  </div>
+
   <div class="devui-demo-example" [dAnchor]="'lazy-load'">
     <div class="devui-demo-title">{{ 'components.common.lazyLoadDemo.title' | translate }}</div>
     <div class="devui-demo-text">{{ 'components.common.lazyLoadDemo.description' | translate }}</div>

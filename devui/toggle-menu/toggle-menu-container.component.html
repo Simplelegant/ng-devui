@@ -19,8 +19,10 @@
       [cdkConnectedOverlayWidth]="dropDownWidth"
       [cdkConnectedOverlayOpen]="isOpen"
       [cdkConnectedOverlayPositions]="overlayPositions"
+      [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
       (positionChange)="onPositionChange($event)"
-      (backdropClick)="toggleChangeFn(false)"
+      (backdropClick)="isOpen = false"
+      (detach)="isOpen && (isOpen = false)"
     >
       <ng-template [ngTemplateOutlet]="selectDropdownTpl"></ng-template>
     </ng-template>
@@ -34,8 +36,7 @@
         'devui-custom-right': listInstance?.customViewDirection === 'right',
         'devui-custom-left': listInstance?.customViewDirection === 'left',
         'devui-custom-top': listInstance?.customViewDirection === 'top',
-        'devui-dropdown-menu-multiple': listInstance?.multiple,
-        'devui-reset-min-width': width
+        'devui-dropdown-menu-multiple': listInstance?.multiple
       }"
       [@fadeInOut]="isOpen && startAnimation ? (appendToBody ? menuPosition : popDirection) : 'void'"
       (@fadeInOut.done)="animationEnd()"

@@ -6,25 +6,26 @@
     appendToBody
     [alignOrigin]="originRef"
     [appendToBodyDirections]="['leftDown', 'leftUp']"
+    [appendToBodyScrollStrategy]="'close'"
     (toggleEvent)="onToggle($event)"
   >
     <div class="align-origin" #origin>
       Align Area
       <a dDropDownToggle class="devui-dropdown-default devui-dropdown-origin">
         Dropdown
-        <span class="icon-select-arrow"></span>
+        <span class="icon-chevron-down-2"></span>
       </a>
     </div>
 
     <ul dDropDownMenu class="devui-dropdown-menu devui-scrollbar" role="menu">
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Disabled Option</a>
+        <a dDropDownMenuItem class="disabled">Disabled Option</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">New </a>
+        <a dDropDownMenuItem>New </a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Delete </a>
+        <a dDropDownMenuItem>Delete </a>
       </li>
     </ul>
   </div>
@@ -41,13 +42,13 @@
     <d-button icon="icon-add" bsStyle="text" title="Add" dDropDownToggle></d-button>
     <ul dDropDownMenu class="devui-dropdown-menu" role="menu">
       <li class="disabled" role="menuitem">
-        <a class="devui-dropdown-item disabled">Disabled Options</a>
+        <a dDropDownMenuItem class="disabled">Disabled Options</a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">New </a>
+        <a dDropDownMenuItem>New </a>
       </li>
       <li role="menuitem">
-        <a class="devui-dropdown-item">Delete</a>
+        <a dDropDownMenuItem>Delete</a>
       </li>
     </ul>
   </div>

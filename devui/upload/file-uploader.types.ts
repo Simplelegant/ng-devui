@@ -3,12 +3,16 @@ export class IUploadOptions {
   isChunked?: boolean;
   // 分片大小
   chunkSize?: number;
+  // 串行上传分片文件，默认并发
+  chunkInSequence?: boolean;
   // 上传接口地址
   uri: string;
   // http 请求方法
   method?: string;
   // 上传文件大小限制
   maximumSize?: number;
+  // 上传文件个数限制，多文件上传时可用
+  maximumCount?: number;
   // 自定义请求headers
   headers?: { [key: string]: any };
   // 认证token
@@ -35,7 +39,7 @@ export class IFileOptions {
 
 export enum UploadStatus {
   preLoad = 0,
-  uploading,
-  uploaded,
-  failed
+  uploading = 1,
+  uploaded = 2,
+  failed = 3,
 }

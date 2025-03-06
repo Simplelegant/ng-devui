@@ -1,4 +1,5 @@
 <d-operable-tree
+  style="width: 400px"
   #operableTree
   [tree]="data"
   [addable]="true"
@@ -7,7 +8,9 @@
   [beforeAddNode]="beforeAddNode"
   [beforeDeleteNode]="beforeDeleteNode"
   [beforeEditNode]="beforeEditNode"
+  [beforeSelectNode]="beforeSelectNode"
   [postAddNode]="postAddNode"
+  [operatorAlign]="'end'"
   (nodeDeleted)="onOperableNodeDeleted($event)"
   (nodeSelected)="onOperableNodeSelected($event)"
   (nodeToggled)="onOperableNodeToggled($event)"

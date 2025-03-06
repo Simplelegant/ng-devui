@@ -1,10 +1,10 @@
 <d-editable-select
+  placeholder="Search"
   [source]="languages"
   [maxHeight]="300"
-  [(ngModel)]="selectItem"
   [enableLazyLoad]="true"
+  [appendToBody]="true"
+  [(ngModel)]="selectItem"
   (loadMore)="loadMore($event)"
-  name="multiple-auto"
-  placeholder="Search"
 >
 </d-editable-select>

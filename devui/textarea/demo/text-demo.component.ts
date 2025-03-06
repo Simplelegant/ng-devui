@@ -10,17 +10,14 @@ export class TextDemoComponent implements OnInit, OnDestroy {
   basicSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./basic/basic.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./basic/basic.component.ts?raw') },
-    { title: 'SCSS', language: 'css', code: require('./basic/basic.component.css?raw') },
   ];
   resizeSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./resize/resize.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./resize/resize.component.ts?raw') },
-    { title: 'SCSS', language: 'css', code: require('./resize/resize.component.css?raw') },
   ];
   countSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./count/count.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./count/count.component.ts?raw') },
-    { title: 'SCSS', language: 'css', code: require('./count/count.component.scss?raw') },
   ];
 
   navItems = [];
@@ -45,8 +42,8 @@ export class TextDemoComponent implements OnInit, OnDestroy {
   setNavValues(values) {
     this.navItems = [
       { dAnchorLink: 'basic-usage', value: values['basic-usage'] },
-      { dAnchorLink: 'resize', value: values['resize'] },
-      { dAnchorLink: 'count', value: values['count'] },
+      { dAnchorLink: 'resize', value: values.resize },
+      { dAnchorLink: 'count', value: values.count },
     ];
   }
 

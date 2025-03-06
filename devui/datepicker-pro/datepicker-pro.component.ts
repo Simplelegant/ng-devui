@@ -5,6 +5,7 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
   Input,
   OnDestroy,
   OnInit,
@@ -13,8 +14,8 @@ import {
   ViewChild
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { I18nInterface, I18nService } from 'ng-devui/i18n';
-import { DefaultDateConverter } from 'ng-devui/utils';
+import { EN_US, I18nFormat, I18nInterface, I18nService } from 'ng-devui/i18n';
+import { DefaultDateConverter, DevConfigService, WithConfig } from 'ng-devui/utils';
 import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { DatepickerProService } from './datepicker-pro.service';
@@ -45,19 +46,26 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
   @Input() appendToBody = true;
   @Input() width: string;
   @Input() placeholder: string;
+  @Input() allowClear = true;
   @Output() dropdownToggle = new EventEmitter<boolean>();
   @Output() confirmEvent = new EventEmitter<Date>();
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle () {
+    return this.showGlowStyle;
+  };
   @Input() set calenderRange (value) {
     this.pickerSrv.calendarRange = value || [1970, 2099];
   }
   @Input() set minDate(value: Date) {
     if (!value) {
+      this.pickerSrv.resetMin();
       return;
     }
     this.pickerSrv.minDate = value;
   }
   @Input() set maxDate(value: Date) {
     if (!value) {
+      this.pickerSrv.resetMax();
       return;
     }
     this.pickerSrv.maxDate = value;
@@ -79,21 +87,23 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
   private i18nLocale: I18nInterface['locale'];
 
   i18nText;
+  i18nFormat;
   dateValue = '';
   datepickerConvert: DefaultDateConverter;
-  unsubscribe$ = new Subject();
+  unsubscribe$ = new Subject<void>();
   isOpen = false;
+
   get dateConfig(): DateConfig {
     return {
       dateConverter: this.datepickerConvert,
-      min: this.pickerSrv.minDate || new Date(this.pickerSrv.calendarRange[0] + '/01/01'),
-      max: this.pickerSrv.maxDate || new Date(this.pickerSrv.calendarRange[1] + '/12/31'),
+      min: this.pickerSrv.minDate || new Date(this.pickerSrv.calendarRange[0] + '-01-01'),
+      max: this.pickerSrv.maxDate || new Date(this.pickerSrv.calendarRange[1] + '-12-31'),
       format: {
-        date: this.format || 'y/MM/dd',
-        time: this.format || 'y/MM/dd HH:mm:ss',
-        month: this.format || 'y-MM',
-        year: 'y'
-      }
+        date: this.format || this.i18nFormat.short,
+        time: this.format || this.i18nFormat.long,
+        month: this.format || (this.i18nLocale === EN_US ? 'MMM dd' : this.i18nFormat.ultraShort),
+        year: 'y',
+      },
     };
   }
 
@@ -103,18 +113,14 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
     } else if (this.mode === 'month') {
       return this.dateConfig.format.month;
     } else {
-      return  this.showTime ? this.dateConfig.format.time : this.dateConfig.format.date;
+      return this.showTime ? this.dateConfig.format.time : this.dateConfig.format.date;
     }
   }
 
   private onChange = (_: any) => null;
   private onTouched = () => null;
 
-  constructor(
-    private i18n: I18nService,
-    private pickerSrv: DatepickerProService
-  ) {
-    this.i18nText = this.i18n.getI18nText().datePickerPro;
+  constructor(private i18n: I18nService, private pickerSrv: DatepickerProService, private devConfigService: DevConfigService) {
     this.datepickerConvert = new DefaultDateConverter();
   }
 
@@ -179,7 +185,7 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
         }
 
         const inputDate = this.datepickerConvert.parse(this.dateValue, this.curFormat);
-        if (inputDate instanceof Date && inputDate.getTime() === this.pickerSrv.curDate.getTime()) {
+        if (inputDate instanceof Date && inputDate.getTime() === this.pickerSrv.curDate?.getTime()) {
           return;
         }
 
@@ -189,6 +195,8 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
             type: 'single',
             value: inputDate
           });
+
+          this.onChange(inputDate);
 
           if (this.showTime) {
             this.pickerSrv.updateTimeChange.next({
@@ -213,13 +221,22 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
   }
 
   private setI18nText() {
-    this.i18nLocale = this.i18n.getI18nText().locale;
-    this.i18n.langChange().pipe(
-      takeUntil(this.unsubscribe$)
-    ).subscribe((data) => {
-      this.i18nLocale = data.locale;
-      this.i18nText = data.datePickerPro;
-    });
+    this.setI18nTextDetail(this.i18n.getI18nText());
+    this.i18n
+      .langChange()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+        this.setI18nTextDetail(data);
+        if (this.pickerSrv.curDate) {
+          this.dateValue = this.formatDateToString(this.pickerSrv.curDate);
+        }
+      });
+  }
+
+  private setI18nTextDetail(data) {
+    this.i18nText = data.datePickerPro;
+    this.i18nLocale = data.locale;
+    this.i18nFormat = I18nFormat.localFormat[this.i18nLocale];
   }
 
   validateDate(value: string) {
@@ -278,6 +295,9 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
     if (this.isOpen) {
       event.stopPropagation();
     }
+    if (this.disabled) {
+      return;
+    }
     this.isOpen = true;
 
     setTimeout(() => {
@@ -286,7 +306,7 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
   }
 
   writeValue(value: Date) {
-    if (!value || !this.pickerSrv.dateInRange(new Date(value))) {
+    if (!value) {
       this.clear();
       return;
     }
@@ -318,5 +338,4 @@ export class DatepickerProComponent implements OnInit, AfterViewInit, OnDestroy,
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-
 }

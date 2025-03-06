@@ -8,8 +8,8 @@ import { TreeComponent } from 'ng-devui/tree';
 })
 export class CustomizeComponent {
   @ViewChild('operableTree', { static: true }) operableTree: TreeComponent;
-  iconParentOpen = '<span class="icon icon-chevron-down"></span>';
-  iconParentClose = '<span class="icon icon-collapse"></span>';
+  iconParentOpen = '<span class="icon icon-chevron-down-2"></span>';
+  iconParentClose = '<span style="transform: rotate(90deg)" class="icon icon-chevron-up-2"></span>';
   iconLeaf = '<span></span>';
   disableMouseEvent = false;
   data2 = [{
@@ -83,10 +83,10 @@ export class CustomizeComponent {
   }
   onToggle($event, node) {
     if ($event && node.data.isHover) {
-      this.disableMouseEvent = true;
+      node.data.disableMouseEvent = true;
     } else {
       node.data.isHover = false;
-      this.disableMouseEvent = false;
+      node.data.disableMouseEvent = false;
     }
   }
   activeNode(node) {

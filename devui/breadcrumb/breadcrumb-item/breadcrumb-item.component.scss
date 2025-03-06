@@ -2,6 +2,11 @@
 @import '../../style/core/_font';
 @import '../../style/core/animation';
 
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
 .devui-breadcrumb-font-style {
   font-size: $devui-font-size;
   color: $devui-aide-text;
@@ -40,12 +45,6 @@
 
   svg g path {
     fill: $devui-icon-fill;
-  }
-
-  &:hover {
-    svg g path {
-      fill: $devui-icon-fill-hover;
-    }
   }
 }
 
@@ -90,6 +89,7 @@
       line-height: 36px;
       width: 170px;
       display: inline-block;
+      vertical-align: top;
 
       &:focus {
         text-decoration: none;
@@ -120,8 +120,16 @@ d-search {
   width: 100%;
 }
 
-.devui-breadcrumb-item-with-menu .devui-breadcrumb-item {
-  cursor: pointer;
+.devui-breadcrumb-item-with-menu {
+  .devui-breadcrumb-item {
+    cursor: pointer;
+  }
+
+  &:hover {
+    svg g path {
+      fill: $devui-icon-fill-hover;
+    }
+  }
 }
 
 .devui-dropdown-open {
@@ -134,6 +142,12 @@ d-search {
   ::ng-deep a,
   ::ng-deep span {
     transition: color $devui-animation-duration-slow $devui-animation-ease-in-out-smooth;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 440px;
+    vertical-align: top;
   }
 }
 

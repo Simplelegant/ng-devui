@@ -2,9 +2,11 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { BadgeModule } from 'ng-devui/badge';
 import { ButtonModule } from 'ng-devui/button';
 import { CheckBoxModule } from 'ng-devui/checkbox';
 import { DropDownModule } from 'ng-devui/dropdown';
+import { IconModule } from 'ng-devui/icon';
 import { LoadingModule } from 'ng-devui/loading';
 import { SearchModule } from 'ng-devui/search';
 import { DevUIApiComponent } from 'ng-devui/shared/devui-api/devui-api.component';
@@ -25,6 +27,7 @@ import { MergeNodeComponent } from './merge-node/merge-node.component';
 import { OperateBtnComponent } from './operate-btn/operate-btn.component';
 import { SearchFilterComponent } from './search-filter/search-filter.component';
 import { TreeDemoComponent } from './tree-demo.component';
+import { TreeDesignComponent } from './tree-design.component';
 import { OperationForAllNodesComponent } from './tree-factory/tree-factory.component';
 import { VirtualScrollComponent } from './virtual-scroll/virtual-scroll.component';
 
@@ -44,8 +47,14 @@ import { VirtualScrollComponent } from './virtual-scroll/virtual-scroll.componen
     DropDownModule,
     SafePipeModule,
     SearchModule,
+    BadgeModule,
+    IconModule,
     RouterModule.forChild([
-      { path: '',  redirectTo: 'demo' },
+      { path: '',  redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: TreeDesignComponent,
+      },
       { path: 'demo', component: TreeDemoComponent},
       { path: 'api', component: DevUIApiComponent, data: {
         'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
@@ -56,6 +65,7 @@ import { VirtualScrollComponent } from './virtual-scroll/virtual-scroll.componen
   exports: [TreeDemoComponent],
   declarations: [
     TreeDemoComponent,
+    TreeDesignComponent,
     BasicComponent,
     CustomKeyComponent,
     OperateBtnComponent,
@@ -66,9 +76,7 @@ import { VirtualScrollComponent } from './virtual-scroll/virtual-scroll.componen
     VirtualScrollComponent,
     CustomLoadingComponent,
     MergeNodeComponent,
-    OperationForAllNodesComponent
+    OperationForAllNodesComponent,
   ],
-
 })
-export class TreeDemoModule {
-}
+export class TreeDemoModule {}

@@ -2,17 +2,25 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'd-select-all',
   templateUrl: './select-all.component.html',
-  styles: [
-    `
-      .col-md-5 {
-        width: 50%;
-      }
-    `
-  ]
 })
-
 export class SelectAllComponent {
-  options = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5', 'Option 6', 'Option 7', 'Option 8',
-    'Option 9', 'Option 10', 'Option 11', 'Option 12', 'Option 13', 'Option 14'];
-  select2 = ['Option 8', 'Option 3'];
+  options =  [
+    {
+      name: 'Option 1',
+      value: 4,
+    },
+    {
+      name: 'Option 2',
+      value: 8,
+    },
+    {
+      name: 'Option 3',
+      value: 16,
+    },
+    {
+      name: 'Option 4',
+      value: 32,
+    },
+  ];
+  selectedItems =  [...this.options];
 }

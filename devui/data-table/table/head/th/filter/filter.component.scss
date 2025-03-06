@@ -3,9 +3,8 @@
 @import '../../../../../style/core/_font';
 
 :host {
-  flex: 1;
   text-align: right;
-  display: none;
+  margin-left: 8px;
 
   &.devui-icon-show {
     display: block;
@@ -14,7 +13,7 @@
 
 .data-table-column-filter-content {
   background: $devui-connected-overlay-bg;
-  border-radius: $devui-border-radius;
+  border-radius: $devui-border-radius-card;
 
   .drop-down-item {
     white-space: nowrap;
@@ -37,6 +36,10 @@
   }
 }
 
+.devui-dropdown-menu {
+  border-radius: $devui-border-radius-card;
+}
+
 .filter-content-hidden {
   display: none !important;
 }
@@ -44,26 +47,22 @@
 .line {
   height: 1px;
   background: $devui-dividing-line;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.filter-operation {
+  text-align: center;
+  padding-bottom: 8px;
+  padding-top: 4px;
+
+  .reset-btn {
+    margin-right: 8px;
+  }
 }
 
 .checkbox-group {
   height: 30px;
-}
-
-.button-style {
-  display: inline-block;
-  width: 45%;
-  font-size: $devui-font-size;
-  color: $devui-text;
-  text-align: center;
-  line-height: 20px;
-  cursor: pointer;
-}
-
-.button-style:hover {
-  color: $devui-brand;
 }
 
 ::ng-deep .filter-options .normal-filter-list-container .cdk-virtual-scroll-content-wrapper {
@@ -83,6 +82,15 @@
 
 .normal-filter-list-container {
   overflow-y: auto;
+}
+
+.filter-search-container {
+  padding-top: 10px;
+  text-align: center;
+}
+
+.filter-options {
+  padding: 4px 8px;
 }
 
 .icon-filter-style {
@@ -108,7 +116,7 @@
 .overlay-mask {
   position: fixed;
   top: 0;
-  bottom: 0;
+  bottom: 0 !important;
   right: 0;
   left: 0;
   z-index: 9;
@@ -163,12 +171,12 @@
   visibility: visible !important;
 
   > svg g {
-    fill: $devui-shape-icon-fill-active;
+    fill: $devui-brand;
   }
 
   &:hover {
     > svg g {
-      fill: $devui-shape-icon-fill-active;
+      fill: $devui-brand;
     }
   }
 }

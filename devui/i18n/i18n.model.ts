@@ -12,6 +12,7 @@ export interface I18nInterface {
     btnClose: string;
     btnClickMe: string;
     copied: string;
+    reset: string;
   };
   autoComplete: {
     latestInput: string;
@@ -35,6 +36,7 @@ export interface I18nInterface {
     min: string;
     second: string;
     getYearMonthStr(year, month): string;
+    yearDisplay(year): string;
   };
   form: {
     required(val): string;
@@ -69,6 +71,20 @@ export interface I18nInterface {
     yAxisLabel: string;
     defaultTitleConf: [{ title: string }];
   };
+  datatable: {
+    tableSetting: string;
+    ensure: string;
+    cancel: string;
+    compact: string;
+    standard: string;
+    loose: string;
+    divideLine: string;
+    striped: string;
+    tableShadow: string;
+    styles: string;
+    colSelected: string;
+    colCanSelect: string;
+  };
   upload: {
     warning: string;
     upload: string;
@@ -84,6 +100,7 @@ export interface I18nInterface {
     cancelUpload: string;
     getNotAllowedFileTypeMsg(filename, scope): string;
     getBeyondMaximalFileSizeMsg(filename, maximalSize): string;
+    getBeyondMaximumFileCountMsg(maximalSize): string;
     getExistSameNameFilesMsg(sameNames): string;
     getAllFilesBeyondMaximalFileSizeMsg(maximalSize): string;
     getSelectedFilesCount(filesCount): string;
@@ -105,6 +122,8 @@ export interface I18nInterface {
     originScale: string;
     pre: string;
     next: string;
+    origin: string;
+    download: string;
   };
   colorPicker: {
     recentlyUsed: string;
@@ -121,12 +140,10 @@ export interface I18nInterface {
     expand: string;
   };
   relativeTime: {
-    hoursAgo: string;
-    minutesAgo: string;
     justnow: string;
     later: string;
-    minutesLater: string;
-    hoursLater: string;
+    minutesLater(num: number): string;
+    hoursLater(num: number): string;
     yearsAgo(num: number): string;
     monthsAgo(num: number): string;
     weeksAgo(num: number): string;
@@ -135,10 +152,13 @@ export interface I18nInterface {
     weeksLater(num: number): string;
     monthsLater(num: number): string;
     yearsLater(num: number): string;
+    hoursAgo(num: number): string;
+    minutesAgo(num: number): string;
   };
   tagsInput: {
     tagsReachMaxLength: string;
     tagsReachMaxNumber: string;
+    create: string;
   };
   categorySearch: {
     confirm: string;

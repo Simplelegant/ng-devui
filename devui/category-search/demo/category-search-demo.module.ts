@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
 import { CategorySearchModule } from "ng-devui/category-search";
 import { SelectModule } from "ng-devui/select";
@@ -11,10 +12,13 @@ import { DDemoNavModule } from "devui-commons/src/demo-nav/d-demo-nav.module";
 import { AutoScrollComponent } from "./auto-scroll/auto-scroll.component";
 import { BasicComponent } from "./basic/basic.component";
 import { CategorySearchDemoComponent } from "./category-search-demo.component";
+import { CategorySearchDesignComponent } from "./category-search-design.component";
+import { ExtendComponent } from "./extend/extend.component";
 @NgModule({
   declarations: [
     CategorySearchDemoComponent,
     BasicComponent,
+    ExtendComponent,
     AutoScrollComponent,
   ],
   imports: [
@@ -25,10 +29,16 @@ import { CategorySearchDemoComponent } from "./category-search-demo.component";
     DevUIApiModule,
     CategorySearchModule,
     SelectModule,
+    FormsModule,
     RouterModule.forChild([
       {
         path: "",
         redirectTo: "demo",
+        pathMatch: "full",
+      },
+      {
+        path: "design",
+        component: CategorySearchDesignComponent,
       },
       {
         path: "demo",

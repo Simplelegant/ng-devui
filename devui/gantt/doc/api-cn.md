@@ -17,6 +17,7 @@ import { GanttModule } from 'ng-devui/gantt';
 |            height             |      `number`      |  --   | 可选，高度                              |
 |           startDate           |       `Date`       |  --   | 可选，开始时间                           |
 |            endDate            |       `Date`       |  --   | 可选，结束时间                           |
+|            showDaySplitLine            |       `boolean`       |     `false`   | 可选，是否显示每日分隔线                   |
 
 ### d-gantt-scale 事件
 
@@ -44,6 +45,8 @@ import { GanttModule } from 'ng-devui/gantt';
 | customBgClass   |     `string`      |   --    | 可选，拖拽bar在移动的时候的背景色                                     | -- |
 | customTitleClass   |     `string`      |   --    | 可选，自定义title样式                                     | -- |
 | scrollElement   |     `Element`      | --  | 可选，滚动的容器                         | [基本用法](demo#gantt-basic) |
+| status   |     `GanttRailStatus`      | --  | 可选，状态`'normal' \| 'overdue' \| 'done'`                 | [基本用法](demo#gantt-basic) |
+| titleTemplateRef   |     ``TemplateRef<any>``      | null  | 可选，自定义标题内容模板                 | [基本用法](demo#gantt-basic) |
 
 
 ### d-gantt-bar 事件
@@ -136,4 +139,6 @@ export enum UnitRole {
   week = 20,
   month = 30,
 }
+
+export type GanttRailStatus = 'normal' | 'overdue' | 'done';
 ```

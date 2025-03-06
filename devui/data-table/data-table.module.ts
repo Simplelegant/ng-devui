@@ -2,17 +2,21 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BadgeModule } from 'ng-devui/badge';
 import { ButtonModule } from 'ng-devui/button';
 import { CheckBoxModule } from 'ng-devui/checkbox';
 import { DCommonModule } from 'ng-devui/common';
 import { DatepickerModule } from 'ng-devui/datepicker';
 import { DragDropModule } from 'ng-devui/dragdrop';
 import { DropDownModule } from 'ng-devui/dropdown';
-import { InputNumberComponent, InputNumberModule } from 'ng-devui/input-number';
+import { InputNumberModule } from 'ng-devui/input-number';
 import { PaginationModule } from 'ng-devui/pagination';
-import { SelectComponent, SelectModule } from 'ng-devui/select';
+import { PopoverModule } from 'ng-devui/popover';
+import { SearchModule } from 'ng-devui/search';
+import { SelectModule } from 'ng-devui/select';
+import { ToggleModule } from 'ng-devui/toggle';
 import { TooltipModule } from 'ng-devui/tooltip';
-import { TreeSelectComponent, TreeSelectModule } from 'ng-devui/tree-select';
+import { TreeSelectModule } from 'ng-devui/tree-select';
 import { LazyLoadModule, SafePipeModule } from 'ng-devui/utils';
 import { WindowRefModule } from 'ng-devui/window-ref';
 import { DataTableBodyComponent } from './data-table-body.component';
@@ -22,6 +26,8 @@ import { DataTableRowComponent } from './data-table-row.component';
 import { DataTableComponent } from './data-table.component';
 import { DisPlayCellValuePipe } from './display-cell-value.pipe';
 import { EditorDirective } from './editor-host.directive';
+import { TableOptionModalComponent } from './table-option-modal.component';
+import { TableOptionToggleComponent } from './table-option-toggle.component';
 import { TableTbodyComponent } from './table/body/tbody.component';
 import { TableTdComponent } from './table/body/td/td.component';
 import { TableTdService } from './table/body/td/td.service';
@@ -51,11 +57,15 @@ import { DataTableHeadCellTmplComponent } from './tmpl/data-table-head-cell-tmpl
     ButtonModule,
     InputNumberModule,
     DropDownModule,
+    PopoverModule,
     TreeSelectModule,
     SafePipeModule,
     TooltipModule,
     DragDropModule,
-    LazyLoadModule
+    LazyLoadModule,
+    ToggleModule,
+    SearchModule,
+    BadgeModule
   ],
   exports: [
     DataTableComponent,
@@ -74,7 +84,9 @@ import { DataTableHeadCellTmplComponent } from './tmpl/data-table-head-cell-tmpl
     TableTheadComponent,
     TableTrComponent,
     TableTbodyComponent,
-    TableTdComponent
+    TableTdComponent,
+    TableOptionToggleComponent,
+    TableOptionModalComponent
   ],
   declarations: [
     DataTableComponent,
@@ -95,7 +107,9 @@ import { DataTableHeadCellTmplComponent } from './tmpl/data-table-head-cell-tmpl
     TableTheadComponent,
     TableTrComponent,
     TableTbodyComponent,
-    TableTdComponent
+    TableTdComponent,
+    TableOptionToggleComponent,
+    TableOptionModalComponent
   ],
 
   providers: [ TableTdService ],

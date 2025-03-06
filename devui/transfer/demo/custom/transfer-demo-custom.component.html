@@ -9,7 +9,7 @@
     <ng-template #sourceTemplate>
       <div class="title">Customize Header</div>
       <div class="line"></div>
-      <div class="content" style="height: 320px; overflow: auto">
+      <div class="content devui-scrollbar" style="height: 320px; overflow: auto">
         <d-data-table
           #sourceTable
           [dataSource]="basicDataSource"
@@ -25,7 +25,7 @@
             field="dob"
             header="Date of birth"
             [fieldType]="'date'"
-            [extraOptions]="{ dateFormat: 'MM/dd/yyyy' }"
+            [extraOptions]="{ dateFormat: 'MM-dd-yyyy' }"
             [width]="'100px'"
           ></d-column>
           <d-column [order]="4" field="gender" header="Gender" [width]="'100px'"></d-column>
@@ -35,7 +35,7 @@
     <ng-template #targetTemplate>
       <div class="title">Customize Header</div>
       <div class="line"></div>
-      <div class="content" style="height: 320px; overflow: auto">
+      <div class="content devui-scrollbar" style="height: 320px; overflow: auto">
         <d-data-table
           #targetTable
           [dataSource]="basicTargetSource"
@@ -51,7 +51,7 @@
             field="dob"
             header="Date of birth"
             [fieldType]="'date'"
-            [extraOptions]="{ dateFormat: 'MM/dd/yyyy' }"
+            [extraOptions]="{ dateFormat: 'MM-dd-yyyy' }"
             [width]="'100px'"
           ></d-column>
           <d-column [order]="4" field="gender" header="Gender" [width]="'100px'"></d-column>

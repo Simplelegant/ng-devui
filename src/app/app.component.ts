@@ -4,19 +4,18 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEVUI_LANG, EN_US, I18nService, ZH_CN } from 'ng-devui/i18n';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 import { VERSION } from '../../devui/version';
+import { LinkMap } from '../../devui-commons/src/constant';
 
 @Component({
   selector: 'd-app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None
-})
+  })
 export class AppComponent implements OnInit, OnDestroy {
   version;
   clickSub: Subscription = new Subscription();
   currentLang: string;
-  versionOptions = [];
-  currentOption;
   innerMenuList = [
     {
       name: '设计规范',
@@ -32,7 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
     {
       name: '版本历程',
       enName: 'Changelog',
-      href: 'https://github.com/DevCloudFE/ng-devui/releases'
+      href: LinkMap.versionRelease
     },
   ];
   constructor(private renderer2: Renderer2, private ngZone: NgZone, private router: Router, private translate: TranslateService,
@@ -60,7 +59,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         const pathArray = this.router.url.split('/');
         const langParam = pathArray[2];
-        if (!this.i18n.i18nConfig.hasOwnProperty(langParam)) {
+        if (!Object.prototype.hasOwnProperty.call(this.i18n.i18nConfig, langParam)) {
           this.currentLang = this.i18n.DEFAULT_LANG;
           localStorage.setItem('lang', this.i18n.DEFAULT_LANG);
           pathArray[2] = this.i18n.DEFAULT_LANG;
@@ -75,15 +74,6 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     this.version = VERSION.full;
     const versionArr = this.version.split('.');
-    this.versionOptions = [
-      { name: this.version, link: '/components/get-start', target: '_self' },
-      { name: '12.3.0', link: '/12.3.0/', target: '_self' },
-      { name: '11.4.0', link: '/11.4.0/', target: '_self' },
-      { name: '10.2.0', link: '/10.2.0/', target: '_self' },
-      { name: '9.3.0', link: '/9.3.0/', target: '_self' },
-      { name: '8.2.0', link: '/8.2.0/', target: '_self' }
-    ];
-    this.currentOption = this.versionOptions[0];
   }
   toggleLanguage(lang) {
     this.i18n.toggleLang(lang);

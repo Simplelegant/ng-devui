@@ -34,6 +34,11 @@
     }
   }
 
+  .devui-per-page {
+    margin-right: 8px;
+    color: $devui-text-weak;
+  }
+
   .devui-total-size {
     display: inline-block;
     position: relative;
@@ -76,7 +81,7 @@
       span:hover,
       a:focus,
       span:focus {
-        background-color: $devui-list-item-hover-bg;
+        background-color: $devui-base-bg;
         color: $devui-list-item-hover-text;
         text-decoration: none; // 覆盖bootStrap默认样式
       }
@@ -87,12 +92,11 @@
       }
 
       &.active a {
-        background-color: $devui-list-item-active-bg;
         color: $devui-list-item-active-text;
         cursor: pointer;
 
         &:hover {
-          background-color: $devui-list-item-active-hover-bg;
+          background-color: transparent;
           color: $devui-list-item-active-text;
         }
       }
@@ -379,4 +383,36 @@
 
 :host ::ng-deep .devui-input-lg {
   height: 46px;
+}
+
+.devui-pagination-dropdown-menu {
+  min-width: 60px;
+}
+
+.devui-pagination-list > li > .devui-pagination-active-block {
+  height: 24px;
+  margin-bottom: -24px;
+}
+
+.devui-pagination-sm > li > .devui-pagination-active-block {
+  height: 22px;
+  margin-bottom: -22px;
+}
+
+.devui-pagination-lg > li > .devui-pagination-active-block {
+  height: 38px;
+  margin-bottom: -38px;
+}
+
+.devui-pagination-active-block {
+  width: calc(100% - 4px);
+  margin-bottom: -24px;
+  margin-left: 4px;
+  background: $devui-primary;
+  z-index: 0;
+  border-radius: $devui-border-radius;
+}
+
+.devui-pagination-acitve-item {
+  background: $devui-list-item-active-bg;
 }

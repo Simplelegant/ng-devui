@@ -30,7 +30,7 @@
       "title": "组件总览",
       "description": "DevUI 为 Web 应用提供了丰富的基础 UI 组件，我们还将持续探索企业级应用的最佳 UI 实践，欢迎尝试使用 DevUI。",
       "placeholder": "请输入你想查找的组件",
-      "newChange": "有更新",
+      "newChange": "UPDATED",
       "sunset": "日落",
       "lookingCmp": "您要找的组件是不是？",
       "suggestCmp": "推荐组件",
@@ -158,6 +158,75 @@
         "change-values": "改变键值"
       }
     },
+    "menu": {
+      "name": "Menu 菜单",
+      "type": "导航",
+      "path": "menu",
+      "description": "为页面菜单的组件。",
+      "tmw": "需要通过分组组织菜单的时候使用。",
+      "basicDemo": {
+        "title": "基本用法",
+        "description": "展开、选中和禁用"
+      },
+      "openCloseDemo": {
+        "title": "可折叠",
+        "description": "[collapsed] 属性控制菜单展开和折叠, 在菜单根元素上设置var(--devui-menu-width)可控制展开和折叠的宽度"
+      },
+      "openOneDemo": {
+        "title": "手风琴效果",
+        "description": "控制d-sub-menu的[open]属性实现手风琴效果"
+      },
+      "LoopDemo": {
+        "title": "递归菜单",
+        "description": "通过封装递归组件实现递归菜单"
+      },
+      "CustomNodeDemo": {
+        "title": "自定义节点",
+        "description": "自定义节点样式，[noStyle]属性会清掉所有预制样式，这意味着得所有样式都得自己写"
+      },
+      "AutoExpandDemo": {
+        "title": "自动展开选中菜单",
+        "description": "根据选中项自动展开其父级菜单"
+      },
+      "anchorLinkValues": {
+        "basic-usage": "基本用法",
+        "open-close": "可折叠",
+        "open-one": "手风琴效果",
+        "loop": "递归菜单",
+        "custom-node": "自定义节点",
+        "auto-expand": "自动展开选中项"
+      }
+    },
+    "input-group": {
+      "name": "输入框组合",
+      "type": "数据录入",
+      "path": "input-group",
+      "description": "为一个或多个类输入框内容添加前后缀，并提供自适应拼接效果。",
+      "tmw": "多个类输入框内容需要拼接组合的场景。",
+      "basicDemo": {
+        "title": "基本用法",
+        "description": "可包含单个或多个类输入框组件拼接，不可换行。"
+      },
+      "responsiveDemo": {
+        "title": "自适应拼接用法",
+        "description": "多个该组件可根据容器宽度自适应拼接。",
+        "alarmRule": "告警规则",
+        "defaultRule": "默认规则",
+        "indicatorName": "指标名称",
+        "indicatorNamePlaceholder": "请输入指标名称",
+        "valueType": "平均值",
+        "valueTypes": "平均值,最大值,最小值"
+      },
+      "embedDemo": {
+        "title": "嵌入用法",
+        "description": "与 text-input 组件配合使用，不支持自适应拼接。"
+      },
+      "anchorLinkValues": {
+        "basic-usage": "基本用法",
+        "responsive-usage": "自适应拼接用法",
+        "embed-usage": "嵌入用法"
+      }
+    },
     "alert": {
       "name": "Alert 警告",
       "type": "反馈",
@@ -176,10 +245,15 @@
         "title": "不使用默认图标",
         "description": "不使用默认的类型图标。"
       },
+      "carouselDemo": {
+        "title": "自动轮播",
+        "description": "循环播放一系列文字提示信息。"
+      },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
         "tips-to-close": "可关闭的提示",
-        "without-icon": "不使用默认图标"
+        "without-icon": "不使用默认图标",
+        "carousel": "自动轮播"
       }
     },
     "animations": {
@@ -326,6 +400,103 @@
         "auto-disable": "设置禁用",
         "auto-latest": "最近输入",
         "auto-lazy-load": "启用懒加载"
+      },
+      "design": {
+        "structure": {
+          "name": "结构",
+          "desc": "不同类型的输入框，其结构也有所不同，具体如下所示：",
+          "image": "assets/design/auto-complete/structure.png",
+          "descList": [
+            {
+              "title": "1.  标签：",
+              "content": "默认状态：按需显示，内容标题，告知用户当前输入的内容。"
+            },
+            {
+              "title": "2.  输入框：",
+              "content": "默认状态：圆角，4px；承载用户的具体输入。"
+            },
+            {
+              "title": "3.  输入的内容：",
+              "content": "默认状态：颜色，#252B3A;用户输入的内容。"
+            },
+            {
+              "title": "4.  输入的结果：",
+              "content": "默认状态：联想，输入的内容; 首个结果为输入的内容。"
+            },
+            {
+              "title": "5.  自动补全的结果：",
+              "content": "默认状态：按需显示，根据输入的内容匹配到的选项; 根据输入的内容匹配包含输入内容字段的选项。"
+            }
+          ]
+        },
+        "how-to-use": {
+          "name": "如何使用",
+          "sub-name": "何时使用",
+          "descList": [
+            "需要对输入框而不是选择器提供输入建议/辅助提示，进行自动补全的操作",
+            "与搜索框Select组件的区别：",
+            "1.AutoComplete本质上是一个带提示的、增强型的提供输入建议文本输入框，而Select是一个选择器",
+            "2.AutoComplete用户可以自由输入，关键词是辅助输入，而Select则是在限定的可选项中进行选择，关键词是选择",
+            "3.AutoComplete只允许为字符串，而Select的已选项渲染可定制化程度更高，可以为任意类型"
+          ]
+        },
+        "scene": {
+          "name": "场景",
+          "sceneList": [
+            {
+              "name": "基本用法",
+              "desc": "根据当前输入以下拉选择的形式展示输入建议。",
+              "img": "assets/design/auto-complete/basic.png"
+            },
+            {
+              "name": "自定义选项",
+              "desc": "需要自定义渲染选项时，可以传入对象数组、特定后缀如邮箱等。",
+              "img": "assets/design/auto-complete/custom.png"
+            },
+            {
+              "name": "自定义输入组件",
+              "desc": "支持自定义输入组件，例如多行文本。",
+              "img": "assets/design/auto-complete/input.png"
+            },
+            {
+              "name": "是否区分大小写",
+              "desc": "区分大小写时则严格按照输入字符串的大小写进行匹配，比如：输入“Please”，含有“Please”的选项会被匹配，而“please”则不会被匹配。",
+              "img": "assets/design/auto-complete/classify.png"
+            },
+            {
+              "name": "类目划分",
+              "desc": "匹配的结果以类目进行分组。",
+              "img": "assets/design/auto-complete/group.png"
+            },
+            {
+              "name": "下拉框的位置",
+              "desc": "根据文本框的位置，可以自定义下拉框的位置，比如：文本框在页面最下方，激活输入后，下拉框可以出现在文本框的上方。",
+              "img": "assets/design/auto-complete/position.png"
+            },
+            {
+              "name": "输入值受限",
+              "desc": "只能选择匹配的下拉框选项，如果输入的值，下拉框里的选项不存在，则输入框失去焦点后，内容清空。",
+              "img": "assets/design/auto-complete/limited.png"
+            }
+          ]
+        },
+        "status": {
+          "name": "状态",
+          "desc": "输入框自动补全状态可分为：正常、禁用、异常（带文本提示）、Toast提示。",
+          "img": "assets/design/auto-complete/status.png"
+        },
+        "size": {
+          "name": "大小",
+          "desc": "有28px、32px、40px三种大小三种不同高度的输入框，以适应不同尺寸布局，通常情况下为32*32px；",
+          "img": "assets/design/auto-complete/size.png"
+        },
+        "rules": {
+          "name": "交互规则",
+          "desc": "文本输入框使用户可以与之交互并输入内容和数据，是表单中的常用控件。*32px；",
+          "sub-name": "单击（Click）",
+          "sub-desc": "文本输入框类组件可用时，激活文本框，光标出现，输入内容后，光标在内容之后。获取焦点后，水印文字不消失，输入字符才消失。",
+          "img": "assets/design/auto-complete/rules.png"
+        }
       }
     },
     "editormd": {
@@ -423,10 +594,6 @@
         "title": "checkbox 渲染",
         "description": "支持checkbox渲染。"
       },
-      "latexDemo": {
-        "title": "数学公式渲染",
-        "description": "支持Latex格式渲染"
-      },
       "tocDemo": {
         "title": "TOC 渲染",
         "description": "支持生成TOC目录"
@@ -457,7 +624,6 @@
         "single-render-md": "单独渲染md文本",
         "mermaid-render": "Mermaid渲染",
         "checked-render": "checkbox渲染",
-        "latex-render": "数学公式渲染",
         "toc-render": "TOC渲染",
         "uml-render": "UML渲染",
         "big-data-process": "大数据量场景处理"
@@ -548,11 +714,15 @@
       "sourceDemo": {
         "title": "传入source"
       },
+      "clickBlockDemo": {
+        "title": "点击可拦截"
+      },
       "anchorLinkValues": {
         "basic-breadcrumbs": "基础面包屑",
         "source-config-breadcrumbs": "传入source",
         "drop-down-breadcrumbs": "可下拉的面包屑",
-        "self-defined-breadcrumbs": "自定义下拉列表和分隔符的面包屑"
+        "self-defined-breadcrumbs": "自定义下拉列表和分隔符的面包屑",
+        "click-block-breadcrumbs": "点击可拦截的面包屑"
       }
     },
     "back-top": {
@@ -626,11 +796,6 @@
         "last": "上一步",
         "next": "下一步"
       },
-      "button-left-right": {
-        "title": "左按钮与右按钮",
-        "left": "左按钮",
-        "right": "右按钮"
-      },
       "button-text": {
         "title": "文字按钮",
         "ok": "确定",
@@ -639,7 +804,7 @@
       },
       "button-danger": {
         "title": "警示按钮",
-        "description": "用于标识系统中的关键操作，例如购买场景。",
+        "description": "用于标识系统中的关键操作，例如删除场景。",
         "purchase": "购买"
       },
       "button-loading": {
@@ -688,7 +853,6 @@
         "button-primary": "主要按钮",
         "button-common": "次要按钮",
         "button-primary-and-common": "主要按钮与次要按钮组合",
-        "button-left-right": "左按钮与右按钮",
         "button-danger": "警示按钮",
         "button-text": "文字按钮",
         "button-loading": "加载中状态",
@@ -696,6 +860,168 @@
         "button-icon": "图标按钮",
         "button-size": "按钮尺寸",
         "button-groups": "按钮组"
+      },
+      "design": {
+        "structure": {
+          "name": "结构",
+          "descList": [
+            {
+              "id": 1,
+              "name": "容器"
+            },
+            {
+              "id": 2,
+              "name": "图标"
+            },
+            {
+              "id": 3,
+              "name": "文字"
+            },
+            {
+              "id": 4,
+              "name": "按钮组"
+            }
+          ]
+        },
+        "how-to-use": {
+          "name": "如何使用",
+          "sub-name": "使用说明",
+          "desc": "根据业务需求，定义按钮的功能逻辑，用不同的颜色表达按钮的主次，并在按钮文案中明确描述其业务功能。结合业务场景，选择对应尺寸，如大、中、小尺寸按钮。",
+          "size-list": [
+            {
+              "name": "大号",
+              "font-desc": "字体：14px",
+              "height-desc": "容器高度：40px",
+              "width-desc": "最小宽：96px",
+              "image": "assets/design/button/lg.png"
+            },
+            {
+              "name": "中号",
+              "font-desc": "字体：14px",
+              "height-desc": "容器高度：32px",
+              "width-desc": "最小宽：80px",
+              "image": "assets/design/button/md.png"
+            },
+            {
+              "name": "小号",
+              "font-desc": "字体：12px",
+              "height-desc": "容器高度：28px",
+              "width-desc": "最小宽：64px",
+              "image": "assets/design/button/sm.png"
+            }
+          ]
+        },
+        "button-list": [
+          {
+            "name": "主要按钮",
+            "anchor": "button-primary",
+            "desc": "界面中需要强调某个操作时，需要使用强调型按钮。在界面上很突出，用于强调当前操作、正面引导。典型场景：弹框、主界面按钮。",
+            "image": "assets/design/button/primary.png"
+          },
+          {
+            "name": "次要按钮",
+            "anchor": "button-common",
+            "desc": "常规按钮，用于非主要动作。如果不确定选择哪种按钮，次按钮永远是最安全的选择。",
+            "image": "assets/design/button/common.png"
+          },
+          {
+            "name": "状态按钮",
+            "anchor": "button-danger",
+            "desc": "删除/移动/修改权限等危险操作，一般需要二次确认，指定为警示色，引起用户警惕。",
+            "image": "assets/design/button/danger.png"
+          },
+          {
+            "name": "文字按钮",
+            "anchor": "button-text",
+            "desc": "文本按钮为纯文本按钮，点击执行操作，可最大限度减少按钮对内容的干扰。",
+            "image": "assets/design/button/text.png"
+          },
+          {
+            "name": "图标按钮",
+            "anchor": "button-icon",
+            "desc": "仅图标为按钮。",
+            "image": "assets/design/button/icon.png"
+          },
+          {
+            "name": "包含图标的按钮",
+            "anchor": "button-icon-contain",
+            "desc": "按钮可以嵌入Icon，默认情况下Icon尺寸自动跟随按钮的尺寸变化。",
+            "image": "assets/design/button/icon-contain.png"
+          },
+          {
+            "name": "按钮组",
+            "anchor": "button-group",
+            "desc": "同级多项操作，以按钮组合方式展现。",
+            "image": "assets/design/button/group.png"
+          }
+        ],
+        "layout": {
+          "name": "主、次按钮相对位置",
+          "desc": "面向复杂的工具系统，主、次按钮的相对位置应有灵活的规则。灵活的布局策略通常会考虑到：",
+          "description1": "默认而言，主按钮都在次要按钮的 ⬅️左侧 ",
+          "description2": "特别的，目前主按钮适合放在在次要按钮➡️右侧 的3种已知场景有",
+          "layoutStrategies": [
+            {
+              "title": "操作维度",
+              "describe": "费茨法则（简而言之：屏幕边角可以兜住鼠标，靠边按钮可更轻易被选中）",
+              "img": "assets/design/button/layoutStrategies1.png"
+            },
+            {
+              "title": "认知心理学维度",
+              "describe": "人眼视线的关注规律（简而言之：左上>右上>左下>右下）",
+              "img": "assets/design/button/layoutStrategies2.png"
+            },
+            {
+              "title": "视觉重心维度",
+              "describe": "避免凌空垂吊一个主要按钮等",
+              "img": "assets/design/button/layoutStrategies3.png"
+            }
+          ],
+          "primaryLeft": [
+            {
+              "title": "弹窗",
+              "describe": "按钮大小：32px（大号）",
+              "img": "assets/design/button/primaryLeft1.png"
+            },
+            {
+              "title": "内容区操作",
+              "describe": "按钮大小：32px（中号）",
+              "img": "assets/design/button/primaryLeft2.png"
+            },
+            {
+              "title": "底部操作栏",
+              "describe": "按钮大小：40px（大号）",
+              "img": "assets/design/button/primaryLeft3.png"
+            }
+          ],
+          "primaryRight": [
+            {
+              "title": "服务头（按钮组整体在右侧）",
+              "describe": "按钮大小：28px（小号）",
+              "img": "assets/design/button/primaryRight1.png"
+            },
+            {
+              "title": "一些和标题同一行的再容器中靠右按钮区（和服务header逻辑类似）",
+              "describe": "按钮大小：32px（中号）",
+              "img": "assets/design/button/primaryRight2.png"
+            },
+            {
+              "title": "当按钮是“下一步”时。最后一步的顺序也是“上一步、取消、确定（主按钮）”",
+              "describe": "按钮大小：40px（大号）",
+              "img": "assets/design/button/primaryRight3.png"
+            },
+            {
+              "title": "独立编辑页",
+              "describe": "按钮大小：28px（小号）",
+              "img": "assets/design/button/primaryRight4.png"
+            },
+            {
+              "title": "侧边栏（仅侧边栏可用圆形添加按钮）",
+              "describe": "按钮大小：24px（圆形按钮）",
+              "img": "assets/design/button/primaryRight5.png"
+            }
+          ]
+        }
       }
     },
     "badge": {
@@ -763,6 +1089,9 @@
         "cardTitle": "DEVUI精品实践课",
         "text": "更新于07月31日15:55"
       },
+      "cardInteractiveDemo": {
+        "title": "可交互卡片"
+      },
       "mediaDemo": {
         "title": "使用图片",
         "description": "通过align可设置d-card-actions操作区域对齐方式：起始对齐、尾部对齐、拉伸对齐。",
@@ -772,6 +1101,7 @@
       "anchorLinkValues": {
         "card-basic": "基本用法",
         "card-with-media": "使用图片",
+        "card-interactive-usage": "可交互卡片",
         "card-custom": "自定义区域"
       }
     },
@@ -791,6 +1121,9 @@
       "autoplayDemo": {
         "title": "自动轮播"
       },
+      "withTransitionProgressDemo": {
+        "title": "显示切换进度条"
+      },
       "customDemo": {
         "title": "自定义操作"
       },
@@ -798,7 +1131,8 @@
         "basic-usage": "基本用法",
         "trigger-usage": "指示器&切换箭头",
         "autoplay-usage": "自动轮播",
-        "custom-usage": "自定义操作"
+        "custom-usage": "自定义操作",
+        "with-transition-progress-usage": "显示切换进度条"
       }
     },
     "checkbox": {
@@ -863,7 +1197,16 @@
         "p2": "滚动监听使用其他元素,比如window·"
       },
       "pipeDemo": {
+        "dDatePipe": {
         "title": "日期解析器"
+      },
+        "dSafeNullPipe": {
+          "title": "空值占位管道",
+          "description": "当数据为 ''、null、undefined时可指定任意字符进行占位展示，默认为：'--'"
+        }
+      },
+      "browserDemo": {
+        "title": "当前浏览器名和版本"
       },
       "openURLDemo": {
         "title": "在新标签页打开网页"
@@ -878,13 +1221,18 @@
       "helperDownloadDemo": {
         "title": "下载文件"
       },
+      "shapeIconHoverableDemo": {
+        "title": "shapeIcon 悬停变色"
+      },
       "anchorLinkValues": {
         "lazy-load": "懒加载指令",
+        "browser-version": "当前浏览器名和版本",
         "date-pipe": "日期解析器",
         "open-url": "新标签页打开网页",
         "download-file": "文件下载",
         "iframe-propagate": "iframe 冒泡事件",
-        "clipboard": "复制到剪贴板指令"
+        "clipboard": "复制到剪贴板指令",
+        "shapeIconHoverable": "shapeIcon 悬停变色"
       }
     },
     "color-picker": {
@@ -941,16 +1289,9 @@
             "themeValue": "当前主题色值",
             "description": "描述"
           },
-          "oldTable": {
-            "tab": "旧版主题颜色对照表",
-            "colorVar": "颜色变量",
-            "newVar": "新版变量",
-            "normalColor": "普通色值",
-            "darkColor": "暗黑色值",
-            "description": "描述"
-          },
           "colorSource": {
             "devui-global-bg": "全局带底色背景",
+            "devui-glass-morphism-bg": "毛玻璃样式背景色",
             "devui-global-bg-normal": "全局白色背景",
             "devui-base-bg": "基础区块背景白色",
             "devui-base-bg-dark": "基础区块背景深色(固定)",
@@ -963,6 +1304,7 @@
             "devui-text": "正文文本",
             "devui-text-weak": "弱化的正文信息（手风琴子项，表头）",
             "devui-aide-text": "辅助文本、帮助信息（面包屑）",
+            "devui-aide-text-hover": "辅助文本悬浮色，用于标签文本悬浮等场景",
             "devui-aide-text-stress": "辅助文本、帮助信息里的强调色",
             "devui-placeholder": "占位符",
             "devui-light-text": "有色深色背景下字体颜色（固定）",
@@ -985,11 +1327,17 @@
             "devui-shadow": "阴影色",
             "devui-light-shadow": "弱化阴影色",
             "devui-icon-text": "文字图标颜色，同 正文颜色",
+            "devui-icon-fill-weak": "弱化型图标填充色",
+            "devui-shape-icon-fill": "面型svg图标填充色",
+            "devui-shape-icon-fill-hover": "面型svg图标悬停反馈色",
+            "devui-shape-icon-fill-active": "面型svg图标高亮填充色（激活状态）",
+            "devui-shape-icon-fill-disabled": "面型svg图标禁用色",
             "devui-icon-bg": " svg图标 背景色",
             "devui-icon-fill": " svg图标 灰色填充色",
             "devui-icon-fill-hover": "svg图标 灰色填充色悬停反馈色",
             "devui-icon-fill-active": "svg图标 高亮填充色（激活状态）",
             "devui-icon-fill-active-hover": "svg图标 高亮填充色悬停反馈色",
+            "devui-form-control-bg": "表单控件背景色",
             "devui-form-control-line": "表单控件边框色，同 边框分割线",
             "devui-form-control-line-hover": "表单控件边框悬停反馈色",
             "devui-form-control-line-active": "表单控件边框激活色，用于获得焦点",
@@ -1004,7 +1352,7 @@
             "devui-disabled-bg": "disabled背景颜色",
             "devui-disabled-line": "disabled边框颜色",
             "devui-disabled-text": "disabled文字颜色",
-            "devui-primary-disabled": "主要按钮disabled状态文字颜色",
+            "devui-primary-disabled": "主要按钮disabled状态背景颜色",
             "devui-icon-fill-active-disabled": "svg图标激活状态禁用色",
             "devui-label-bg": "默认标签化选项背景色",
             "devui-connected-overlay-bg": "有连接点的弹出菜单层背景色",
@@ -1033,17 +1381,24 @@
             "devui-primary-line": "主要边框",
             "devui-primary-bg": "主要底色",
             "devui-default-line": "默认边框",
-            "devui-default-bg": "默认底色"
+            "devui-default-bg": "默认底色",
+            "devui-connected-overlay-shadow": "下拉菜单类阴影",
+            "devui-feedback-overlay-shadow": "信息提示类阴影"
           },
           "catalogs": {
             "basic": "基本变量",
-            "icon": "图标",
+            "text": "文字/图标",
             "form": "表单",
             "list": "列表",
             "disable": "禁用",
             "specialBackground": "特殊背景色",
             "button": "按钮",
-            "status": "状态"
+            "status": "状态色",
+            "brand": "主题色",
+            "shadow": "阴影色",
+            "border": "边框色",
+            "background": "背景色",
+            "others": "其他"
           },
           "catalogsList": {
             "theme": "主题色",
@@ -1161,7 +1516,7 @@
             "devui-shadow-length-slide-right": "向右滑动时出现在左侧边缘的阴影 (dataTable固定左侧列向右滑动)",
             "devui-shadow-length-connected-overlay": "有连接点的弹出(覆盖)层 (DatePicker Cascader Select TagsInput Pagination的下拉菜单等)",
             "devui-shadow-length-hover": "涉及到hover的地方",
-            "devui-shadow-length-feedback-overlay": "信息提示反馈类 (PopOver Tooltip Toast StepsGuide等)",
+            "devui-shadow-length-feedback-overlay": "信息提示反馈类 (PopOver Tooltip Toast StepsGuide等)及占位较大的卡片",
             "devui-shadow-length-fullscreen-overlay": "无连接点的弹出(覆盖)层 (Drawer Modal ImagePreview等)"
           },
           "oldShadows": {
@@ -1183,7 +1538,9 @@
             "devui-shadow": "阴影色",
             "devui-light-shadow": "弱化阴影色",
             "devui-connected-overlay-shadow": "有连接点的弹出(覆盖)层阴影色",
-            "devui-feedback-overlay-shadow": "信息提示反馈类阴影色"
+            "devui-feedback-overlay-shadow": "信息提示反馈类阴影色",
+            "devui-hover-shadow": "悬浮阴影色",
+            "devui-float-block-shadow": "特殊浮层背景色"
           }
         }
       },
@@ -1438,6 +1795,10 @@
         "title": "表格交互",
         "description": "支持列排序、列过滤、自定义过滤模板、选中、调整列宽\n支持两种实现方式，方式一通过自定义head、body模板和其中的行、单元格实现，方式二通过配置column来实现。"
       },
+      "memoryDemo": {
+        "title": "表格列宽记忆",
+        "description": "通过缓存来记忆列宽, 刷新后列宽不变。"
+      },
       "lazyDemo": {
         "title": "懒加载",
         "description": "使用lazy启用懒加载，当滚动表格底部时到触发loadMore事件实现懒加载。"
@@ -1462,8 +1823,15 @@
         "title": "大数据量树形表格交互",
         "description": "大数据量树形表格的高级操作，拖拽、复选、批量删除、继承原本数据表格的大部分功能。"
       },
+      "virtualScrollTreeTableMultiDragDemo": {
+        "title": "大数据树形表格批量拖拽",
+        "description": "按住ctrl批量选择行并进行批量拖拽"
+      },
       "mutilStylesDemo": {
         "title": "表格样式"
+      },
+      "dynamicColDemo": {
+        "title": "动态列及动态表格样式配置器"
       },
       "treeTableDemo": {
         "title": "树形表格",
@@ -1480,8 +1848,10 @@
       "anchorLinkValues": {
         "basic-usage": "基本用法",
         "mutil-styles": "表格样式",
+        "dynamic-cols": "动态列及样式配置器",
         "async-loading": "异步加载数据",
         "table-interaction": "表格交互",
+        "table-memory": "表格列宽记忆",
         "table-check-options": "自定义表格选中操作",
         "lazy-loading-of-list-data": "懒加载",
         "virtual-scroll": "虚拟滚动",
@@ -1498,7 +1868,8 @@
         "muti-drag-row": "批量行拖拽",
         "virtual-scroll-tree-table-basic": "大数据量树形表格基本用法",
         "virtual-scroll-tree-table-operation": "大数据量树形表格操作功能",
-        "virtual-scroll-tree-table-interaction": "大数据量树形表格交互"
+        "virtual-scroll-tree-table-interaction": "大数据量树形表格交互",
+        "virtual-scroll-tree-table-multi-drag": "大数据量树形表格批量拖拽"
       }
     },
     "datepickerPro": {
@@ -1746,7 +2117,7 @@
       },
       "disabledDemo": {
         "title": "使用禁用",
-        "description": "通过 disabled 自定义是否使用禁用。"
+        "description": "设置 disabled 禁用整个组件，也可传入 disabledKey 禁用单个选项。"
       },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
@@ -1862,6 +2233,7 @@
       },
       "innerValidatorDemo": {
         "title": "验证单个元素，使用内置校验器，配置error message",
+        "subtitle": "我们还内置了诸多校验器，可以前往 API 中查看更多信息。",
         "description": "<p> 当前<code>DevUI</code>支持的内置校验器有：<code>required、minlength、maxlength、min、max、requiredTrue、email、pattern、whitespace</code>。</p><p>若需限制用户输入不能全为空格，可使用<code>whitespace</code>内置校验器</p><p>若需限制用户输入长度，将最大限制设置为实际校验值<code>+1</code>是一个好的办法。</p><p>除<code>pattern</code>外，其他内置校验器我们也提供了内置的错误提示信息，在你未自定义提示消息时，我们将使用默认的提示信息。</p><p><code>message</code>配置支持<code>string</code>与<code>object</code>两种形式（支持国际化词条配置，如<code>'zh-cn'</code>，默认将取<code>'default'</code>）。</p>"
       },
       "customerValidatorDemo": {
@@ -1890,7 +2262,7 @@
       },
       "validateReactiveDemo": {
         "title": "响应式表单验证",
-        "description": "模板中绑定<code>formGroup、formControlName、formControl</code>，使用<code>dValidateRules</code>配置校验规则。<p>推荐阅读<a href=\"https://angular.cn/guide/reactive-forms\" target=\"_blank\">【Angular响应式表单】</a></p>"
+        "description": "模板中绑定<code>formGroup、formControlName、formControl</code>，使用<code>dValidateRules</code>配置校验规则。<p>推荐阅读<a class='devui-link' href=\"https://angular.cn/guide/reactive-forms\" target=\"_blank\">【Angular响应式表单】</a></p>"
       },
       "customStatusDemo": {
         "title": "指定表单Feedback状态",
@@ -1920,12 +2292,18 @@
         "demo-modal": "弹框表单",
         "demo-multi-col": "多列表单",
         "demo-filter": "表单过滤",
-        "demo-validate-template": "模板驱动表单验证（推荐）",
+        "demo-validate-template": "在表单中使用校验器",
         "demo-validate-reactive": "响应式表单验证",
         "demo-custom-status": "指定表单状态",
         "demo-validate-sync": "表单协同验证",
         "demo-validate-cross-component": "跨组件表单验证",
-        "demo-validate-update": "更新验证规则"
+        "demo-validate-update": "更新验证规则",
+        "demo-inner-validator": "使用内置校验器",
+        "demo-custom-validator": "自定义校验器",
+        "demo-error-strategy": "配置错误更新策略，校验时机",
+        "demo-custom-message": "自定义错误提示",
+        "demo-debounce-time": "自定义 debounce time",
+        "demo-user-register": "在用户注册场景中使用"
       }
     },
     "fullscreen": {
@@ -1947,15 +2325,15 @@
         "exitFullscreen": "退出全屏"
       },
       "customDemo": {
-        "title": "函数方式调用",
-        "description": "调用方法触发全屏。",
+        "title": "自定义全屏",
+        "description": "通过调用函数方法在指定容器中触发全屏。",
         "fullscreen": "全屏",
         "exitFullscreen": "退出全屏"
       },
       "anchorLinkValues": {
         "immersive-full-screen": "沉浸式全屏",
         "general-full-screen": "普通全屏",
-        "custom-full-screen": "函数方式调用"
+        "custom-full-screen": "自定义全屏"
       }
     },
     "transfer": {
@@ -2197,10 +2575,15 @@
         "title": "自定义模板",
         "description": "自定义抽屉板模板。"
       },
+      "resizeDemo": {
+        "title": "动态调整宽度",
+        "description": "侧滑宽度动态可调整"
+      },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
         "do-not-destroy-after-closing": "关闭后不销毁",
-        "template": "自定义模板"
+        "template": "自定义模板",
+        "resize": "动态调整宽度"
       }
     },
     "dropdown": {
@@ -2326,7 +2709,11 @@
       "tmw": "当需要同时支持用户输入数据和选择已有数据的时候使用，加入输入联想功能，方便用户搜索已有数据。",
       "basicDemo": {
         "title": "基本用法",
-        "description": "通过 source 设置数据源。"
+        "description": "通过 source 设置数据源，使用 enableSelectedValueList 控制在已选值时是否显示全部选项。"
+      },
+      "objectDemo": {
+        "title": "使用对象数组",
+        "description": "对象数组默认读取 label 属性，可使用 value Parser 和 formatter 方法自定义显示值和格式。"
       },
       "disableDataDemo": {
         "title": "设置禁用选项",
@@ -2344,12 +2731,18 @@
         "title": "数据懒加载",
         "description": "数据懒加载。"
       },
+      "customAreaDemo": {
+        "title": "自定义区域",
+        "description": "通过传入模板自定义区域"
+      },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
+        "object-source": "使用对象数组",
         "disable-data-with-source": "设置禁用选项",
         "with-search-function": "自定义匹配方法",
         "async-data-with-function": "异步获取数据源并设置匹配方法",
-        "lazy-load": "数据懒加载"
+        "lazy-load": "数据懒加载",
+        "custom-area-usage": "自定义区域"
       }
     },
     "editorx": {
@@ -2364,7 +2757,7 @@
       },
       "customToolbarDemo": {
         "title": "自定义工具栏",
-        "description": "完整功能+自定义工具栏分组+收起不常用的工具按钮。"
+        "description": "自定义工具栏图标+自定义工具栏分组+收起不常用的工具按钮。"
       },
       "readOnlyModeDemo": {
         "title": "只读模式",
@@ -2478,6 +2871,10 @@
         "title": "标准对话框",
         "description": "使用dialogService可拖拽的标准对话框。"
       },
+      "maximizeDemo":{
+        "title":"最大化对话框",
+        "description":"使用showMaximizeBtn可设置最大化/退出最大化按钮的显示/隐藏"
+      },
       "customizeDemo": {
         "title": "自定义对话框",
         "description": "使用modalService可以自定义对话框内的所有内容。"
@@ -2516,6 +2913,7 @@
       },
       "anchorLinkValues": {
         "standard-dialog": "标准对话框",
+        "maximize-dialog":"最大化对话框",
         "custom-dialog": "自定义对话框",
         "intercept-dialog-closed": "拦截对话框关闭",
         "message-hint": "信息提示",
@@ -2651,16 +3049,21 @@
       "description": "进度条。",
       "tmw": "<div>1. 当操作需要较长的时间时，向用户展示操作进度。</div> <div>2. 当操作需要打断现有界面或后台运行，需要较长时间时。</div> <div>3. 当需要显示一个操作完成的百分比或已完成的步骤/总步骤时。</div>",
       "basicDemo": {
-        "title": "基本用法",
-        "description": "基本的进度和文字配置。"
+        "title": "线形进度条",
+        "description": "可配置在中间、右端或随进度显示的文字和自定义模板。"
       },
       "circleDemo": {
-        "title": "圆环用法",
-        "description": "基本的进度和文字配置。"
+        "title": "环形进度条",
+        "description": "可配置在环形中间显示文字或自定义模板。"
+      },
+      "multipleDemo": {
+        "title": "自定义多色进度条",
+        "description": "可配置多段不同色值或渐变色。"
       },
       "anchorLinkValues": {
-        "basic-usage": "基本用法",
-        "circle-usage": "圆环用法"
+        "basic-usage": "线形进度条",
+        "circle-usage": "环形进度条",
+        "multiple-usage": "自定义多色进度条"
       }
     },
     "quadrant-diagram": {
@@ -2838,7 +3241,7 @@
       },
       "AllowClearValueDemo": {
         "title": "允许清空值",
-        "description": "",
+        "description": "通过修改ngModel变量清空选中值",
         "test": "选项"
       },
       "CustomAreaDemo": {
@@ -2961,6 +3364,112 @@
         "user-search-n-lazyload": "用户场景：自定义搜索的懒加载",
         "user-mail-search": "用户场景：自定义搜索和模板结合 —— 邮箱搜索",
         "model-value": "ngModel值处理"
+      },
+      "design": {
+        "structure": {
+          "name": "结构",
+          "basic": {
+            "name": "基础选择",
+            "img": "assets/design/select/structure.png",
+            "descList": [
+              {
+                "title": "标签：",
+                "content": "默认状态：按需显示，内容标题，告知用户当前下拉选择的内容。"
+              },
+              {
+                "title": "触发器：",
+                "content": "整个框的区域都可点击触发：点击触发展开选项列表，三角形朝上；再次点击收起选项列表，三角线朝下。"
+              },
+              {
+                "title": "内容录入区：",
+                "content": "默认状态：显示占位文字，格式为“请选择“（具体文案不做规定）;显示已选结果时：单选项若文案过长显示不下，则显示'...'"
+              },
+              {
+                "title": "选项列表区：",
+                "content": "展开选择列表; 列表内容可分组。"
+              }
+            ]
+          },
+          "muti": {
+            "name": "多项选择",
+            "img": "assets/design/select/structure2.png",
+            "descList": [
+              {
+                "title": "已选标签：",
+                "content": "不限制特定字符长度，无论所选选项字符数量多少，均保持右侧距选项清除图标安全距离4px。超出可显示数量；也可设置自适应拓展内容录入区高度。"
+              },
+              {
+                "title": "清空：",
+                "content": "当已有选项，鼠标移到输入框中时，点击则可删除全部已选选项。可按需选择是否使用。"
+              },
+              {
+                "title": "滚动条：",
+                "content": "内容录入区：当选项数量展示超出三行时，显示竖向滚动条，滚动条最低高度32px；选项列表区：当选项数量超出当前高度时，允许显示竖向滚动条，滚动条最低高度80px。"
+              },
+              {
+                "title": "复选框：",
+                "content": "当选项被选中后，会按照列表排列顺序依次展现在上方选择框中；当全选状态下时，选框只单独显示“全选”选项。"
+              },
+              {
+                "title": "选项文字：",
+                "content": "选项字体默认使用常规体积；“全选”选项字体均使用中黑体。"
+              },
+              {
+                "title": "已选选项：",
+                "content": "不限制特定字符长度，字符右侧距离背景已选选框安全距离16px。"
+              },
+              {
+                "title": "选项背景：",
+                "content": "选项背景整体宽度和高度由业务根据具体场景自行确定，若不定义，高度默认支持显示到12项，超出则显示滚动条；默认与下拉框宽度保持一致，可选择比下拉宽更框，但不可更窄，背景距离滚动条保持左侧安全距离4px，选项选中背景右侧距滚动条保持安全距离8px。"
+              }
+            ]
+          }
+        },
+        "how-to-use": {
+          "name": "如何使用",
+          "descList": [
+            "适用于用户可以快速做出选择的场景；",
+            "常规下拉菜可根据业务具体场景自行调整高度或宽度，若不定义，高度默认支持显示到12项，超出则右侧显示滚动条下拉，若下拉框存在多级，取最大级的宽度做为宽度标准。"
+          ]
+        },
+        "selectList": [
+          {
+            "name": "基础选择",
+            "desc": "",
+            "image": "assets/design/select/basic.png"
+          },
+          {
+            "name": "多级菜单",
+            "desc": "下拉框存在多级状态下，取最大级的宽度做为宽度标准，当选择完成后，单选下拉框内可同时展示父级/子级内容，选项层级建议不超过 3 层。",
+            "image": "assets/design/select/muti.png"
+          },
+          {
+            "name": "选择即改变",
+            "desc": "选框内实时更新已选选项",
+            "image": "assets/design/select/change.png"
+          },
+          {
+            "name": "带标题下拉",
+            "desc": "当选择操作完成后，单选下拉框内仅单独展示所选选项文字内容（标题不做同步展示）",
+            "image": "assets/design/select/title.png"
+          },
+          {
+            "name": "带图标下拉",
+            "desc": "当选择操作完成后，常规状态下，下拉框内选项文案及所搭配图标同步展示；多级状态下，只展示子级文案及所搭配图标",
+            "image": "assets/design/select/icon.png"
+          },
+          {
+            "name": "多项选择",
+            "desc": "以Tag形式展示已选择项；点击标签后的“x”号则移除该标签。触发器后面的“x”号则清除全部选项。  ",
+            "image": "assets/design/select/options.png",
+            "image2": "assets/design/select/options2.png"
+          },
+          {
+            "name": "可输入搜索",
+            "desc": "当选项超过25个时，建议开启可输入搜索功能，帮助用户快速找到指定相关内容。",
+            "image": "assets/design/select/input.png"
+          }
+        ]
       }
     },
     "cascader": {
@@ -3114,17 +3623,17 @@
       }
     },
     "tabs": {
-      "name": "Tabs 选项卡切换",
+      "name": "Tabs 页签",
       "type": "导航",
       "path": "tabs",
-      "description": "选项卡切换组件。",
+      "description": "页签组件。",
       "tmw": "用户需要通过平级的区域将大块内容进行收纳和展现，保持界面整洁。",
       "basicDemo": {
         "title": "基本用法",
         "description": ""
       },
       "withoutContentDemo": {
-        "title": "禁用选项卡",
+        "title": "禁用页签",
         "description": "",
         "activeID:": "activeID:"
       },
@@ -3149,33 +3658,38 @@
         "description": ""
       },
       "sizeDemo": {
-        "title": "选项卡尺寸",
-        "description": "选项卡有4种大小，可以根据业务场景选择合适大小的尺寸。"
+        "title": "页签尺寸",
+        "description": "页签有4种大小，可以根据业务场景选择合适大小的尺寸。"
       },
       "beforeChangeDemo": {
         "title": "拦截tab切换",
-        "description": "使用beforeChange拦截选项卡切换。"
+        "description": "使用beforeChange拦截页签切换。"
       },
       "addDeleteDemo": {
         "title": "添加 / 删除",
-        "description": "添加和删除选项卡。"
+        "description": "添加和删除页签。"
       },
       "bigDataDemo": {
         "title": "大数据展示",
-        "description": "需要使用大量选项卡切换。"
+        "description": "可选择直接开启和自动判断两种模式"
+      },
+      "configurableTabsDemo": {
+        "title": "自定义Tabs显示与排列",
+        "description": "通过引入transfer组件，实现tabs的自定义显示。"
       },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
-        "no-set-content": "禁用选项卡",
+        "no-set-content": "禁用页签",
         "custom-template": "自定义模板",
         "type-pills": "Pills类型",
         "type-options": "Options类型",
         "type-slider": "Slider类型",
         "type-wrapped": "Wrapped类型",
-        "size": "选项卡尺寸",
+        "size": "页签尺寸",
         "intercept-tab-switch": "拦截tab切换",
         "add-delete": "添加 / 删除",
-        "big-data": "大数据展示"
+        "big-data": "大数据展示",
+        "custom-tabs-display-and-arrangement": "自定义Tabs显示与排列"
       }
     },
     "tags": {
@@ -3192,9 +3706,14 @@
         "title": "标签组",
         "description": "标签组可传入字符串数组或对象数组，在对象数组中，可通过displayProperty，titleProperty设置标签显示值和title显示值，通过labelStyle设置标签样式。"
       },
+      "hideDemo": {
+        "title": "多标签超出隐藏",
+        "description": "当标签组总宽度超过定宽宽度且hideBeyondTags为true时隐藏多余标签，点击+x后弹窗显示剩余标签"
+      },
       "anchorLinkValues": {
         "single-tag": "单个标签",
-        "tags-group": "标签组"
+        "tags-group": "标签组",
+        "hide-tags": "多标签超出隐藏"
       }
     },
     "tags-input": {
@@ -3209,15 +3728,16 @@
       "asyncDemo": {
         "title": "异步数据源"
       },
-      "ngmodelDemo": {
-        "title": "双向绑定"
+      "customizeDemo": {
+        "title": "自定义",
+        "description": "标签中包含 'item' 才能输入"
       },
       "virtualScrollDemo": {
         "title": "虚拟滚动"
       },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
-        "ng-model": "双向绑定",
+        "customize": "自定义",
         "async-input": "异步数据源",
         "virtual-scroll": "虚拟滚动"
       }
@@ -3256,6 +3776,10 @@
       "customDotDemo": {
         "title": "时间点自定义"
       },
+      "singleDemo": {
+        "title": "单边模式",
+        "description": "通过设置mode为 top|bottom|left|right 将时间轴设置为指定位置展示内容的单边模式"
+      },
       "anchorLinkValues": {
         "basic-usage": "设置时间位置",
         "direction": "设置方向",
@@ -3263,7 +3787,8 @@
         "content-with-html": "内容使用html",
         "content-with-template": "内容使用模板自定义",
         "content-with-alternative-mode": "时间节点内容方向自定义",
-        "seperate-way": "时间节点单独使用"
+        "seperate-way": "时间节点单独使用",
+        "single": "单边模式"
       }
     },
     "toast": {
@@ -3287,6 +3812,10 @@
         "title": "每个消息使用单独的超时时间",
         "description": "当设置超时时间模式为single时，每个消息使用自身的life作为超时时间，如果未设置则按severity判断，severity也未设置时默认超时时间为5000毫秒。"
       },
+      "appendDemo": {
+        "title": "追加显示",
+        "description": "在指定数量范围内追加显示新消息，而不是清空原有消息，需注意新消息插入后会重置已有消息的持续时间"
+      },
       "serviceDemo": {
         "title": "服务方式调用",
         "description": "使用服务的方式创建toast全局通知。"
@@ -3296,7 +3825,8 @@
         "life": "超时时间",
         "style": "自定义样式",
         "toast-service": "服务方式调用",
-        "single": "每个消息使用单独的超时时间"
+        "single": "每个消息使用单独的超时时间",
+        "append": "追加显示"
       }
     },
     "tooltip": {
@@ -3361,17 +3891,22 @@
       },
       "prefixDemo": {
         "title": "自定义前缀",
-        "description": "自定义前缀。"
+        "description": "自定义一个或多个前缀。"
       },
       "customDemo": {
         "title": "自定义模板",
         "description": "自定义列表单条展示模板。"
       },
+      "toggleDemo": {
+        "title": "是否使用间隔符",
+        "description": "为避免与其他内容混淆，前缀符 + 关键字前后有间隔符才能分别触发和结束组件，默认间隔符为半角空格。"
+      },
       "anchorLinkValues": {
         "basic-usage": "基本用法",
         "async-usage": "异步用法",
         "custom-prefix": "自定义前缀",
-        "custom-template": "自定义模板"
+        "custom-template": "自定义模板",
+        "use-separator": "是否使用间隔符"
       }
     },
     "toggle": {
@@ -3529,10 +4064,30 @@
         "title": "自定义用法",
         "description": "自定义编辑时的显示模板。"
       },
+      "editableDemo": {
+        "title": "可编辑用法",
+        "description": "可自定义初始模板、编辑模板，也可设置内容字符串、内容投影等形式。支持直接点击编辑和操作图标按钮编辑、复制等。"
+      },
+      "textOverflowDemo": {
+        "title": "文本溢出缩略",
+        "description": "支持单行和多行场景，优先使用样式方式处理。",
+        "singleLineContent": "DevUI组件库源自于华为内部大量业务的多年沉淀，支持灵活配置的组件才能满足不同诉求。",
+        "multiRowContent": "DevUI是面向企业中后台产品的开源前端解决方案，其设计价值观基于\"至简\"、\"沉浸\"、\"灵活\"三种自然与人文相结合的理念，旨在为设计师、前端开发者提供标准的设计体系，并满足各类落地场景，是一款企业级开箱即用的产品。",
+        "singleLineTitle": "使用样式处理单行文本",
+        "multiRowIsWebkitTitle": "如果浏览器支持webkit使用样式处理多行文本",
+        "multiRowNotWebkitTitle": "使用计算方式处理多行文本",
+        "multiRowExpandTitle": "设置展开收起显示多行文本"
+      },
+      "adaptiveInputDemo": {
+        "title": "自适应内容输入框",
+        "description": "编辑时将单行input扩展为textarea，结束后恢复。使用户在使用单行input时更方便的输入和阅读大量文本内容。"
+      },
       "anchorLinkValues": {
         "title-usage": "标题用法",
         "text-usage": "文本用法",
-        "custom-usage": "自定义用法"
+        "editable-usage": "可编辑用法",
+        "text-overflow": "文本溢出缩略",
+        "adaptive-input": "自适应内容输入框"
       }
     },
     "upload": {
@@ -3933,6 +4488,159 @@
         "basic-usage": "基本用法",
         "size": "尺寸",
         "password-input": "密码框"
+      },
+      "design": {
+        "structure": {
+          "name": "结构",
+          "desc": "不同类型的输入框，其结构也有所不同，具体如下所示：",
+          "image": "assets/design/text-input/structure.png",
+          "descList": [
+            {
+              "title": "标签：",
+              "content": "默认状态：按需显示，内容标题，告知用户当前输入的内容。"
+            },
+            {
+              "title": "输入框：",
+              "content": "默认状态：圆角，4px；承载用户的具体输入。"
+            },
+            {
+              "title": "占位符：",
+              "content": "默认状态：按需显示，内容提示说明;可利用占位符告知用户填写格式，或邀请用户进行输入。"
+            },
+            {
+              "title": "前置标签：",
+              "content": "默认状态：按需显示，前置标签名或图标; 告知用户输入文本的类型。"
+            },
+            {
+              "title": "后置标签：",
+              "content": "默认状态：按需显示，后置标签名或图标; 一般为单位，和前置的类型相关联。"
+            },
+            {
+              "title": "类型：",
+              "content": "默认状态：按需显示，类型名称; 用户可选择输入内容的类型。"
+            },
+            {
+              "title": "分隔符：",
+              "content": "默认状态：圆点，4px; 固定符号，不需要用户输入。"
+            },
+            {
+              "title": "可见/隐藏图标：",
+              "content": "默认状态：图标，默认为不可见图标; 可以切换密码可见性，每次点击均切换是否可见性。"
+            },
+            {
+              "title": "字数提示：",
+              "content": "字数提示：默认状态：分数形式，默认分子为0，分母按需显示; 对输入的内容进行字数统计，一般用于有字数限制的输入框内。"
+            },
+            {
+              "title": "连接符：",
+              "content": "默认状态：横线，默认分子为0，分母按需显示; 连接前后两个输入框，视情况而定，可有可无。"
+            }
+          ]
+        },
+        "how-to-use": {
+          "name": "如何使用",
+          "layout": {
+            "name": "布局",
+            "layoutList": [
+              {
+                "image": "assets/design/text-input/layout1.png",
+                "desc": "推荐",
+                "descList": [
+                  "1、更好的阅读路径 ",
+                  "2、更好的标题字长兼容性",
+                  "3、更整齐的排版",
+                  "4、更好的拓展挂件兼容性"
+                ]
+              },
+              {
+                "image": "assets/design/text-input/layout2.png",
+                "desc": "慎用",
+                "descList": [
+                  "仅在空间有限的可折叠区域使用左右排版，比如高级搜索组件中"
+                ]
+              }
+            ]
+          },
+          "when-to-use": {
+            "name": "何时使用",
+            "desc1": "当需要用户输入文本内容时，可带前缀或后缀。",
+            "desc2": "可与其它组件组合使用，如组合成一个分类输入框，还可以进行大小选择。"
+          },
+          "sceneName": "场景",
+          "sceneList": [
+            {
+              "name": "基本用法",
+              "desc": "最基础的单行文本输入框，按状态可分为正常、禁用、错误等。通常在需要输入少量内容的场景下使用。",
+              "image": "assets/design/text-input/basic.png"
+            },
+            {
+              "name": "前、后预置文本输入框",
+              "desc": "在输入框前后加入一些特定的纯展示标签或图标，通常在需要提高辨识效率时使用，且前后置标签或图标不允许编辑和删除。",
+              "image": "assets/design/text-input/input.png"
+            },
+            {
+              "name": "分类输入框",
+              "desc": "当用户需要输入的表单域内容有多种类型时，应该使用分类输入文本框，先通过下拉菜单选择类型，根据不同类型输入不同的内容。",
+              "image": "assets/design/text-input/classify.png"
+            },
+            {
+              "name": "IP输入框",
+              "desc": "当用户需要分区输入表单域内容时，应该使用分区输入框，用户可以自定义分隔符，比如设置为“·”、“-”、“｜”或“/”等符号。例如输入IP地址，IPv4共32位，用“·”分为4段，每段地址的取值范围位0-255，如不在该区域内不允许上屏，直接强转为最大值。",
+              "image": "assets/design/button/structure.png",
+              "desc2": "例如：IPv6共128位，用“：”分成8段，每段地址的取值范围为0000-ffff。IPv6地址不区分大小写，如果有一组或连续几组都是0，可简写成“::”，只能有一个“::”。",
+              "image2": "assets/design/text-input/ip.png"
+            },
+            {
+              "name": "密码输入框",
+              "desc": "当需要输入密码等账号信息时，用“·”来显示密码，并可通过显示/隐藏图标来控制密码可见性。用于强安全信息输入的场景。",
+              "image": "assets/design/text-input/password.png"
+            },
+            {
+              "name": "组合输入框",
+              "desc": "多个输入框相组合，或与其他控件（如下拉）组合，可通过“-”连接，也可不通过任何符号连接。用于一些固定组合或者固定格式输入的场景，以方便识别，如输入电话号码。",
+              "image": "assets/design/text-input/combine.png"
+            },
+            {
+              "name": "字数限制",
+              "descList": [
+                "设置输入框最大输入字数，在最右侧显示字数统计，多用于有字数限制的场景，如名称；超过最大字数时会展示错误状态；如果右侧配置了字数统计，那么输入框则不可再配置其他类型内容。",
+                "一个中文汉字表示两个字符长度，一个英文字符或数字表示一个字符长度。"
+              ],
+              "image": "assets/design/text-input/limited.png"
+            },
+            {
+              "name": "可清空内容输入框",
+              "desc": "带清空操作的输入框，当用户需要清空输入框里的内容时，点击图标可快捷清空输入的所有内容。",
+              "image": "assets/design/text-input/clear.png"
+            },
+            {
+              "name": "辅助信息",
+              "descList": [
+                "当使用占位符文本不能满足合理地提示用户要求，或者在用户输入时需要强调一些关键信息时，可以使用辅助信息。",
+                "辅助信息区分两种形式：图标Tips 和 帮助文本。对于需要在用户填写时特别强调的，建议使用帮助文本显示在文本框下方；其他情况建议图标Tips的方式，以免给用户带来过大的信息负荷。",
+                "文本框下方的帮助文本和图标Tips只能选其一，不可同时出现在同一个输入框文本上。"
+              ],
+              "image": "assets/design/text-input/support.png"
+            }
+          ],
+          "status": {
+            "name": "状态及校验",
+            "desc": "输入框状态可分为：正常、禁用、异常（带文本提示）、Toast提示。",
+            "image": "assets/design/text-input/status.png"
+          },
+          "size": {
+            "name": "大小",
+            "desc": "有28px、32px、40px三种大小三种不同高度的输入框，以适应不同尺寸布局，通常情况下为32*32px；",
+            "image": "assets/design/text-input/size.png"
+          },
+          "rules": {
+            "name": "交互规则",
+            "desc": "文本输入框使用户可以与之交互并输入内容和数据，是表单中的常用控件。",
+            "sub-name": "单击（Click）",
+            "sub-desc": "文本输入框类组件可用时，激活文本框，光标出现，输入内容后，光标在内容之后。获取焦点后，水印文字不消失，输入字符才消失。",
+            "image": "assets/design/text-input/rules.png"
+          }
+        }
       }
     },
     "textarea": {
@@ -4077,7 +4785,11 @@
       },
       "customDemo": {
         "title": "自定义展示模板",
-        "description": "自定义类型及下拉列表展示内容模板"
+        "description": "自定义分类下拉展示模板"
+      },
+      "extendDemo": {
+        "title": "自定义扩展按钮",
+        "description": "通过输入添加选项并禁用扩展按钮，使用自定义扩展按钮重置选项"
       },
       "autoScrollDemo": {
         "title": "大数据量优化展示",
@@ -4085,7 +4797,8 @@
       },
       "anchorLinkValues": {
         "basicDemo": "基本用法",
-        "customDemo": "自定义类型",
+        "customDemo": "自定义展示模板",
+        "extendDemo": "自定义扩展按钮",
         "autoScrollDemo": "大数据量优化展示"
       }
     },
@@ -4157,9 +4870,26 @@
       "trend-icon-template": {
         "title": "自定义趋势图标"
       },
+      "showTrendDemo": {
+        "title": "控制趋势显示"
+      },
+      "trendPositionDemo": {
+        "title": "趋势显示位置"
+      },
+      "customTrendStyleDemo": {
+        "title": "自定义趋势数字样式"
+      },
+      "withSubtextDemo": {
+        "title": "趋势带辅助文本",
+        "description": "如果实际使用需要带百分号，分数如 95%, 222/250 时可以自定义样式"
+      },
       "anchorLinkValues": {
         "basicDemo": "基本用法",
-        "trend-icon-template": "自定义趋势图标"
+        "trend-icon-template": "自定义趋势图标",
+        "show-trend-usage": "控制趋势显示",
+        "trend-position-usage": "趋势显示位置",
+        "custom-trend-style-usage": "自定义趋势数字样式",
+        "with-subtext-usage": "趋势带辅助文本"
       }
     },
     "line-chart": {
@@ -4368,6 +5098,28 @@
         "type-usage": "状态与类型",
         "custom-usage": "自定义配置"
       }
+    },
+    "config-provider": {
+      "name": "自定义Config容器",
+      "type": "演进中",
+      "path": "config-provider",
+      "description": "自定义Config容器，可使用容器进行局部主题化等配置。",
+      "tmw": "需要自定义局部容器配置项时。",
+      "themeDemo": {
+        "title": "局部主题化",
+        "description": "使用themeId（已初始化）或直接使用theme自定义配置局部主题。"
+      },
+      "anchorLinkValues": {
+        "custom-theme": "局部主题化"
+      }
     }
+  },
+  "footer": {
+    "desc": "找到我们",
+    "github": "Github",
+    "team": "DevUI团队",
+    "design": "DevUI Design",
+    "group": "官方交流群",
+    "tabDesign": "设计"
   }
 }

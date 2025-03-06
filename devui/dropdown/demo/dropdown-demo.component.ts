@@ -6,6 +6,14 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'd-demo-dropdown',
   templateUrl: './dropdown-demo.component.html',
+  styles: [
+    `
+      :host ::ng-deep .icon-chevron-down-2 {
+        font-size: 14px !important;
+        vertical-align: middle;
+      }
+    `,
+  ],
 })
 export class DropdownDemoComponent implements OnInit, OnDestroy {
   basicSource: Array<DevuiSourceData> = [
@@ -44,7 +52,7 @@ export class DropdownDemoComponent implements OnInit, OnDestroy {
   multiLevelSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./multi-level/multi-level.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./multi-level/multi-level.component.ts?raw') },
-    { title: 'SCSS', language: 'css', code: require('./multi-level/multi-level.component.css?raw') },
+    { title: 'SCSS', language: 'css', code: require('./multi-level/multi-level.component.scss?raw') },
   ];
 
   dropdownDemoSetIsOpen: Array<DevuiSourceData> = [

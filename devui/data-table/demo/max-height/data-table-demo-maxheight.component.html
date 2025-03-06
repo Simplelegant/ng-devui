@@ -1,7 +1,7 @@
 <d-data-table
   [dataSource]="maxHeightDataSource"
-  [tableOverflowType]="'overlay'"
   [fixHeader]="true"
+  [tableOverflowType]="'overlay'"
   tableHeight="360px"
   [containFixHeaderHeight]="true"
   [scrollable]="true"
@@ -15,7 +15,7 @@
     <ng-template let-rowItem="rowItem" let-rowIndex="rowIndex">
       <tr dTableRow>
         <td dTableCell *ngFor="let colOption of dataTableOptions.columns">
-          {{ colOption.fieldType === 'date' ? (rowItem[colOption.field] | i18nDate: 'short':false) : rowItem[colOption.field] }}
+          {{ colOption.fieldType === 'date' ? (rowItem[colOption.field] | i18nDate : 'short' : false) : rowItem[colOption.field] }}
         </td>
       </tr>
     </ng-template>

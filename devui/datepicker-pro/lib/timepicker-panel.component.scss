@@ -40,27 +40,21 @@
 
     .devui-time-list {
       flex: 1;
-      overflow-x: hidden;
-      overflow-y: scroll;
-      overflow-y: overlay;
+      overflow: hidden;
       scroll-behavior: auto;
-      padding-right: 12px;
-      scrollbar-width: none;
+      padding-right: 6px;
+      scrollbar-gutter: stable;
 
       &:last-child {
         padding-right: 0;
       }
 
       &::-webkit-scrollbar {
-        width: 0 !important;
+        width: $devui-scrollbar-width-sm;
       }
 
       &:hover {
-        scrollbar-width: thin;
-
-        &::-webkit-scrollbar {
-          width: 4px !important;
-        }
+        overflow-y: scroll;
       }
 
       .devui-time-item {
@@ -75,7 +69,11 @@
         }
 
         &:last-child {
-          margin-bottom: 260px;
+          margin-bottom: 254px;
+        }
+
+        &.disabled {
+          cursor: not-allowed;
         }
       }
     }

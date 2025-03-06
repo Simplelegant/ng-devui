@@ -1,6 +1,6 @@
 import {
-  AfterContentInit,
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ContentChildren,
   ElementRef,
@@ -11,8 +11,9 @@ import {
   QueryList,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
+import { sum } from 'lodash-es';
 import { Observable } from 'rxjs';
 import { TabComponent } from './tab.component';
 
@@ -28,14 +29,14 @@ export interface ITabOperation {
   exportAs: 'tabs',
   preserveWhitespaces: false,
 })
-export class TabsComponent implements AfterContentInit, OnChanges, AfterViewInit {
+export class TabsComponent implements OnChanges, AfterViewInit {
   static ID_SEED = 0;
   @ViewChild('tabsEle') tabsEle: ElementRef;
   @ViewChild('tabsViewport') tabsViewport: ElementRef;
   @Input() type: 'tabs' | 'pills' | 'options' | 'wrapped' | 'slider' = 'tabs';
   @Input() size: 'lg' | 'md' | 'sm' | 'xs' = 'md';
   @Input() showContent = true;
-  @Input() scrollMode = false;
+  @Input() scrollMode: boolean | 'normal' | 'auto' = false;
   @Input() activeTab: number | string;
   @Input() customWidth: string;
   @Input() reactivable = false;
@@ -43,7 +44,19 @@ export class TabsComponent implements AfterContentInit, OnChanges, AfterViewInit
   @Input() closeableIds = [];
   @Input() addable = false;
   @Input() addTabTpl: TemplateRef<any>;
-  @Input() beforeChange: (value) => boolean | Promise<boolean> | Observable<boolean>;
+  @Input() scrollModeOperationTpl: TemplateRef<any>;
+  /**
+   * @todo
+   * 待重新设计
+   */
+  @Input() vertical = false;
+  /**
+   * @deprecated
+   * class设置无需内层，外层即可
+   */
+  @Input() cssClass: string;
+  @Input() isHidden = false;
+  @Input() beforeChange: (currentValue, previousValue) => boolean | Promise<boolean> | Observable<boolean>;
   @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
   @Output() activeTabChange = new EventEmitter<number | string>();
   @Output() addOrDeleteTabChange = new EventEmitter<ITabOperation>();
@@ -51,57 +64,72 @@ export class TabsComponent implements AfterContentInit, OnChanges, AfterViewInit
   offsetIndex = 0;
   offsetLeft: number;
   offsetWidth: number;
+  scrollModeToggle = false;
   tabsWidth = [];
+  ARROW_DROPDOWN_WIDTH = 128; // 两边箭头和下拉菜单按钮的宽度 48 + 32 + 48
 
   get isShowShadow() {
-    return this.scrollMode && ['tabs', 'pills', 'wrapped'].includes(this.type);
+    return this.scrollModeToggle && ['tabs', 'pills', 'wrapped'].includes(this.type);
   }
 
-  constructor() {
+  constructor(private el: ElementRef, private cdr: ChangeDetectorRef) {
     this.id = `devuiTabs${TabsComponent.ID_SEED++}`;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.type === 'slider' && changes['activeTab']) {
+    const { activeTab, scrollMode } = changes;
+    if (scrollMode) {
+      this.getTabsWidth();
+    }
+    if (activeTab) {
       this.changeActiveSlidingBlock();
+      if (this.scrollModeToggle && this.tabsEle && this.tabs) {
+        const tabs = this.tabsEle.nativeElement.querySelectorAll('li.devui-nav-tab-item');
+        const index = Array.from(this.tabs).findIndex((item) => item.id === this.activeTab);
+        this.offsetIndex = index;
+        this.scrollIntoView(tabs[index]);
+      }
     }
   }
 
   ngAfterViewInit(): void {
-    if (this.type === 'slider' && this.activeTab === undefined && this.tabs.length > 0 && this.tabs[0]) {
-      this.select(this.tabs.first.id, this.tabsEle.nativeElement.getElementById(this.tabs[0].tabId));
+    if (this.tabs.length) {
+      if (this.activeTab === undefined) {
+        // 无选中页签则默认选择第一个未被禁用的页签
+        const { id } = this.tabs.find((item) => !item.disabled);
+        this.select(id);
+      } else {
+        this.changeActiveSlidingBlock();
+      }
     }
     this.getTabsWidth();
-
     this.tabs.changes.subscribe(() => {
       this.changeActiveSlidingBlock();
-      this.getTabsWidth();
+      // 延时等待tabs渲染完毕
+      setTimeout(() => this.getTabsWidth());
     });
   }
 
-  ngAfterContentInit(): void {
-    if (this.type !== 'slider' && this.activeTab === undefined && this.tabs.length > 0) {
-      this.select(this.tabs.first.id);
+  changeActiveSlidingBlock(): void {
+    if (this.type === 'slider' && this.tabsEle) {
+      // 延时等待active样式切换至正确的tab
+      setTimeout(() => {
+        const tabEle = this.tabsEle.nativeElement.querySelector(`#${this.id} li.active`);
+        if (tabEle) {
+          const leftFix = this.scrollModeToggle ? this.tabsEle.nativeElement.scrollLeft : 0;
+          this.offsetLeft = tabEle.getBoundingClientRect().left + leftFix - this.tabsEle.nativeElement.getBoundingClientRect().left;
+          this.offsetWidth = tabEle.getBoundingClientRect().width;
+          this.cdr.detectChanges();
+        }
+      });
     }
   }
 
-  changeActiveSlidingBlock() {
-    // 延时等待active样式切换至正确的tab
-    setTimeout(() => {
-      const tabEle = this.tabsEle.nativeElement.querySelector(`#${this.id} li.active`);
-      if (tabEle) {
-        const leftFix = this.scrollMode ? this.tabsEle.nativeElement.scrollLeft : 0;
-        this.offsetLeft = tabEle.getBoundingClientRect().left + leftFix - this.tabsEle.nativeElement.getBoundingClientRect().left;
-        this.offsetWidth = tabEle.getBoundingClientRect().width;
-      }
-    });
-  }
-
-  canChange(currentTab: number | string) {
+  canChange(currentTab: number | string): Promise<boolean> {
     let changeResult = Promise.resolve(true);
 
     if (this.beforeChange) {
-      const result: any = this.beforeChange(currentTab);
+      const result: any = this.beforeChange(currentTab, this.activeTab);
       if (typeof result !== 'undefined') {
         if (result.then) {
           changeResult = result;
@@ -116,7 +144,7 @@ export class TabsComponent implements AfterContentInit, OnChanges, AfterViewInit
     return changeResult;
   }
 
-  select(id: number | string, tabEl?) {
+  select(id: number | string, callback?: Function): void {
     if (!this.reactivable && this.activeTab === id) {
       return;
     }
@@ -127,66 +155,89 @@ export class TabsComponent implements AfterContentInit, OnChanges, AfterViewInit
       const tab = this.tabs.find((item) => item.id === id);
       if (tab && !tab.disabled) {
         this.activeTab = id;
-        if (this.type === 'slider' && tabEl && this.tabsEle) {
-          const leftFix = this.scrollMode ? this.tabsEle.nativeElement.scrollLeft : 0;
-          this.offsetLeft = tabEl.getBoundingClientRect().left + leftFix - this.tabsEle.nativeElement.getBoundingClientRect().left;
-          this.offsetWidth = tabEl.getBoundingClientRect().width;
+        this.changeActiveSlidingBlock();
+        if (callback) {
+          callback();
         }
         this.activeTabChange.emit(id);
       }
     });
   }
 
-  checkCloseable(tab) {
-    const closeable = this.closeable && (this.closeableIds.length === 0 || this.closeableIds.includes(tab.id));
-    return !tab.disabled && !tab.titleTpl && closeable;
-  }
-
-  addOrDeleteTab(event, id?: number | string) {
+  addOrDeleteTab(event: Event, id?: number | string): void {
     event.stopPropagation();
-    const operation = id || id >= 0 ? 'delete' : 'add';
+    const operation = id || id === 0 ? 'delete' : 'add';
     this.addOrDeleteTabChange.emit({ id, operation });
   }
 
-  getTabsWidth() {
+  getTabsWidth(): void {
     if (this.scrollMode && this.tabsViewport && this.tabsEle) {
-      const tabs = this.tabsEle.nativeElement.querySelectorAll('li.devui-nav-tab-item[role=presentation]');
+      let tabsWidthSum = 0;
+      const tabs = this.tabsEle.nativeElement.querySelectorAll('li.devui-nav-tab-item');
       this.tabsWidth = [];
       tabs.forEach((tab) => {
+        let width = tab.offsetWidth;
         const style = getComputedStyle(tab);
-        const width = parseFloat(style.marginLeft) + tab.offsetWidth + parseFloat(style.marginRight);
+        const marginLeft = parseFloat(style.marginLeft);
+        const marginRight = parseFloat(style.marginRight);
+        width += marginLeft > 0 ? marginLeft : 0;
+        width += marginRight > 0 ? marginRight : 0;
+        tabsWidthSum += width;
         this.tabsWidth.push(width);
+      });
+      // 延时赋值避免脏值检查错误
+      setTimeout(() => {
+        const fixWidth = this.el.nativeElement.clientWidth - this.ARROW_DROPDOWN_WIDTH;
+        this.scrollModeToggle = this.scrollMode === 'auto' ? tabsWidthSum > fixWidth : !!this.scrollMode;
+        if (this.scrollModeToggle && this.activeTab && this.tabs) {
+          const data = this.tabs.toArray();
+          const index = data.findIndex((item) => item.id === this.activeTab);
+          const tab = data[index];
+          this.scroll(null, index, tab, true);
+        }
       });
     }
   }
 
-  scroll(direction?: string, index?: number, tab?: TabComponent) {
-    if (this.scrollMode && this.tabsEle) {
-      let dom;
-      const tabs = this.tabsEle.nativeElement.querySelectorAll('li[role=presentation]');
+  scroll(direction?: string, index?: number, tab?: TabComponent, isInitScrollMode?: boolean): void {
+    if (this.scrollModeToggle && this.tabsEle) {
+      const tabs = this.tabsEle.nativeElement.querySelectorAll('li.devui-nav-tab-item');
+      const containerWidth = this.tabsEle.nativeElement.scrollWidth;
+      const scrollLeft = this.tabsEle.nativeElement.scrollLeft;
+      const viewportWidth = this.tabsViewport.nativeElement.offsetWidth;
       if (direction) {
-        const containerWidth = this.tabsEle.nativeElement.scrollWidth;
-        const scrollLeft = this.tabsEle.nativeElement.scrollLeft;
-        const viewportWidth = this.tabsViewport.nativeElement.offsetWidth;
         const distance = direction === 'next' ? scrollLeft + viewportWidth : scrollLeft - viewportWidth;
         let width = 0;
         for (let i = 0; i < this.tabsWidth.length; i++) {
           width += this.tabsWidth[i];
           if (width >= distance) {
-            this.offsetIndex = direction === 'next' || i === 0 ? (containerWidth - width < viewportWidth ? tabs.length - 1 : i) : i + 1;
+            const lastIndex = containerWidth - width < viewportWidth ? tabs.length - 1 : i;
+            const nexIndex = direction === 'next' ? lastIndex : i + 1;
+            this.offsetIndex = i === 0 ? 0 : nexIndex;
             break;
           }
         }
-        dom = tabs[this.offsetIndex];
-      } else if (index >= 0) {
-        dom = tabs[index];
-        this.offsetIndex = index;
-        this.activeTab = tab.id;
-        this.activeTabChange.emit(this.activeTab);
+        this.scrollIntoView(tabs[this.offsetIndex]);
+      } else if (index >= 0 && tab) {
+        const toIndexArr = this.tabsWidth.slice(0, index);
+        const width = sum(toIndexArr);
+        const lastIndex = containerWidth - width < viewportWidth ? tabs.length - 1 : index;
+        const fixIndex = index === 0 ? 0 : lastIndex;
+        const dom = tabs[fixIndex];
+        this.offsetIndex = fixIndex;
+        if (isInitScrollMode) {
+          // 切换为滚动模式尚未渲染完，目标dom仍在可视区，不会产生滚动，延时待渲染完毕后执行滚动
+          setTimeout(() => this.scrollIntoView(dom));
+        } else {
+          this.select(tab.id, () => this.scrollIntoView(dom));
+        }
       }
-      if (dom) {
-        dom.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-      }
+    }
+  }
+
+  scrollIntoView(dom: HTMLElement): void {
+    if (dom) {
+      dom.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
     }
   }
 }

@@ -4,22 +4,6 @@
 @import '../style/core/animation';
 @import '../style/theme/z-index';
 
-.edge,
-.ie,
-.firefox {
-  &.devui-tree-select {
-    &:hover {
-      .clear {
-        right: 20px;
-      }
-    }
-
-    .devui-select-chevron-icon {
-      right: 20px;
-    }
-  }
-}
-
 .devui-tree-select {
   position: relative;
   width: 100%;
@@ -35,13 +19,17 @@
       height: unset;
       min-height: 28px;
       max-height: 52px;
-      overflow-y: scroll;
+      overflow-y: auto;
       line-height: 22px;
       display: flex;
       text-indent: 8px;
 
       &.devui-select-no-label {
-        padding-left: 10px;
+        padding-left: 8px;
+      }
+
+      & > span.devui-tree-select-placeholder {
+        text-indent: 0;
       }
     }
   }
@@ -88,7 +76,7 @@
   }
 
   .devui-select-chevron-icon {
-    right: 12px;
+    right: 7px;
     top: calc((100% - 14px) / 2);
     position: absolute;
     user-select: none;
@@ -135,22 +123,7 @@
 .devui-tree-select.devui-options-container {
   width: 100%;
   color: $devui-text;
-  margin: 4px 0;
   padding-left: 8px;
-
-  .devui-no-data-tip {
-    user-select: none;
-    cursor: not-allowed;
-    padding: 5px 12px;
-    background-color: $devui-disabled-bg;
-    color: $devui-disabled-text;
-  }
-}
-
-.devui-tree-select.devui-search-container {
-  .devui-search-in-dropdown {
-    height: 32px;
-  }
 }
 
 .devui-select-item {
@@ -280,8 +253,13 @@ svg.svg-icon-search path {
 
 .devui-tree-select {
   .devui-select-input.devui-tree-select-input {
-    &:not(.icon):not([class^=icon-]):not([disabled]):not(.disabled):not(.devui-disabled) { // 为了增加层级覆盖form的样式
+    &:not(.icon):not([class^='icon-']):not([disabled]):not(.disabled):not(.devui-disabled) {
+      // 为了增加层级覆盖form的样式
       color: $devui-placeholder;
     }
   }
+}
+
+::ng-deep .devui-tree-select.devui-search-container d-search {
+  width: 100%;
 }

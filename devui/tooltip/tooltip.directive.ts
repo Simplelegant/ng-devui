@@ -8,11 +8,11 @@ import {
   Input,
   OnChanges,
   OnDestroy,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 import { OverlayContainerRef } from 'ng-devui/overlay-container';
 import { DevConfigService, WithConfig } from 'ng-devui/utils';
-import { fromEvent, Subject } from 'rxjs';
+import { Subject, fromEvent } from 'rxjs';
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 import { TooltipComponent } from './tooltip.component';
 import { PositionType } from './tooltip.types';
@@ -36,8 +36,8 @@ export class TooltipDirective implements OnChanges, AfterViewInit, OnDestroy {
   // 因为鼠标移出之后如果立刻消失会很突然，所以增加略小一些的延迟，使得既不突然也反应灵敏
   @Input() mouseLeaveDelay = 100;
   isEnter: boolean;
-  unsubscribe$ = new Subject();
-  unsubscribeT$ = new Subject();
+  unsubscribe$ = new Subject<void>();
+  unsubscribeT$ = new Subject<void>();
   tooltipComponentRef: ComponentRef<TooltipComponent>;
   constructor(
     private triggerElementRef: ElementRef,
@@ -62,8 +62,8 @@ export class TooltipDirective implements OnChanges, AfterViewInit, OnDestroy {
     this.instanceAssignValue(['content', 'position', 'showAnimation', 'triggerElementRef']);
 
     // 对创建的ToolTip组件添加鼠标移入和移出的监听事件
-    if (this.tooltipComponentRef.instance['tooltip'].nativeElement) {
-      this.bindMouseEvent(this.tooltipComponentRef.instance['tooltip'].nativeElement, this.unsubscribeT$);
+    if ((this.tooltipComponentRef.instance as any).tooltip.nativeElement) {
+      this.bindMouseEvent((this.tooltipComponentRef.instance as any).tooltip.nativeElement, this.unsubscribeT$);
     }
   }
 
@@ -142,12 +142,18 @@ export class TooltipDirective implements OnChanges, AfterViewInit, OnDestroy {
   instanceAssignValue(key: string | string[]): void {
     const keyArr = typeof key === 'string' ? [key] : key;
     const obj: any = {};
-    keyArr.forEach((item) => {(obj[item] = this[item]);});
+    keyArr.forEach((item) => {
+      obj[item] = this[item];
+    });
     Object.assign(this.tooltipComponentRef.instance, obj);
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (this.tooltipComponentRef) {
       const { content, position, showAnimation } = changes;
+      if (!content.currentValue) {
+        this.hide();
+      }
+
       if (content) {
         this.instanceAssignValue('content');
       }

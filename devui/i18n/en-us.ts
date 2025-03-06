@@ -1,3 +1,17 @@
+const monthsOfYear = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 export default {
   locale: 'en-us',
   common: {
@@ -10,29 +24,44 @@ export default {
     btnOk: 'OK',
     btnCancel: 'Cancel',
     btnClose: 'Close',
+    reset: 'Reset',
     btnClickMe: 'click me!',
     copied: 'Copied',
   },
   autoComplete: {
     latestInput: 'Latest input',
   },
+  datatable: {
+    tableSetting: 'Table Setting',
+    ensure: 'Ensure',
+    cancel: 'Cancel',
+    compact: 'Compact',
+    standard: 'Standard',
+    loose: 'Loose',
+    divideLine: 'Divide Line',
+    striped: 'Striped',
+    tableShadow: 'Table Shadow',
+    styles: 'Table Style',
+    colSelected: 'Selected',
+    colCanSelect: 'Selectable',
+  },
   datePicker: {
     today: 'Today',
     clear: 'Clear',
     daysOfWeek: ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'],
     monthsOfYear: [
-      'January',
-      'February',
-      'March',
-      'April',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
       'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ],
     startDate: 'Start Date',
     endDate: 'End Date',
@@ -44,15 +73,15 @@ export default {
     placeholder: 'select date',
     startPlaceholder: 'select start date',
     endPlaceholder: 'select end date',
-    daysOfWeek: ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'],
+    daysOfWeek: ['Sun', 'Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat'],
     monthsOfYear: [
       'Jan',
       'Feb',
       'Mar',
       'Apr',
       'May',
-      'June',
-      'July',
+      'Jun',
+      'Jul',
       'Aug',
       'Sep',
       'Oct',
@@ -60,11 +89,14 @@ export default {
       'Dec',
     ],
     getYearMonthStr(year, month) {
-      return `${year} - ${month}`;
+      return `${monthsOfYear[month - 1]} ${year}`;
     },
     hour: 'Hr',
     min: 'Min',
-    second: 'Sec'
+    second: 'Sec',
+    yearDisplay(year) {
+      return `${year}`;
+    },
   },
   form: {
     required(val): string {
@@ -93,24 +125,24 @@ export default {
     },
   },
   gantt: {
-    today: 'today',
+    today: 'Today',
     day: 'Day',
     week: 'Week',
     month: 'Month',
     milestone: 'milestone',
     monthsOfYear: [
-      'January',
-      'February',
-      'March',
-      'April',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
       'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sept',
+      'Oct',
+      'Nov',
+      'Dec',
     ],
     yearDisplay(year) {
       return `${year}`;
@@ -119,16 +151,16 @@ export default {
       return this.monthsOfYear[Number(strMonthIndex) - 1];
     },
     yearAndMonthDisplay(year: string, strMonthIndex: string) {
-      return this.yearDisplay(year) + this.monthDisplay(strMonthIndex);
+      return this.monthDisplay(strMonthIndex) + ' ' + this.yearDisplay(year);
     },
   },
   pagination: {
     goTo: 'Go To',
     pageSize: 'Page Size',
     page: 'Page',
-    perPage: 'Per Page',
+    perPage: ' / Page',
     totalItem(total) {
-      return `Total ${total} Records`;
+      return `Total Records: ${total}`;
     }
   },
   quadrant: {
@@ -159,6 +191,9 @@ export default {
     },
     getBeyondMaximalFileSizeMsg(filename, maximalSize) {
       return `Maximum file size (MB): ${maximalSize}. Files whose size exceeds the maximum value: ${filename}`;
+    },
+    getBeyondMaximumFileCountMsg(maximalSize){
+      return `Maximum file count: ${maximalSize}. Files exceeds the maximum value`;
     },
     getAllFilesBeyondMaximalFileSizeMsg(maximalSize) {
       return `Maximum file size (MB): ${maximalSize}. The selected files exceed the maximum value`;
@@ -191,6 +226,8 @@ export default {
     originScale: 'Original Ratio',
     pre: 'Previous',
     next: 'Next',
+    origin: 'View the original image',
+    download: 'Download'
   },
   colorPicker: {
     recentlyUsed: 'Recently Used',
@@ -231,16 +268,25 @@ export default {
     yearsLater(num: number) {
       return num === 1 ? 'next year' : `${num} years later`;
     },
-    hoursAgo: ' hours ago',
-    minutesAgo: ' minutes ago',
+    hoursAgo(num: number) {
+      return num === 1 ? `1 hour ago` : `${num} hours ago`;
+    },
+    minutesAgo(num: number) {
+      return num === 1 ? `1 minute ago` : `${num} minutes ago`;
+    },
+    minutesLater(num: number) {
+      return num === 1 ? `1 minute later` : `${num} minutes later`;
+    },
+    hoursLater(num: number) {
+      return num === 1 ? `1 hours later` : `${num} hours later`;
+    },
     justnow: 'just now',
     later: 'later',
-    minutesLater: ' minutes later',
-    hoursLater: ' hours later',
   },
   tagsInput: {
     tagsReachMaxLength: 'The length of tags has reached maxTags',
     tagsReachMaxNumber: 'Maximum number reached: ',
+    create: 'Create'
   },
   categorySearch: {
     confirm: 'Confirm',

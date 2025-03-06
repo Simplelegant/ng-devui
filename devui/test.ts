@@ -1,12 +1,7 @@
 // This file is required by karma.conf.js and loads recursively all the .spec and framework files
 // 此处顺序不可改变
 import 'zone.js';
-import 'zone.js/dist/long-stack-trace-zone';
-import 'zone.js/dist/proxy';
-import 'zone.js/dist/sync-test';
-import 'zone.js/dist/jasmine-patch';
-import 'zone.js/dist/async-test';
-import 'zone.js/dist/fake-async-test';
+import 'zone.js/testing';
 import { getTestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
@@ -21,7 +16,3 @@ getTestBed().initTestEnvironment(
     teardown: { destroyAfterEach: false }
   }
 );
-// Then we find all the tests.
-const context = require.context('./', true, /\.spec\.ts$/);
-// And load the modules.
-context.keys().map(context);

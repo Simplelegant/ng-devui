@@ -1,60 +1,89 @@
 import {
-  CdkConnectedOverlay, CdkOverlayOrigin, ConnectedOverlayPositionChange, ConnectedPosition, VerticalConnectionPos
+  CdkConnectedOverlay,
+  CdkOverlayOrigin,
+  ConnectedOverlayPositionChange,
+  ConnectedPosition,
+  ScrollStrategy,
+  ScrollStrategyOptions,
+  VerticalConnectionPos,
 } from '@angular/cdk/overlay';
 import { Component, ElementRef, Host, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
-import { AppendToBodyDirection, AppendToBodyDirectionsConfig, fadeInOut } from 'ng-devui/utils';
+import {
+  AppendToBodyDirection,
+  AppendToBodyDirectionsConfig,
+  AppendToBodyScrollStrategyType,
+  DevConfigService,
+  WithConfig,
+  fadeInOut,
+} from 'ng-devui/utils';
 import { DropDownDirective } from './dropdown.directive';
 
 @Component({
   /* eslint-disable-next-line @angular-eslint/component-selector*/
   selector: '[dDropDown][appendToBody]',
+  exportAs: 'd-dropdown-append-to-body',
   template: `
     <ng-content></ng-content>
-    <ng-template cdk-connected-overlay
+    <ng-template
+      cdk-connected-overlay
       [cdkConnectedOverlayOrigin]="origin || dropDown.cdkConnectedOverlayOrigin"
       [cdkConnectedOverlayOpen]="dropDown.isOpen"
       [cdkConnectedOverlayPositions]="positions"
-      (backdropClick)="dropDown.isOpen=false"
-      (positionChange)="onPositionChange($event)">
-      <div [@fadeInOut]="dropDown.startAnimation ? menuPosition : 'void'" #dropDownWrapper
-        [@.disabled]="!dropDown.showAnimation">
+      [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
+      (backdropClick)="dropDown.isOpen = false"
+      (detach)="dropDown.isOpen && (dropDown.isOpen = false)"
+      (positionChange)="onPositionChange($event)"
+    >
+      <div [@fadeInOut]="dropDown.startAnimation ? menuPosition : 'void'" #dropDownWrapper [@.disabled]="!dropDown.showAnimation">
         <ng-content select="[dDropDownMenu]"></ng-content>
       </div>
     </ng-template>
   `,
   styleUrls: ['dropdown.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
-    fadeInOut
-  ],
+  animations: [fadeInOut],
   preserveWhitespaces: false,
 })
 export class DropDownAppendToBodyComponent implements OnInit, OnChanges {
-  menuPosition: VerticalConnectionPos = 'bottom';
-  positions;
-  origin;
   @ViewChild('dropDownWrapper') dropDownWrapper: ElementRef;
   @ViewChild(CdkConnectedOverlay, { static: true }) overlay: CdkConnectedOverlay;
   @Input() alignOrigin: ElementRef<any>;
-  @Input() appendToBodyDirections: Array<AppendToBodyDirection | ConnectedPosition> = [
-    'rightDown', 'leftDown', 'rightUp', 'leftUp'
-  ];
-  constructor(@Host() public dropDown: DropDownDirective) {
+  @Input() appendToBodyDirections: Array<AppendToBodyDirection | ConnectedPosition> = ['rightDown', 'leftDown', 'rightUp', 'leftUp'];
+  @Input() @WithConfig() appendToBodyScrollStrategy: AppendToBodyScrollStrategyType;
+  menuPosition: VerticalConnectionPos = 'bottom';
+  origin: CdkOverlayOrigin;
+  positions;
+  scrollStrategy: ScrollStrategy;
+
+  constructor(
+    @Host() public dropDown: DropDownDirective,
+    private scrollStrategyOption: ScrollStrategyOptions,
+    private devConfigService: DevConfigService
+  ) {
     this.dropDown.appendToBody = true;
+    this.scrollStrategy = this.scrollStrategyOption.reposition();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    const { alignOrigin, appendToBodyDirections, appendToBodyScrollStrategy } = changes;
+    const globalScrollStrategy = this.devConfigService.getConfigForApi('appendToBodyScrollStrategy');
+    if (appendToBodyDirections) {
+      this.setPositions();
+    }
+    if (alignOrigin) {
+      this.setOrigin();
+    }
+    if (this.appendToBodyScrollStrategy && (appendToBodyScrollStrategy || globalScrollStrategy)) {
+      const func = this.scrollStrategyOption[this.appendToBodyScrollStrategy];
+      this.scrollStrategy = func();
+    }
   }
 
   ngOnInit() {
     this.setPositions();
     this.setOrigin();
   }
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['appendToBodyDirections']) {
-      this.setPositions();
-    }
-    if (changes['alignOrigin']) {
-      this.setOrigin();
-    }
-  }
+
   setOrigin() {
     if (this.alignOrigin) {
       this.origin = new CdkOverlayOrigin(this.alignOrigin);
@@ -64,13 +93,15 @@ export class DropDownAppendToBodyComponent implements OnInit, OnChanges {
   }
   setPositions() {
     if (this.appendToBodyDirections && this.appendToBodyDirections.length > 0) {
-      this.positions = this.appendToBodyDirections.map(position => {
-        if (typeof position === 'string') {
-          return AppendToBodyDirectionsConfig[position];
-        } else {
-          return position;
-        }
-      }).filter(position => position !== undefined);
+      this.positions = this.appendToBodyDirections
+        .map((position) => {
+          if (typeof position === 'string') {
+            return AppendToBodyDirectionsConfig[position];
+          } else {
+            return position;
+          }
+        })
+        .filter((position) => position !== undefined);
     } else {
       this.positions = undefined;
     }
@@ -93,6 +124,8 @@ export class DropDownAppendToBodyComponent implements OnInit, OnChanges {
       break;
     case 'bottom':
       this.menuPosition = 'top';
+      break;
+    default:
     }
   }
 }

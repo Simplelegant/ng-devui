@@ -9,7 +9,9 @@ import { DevUICodeboxModule } from 'ng-devui/shared/devui-codebox/devui-codebox.
 import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { AlertDemoComponent } from './alert-demo.component';
+import { AlertDesignComponent } from './alert-design.component';
 import { BasicComponent } from './basic/basic.component';
+import { CarouselComponent } from './carousel/carousel.component';
 import { CloseComponent } from './close/close.component';
 import { WithoutIconComponent } from './withoutIcon/withoutIcon.component';
 
@@ -23,22 +25,23 @@ import { WithoutIconComponent } from './withoutIcon/withoutIcon.component';
     DevUIApiModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '',  redirectTo: 'demo' },
-      { path: 'demo', component: AlertDemoComponent},
-      { path: 'api', component: DevUIApiComponent, data: {
-        'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
-        'en-us': require('!html-loader!markdown-loader!../doc/api-en.md')
-      }}
-    ])
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: AlertDesignComponent,
+      },
+      { path: 'demo', component: AlertDemoComponent },
+      {
+        path: 'api',
+        component: DevUIApiComponent,
+        data: {
+          'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
+          'en-us': require('!html-loader!markdown-loader!../doc/api-en.md'),
+        },
+      },
+    ]),
   ],
   exports: [AlertDemoComponent],
-  declarations: [
-    AlertDemoComponent,
-    BasicComponent,
-    CloseComponent,
-    WithoutIconComponent
-  ],
-
+  declarations: [AlertDemoComponent, AlertDesignComponent, BasicComponent, CloseComponent, WithoutIconComponent, CarouselComponent],
 })
-export class AlertDemoModule {
-}
+export class AlertDemoModule {}

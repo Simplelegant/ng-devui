@@ -1,6 +1,7 @@
 import { ConnectedPosition } from '@angular/cdk/overlay';
 import {
   AfterViewInit,
+  ApplicationRef,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -12,11 +13,13 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
+import { DropDownAppendToBodyComponent } from 'ng-devui/dropdown';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
 import { AppendToBodyDirection } from 'ng-devui/utils';
-import { fromEvent, Subscription } from 'rxjs';
+import { Subscription, fromEvent } from 'rxjs';
+
 @Component({
   selector: 'd-pagination',
   styleUrls: ['./pagination.component.scss'],
@@ -54,10 +57,12 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
    */
   @Input() maxItems = 10;
   /**
+   * @depreted 存在xxs风险，后续将替换为模板，使用方需根据自身场景做好防护
    * 【可选】前一页按钮文字，默认为左箭头图标
    */
   @Input() preLink: string;
   /**
+   * @depreted 存在xxs风险，后续将替换为模板，使用方需根据自身场景做好防护
    * 【可选】后一页按钮文字，默认为左箭头图标
    */
   @Input() nextLink: string;
@@ -120,12 +125,15 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
   private litePaginatorOptionsLengthCache = 0;
   showConfig = false;
   @ViewChild('litePaginator') litePaginator: ElementRef;
+  @ViewChild('dropDownElement') dropDownElement: DropDownAppendToBodyComponent;
+  @ViewChild('activeBlock') activeBlock: ElementRef;
   private configButtonLoseFocusHandler: Subscription | null = null;
   private loseFocusListener: any = null;
   i18nText: I18nInterface['pagination'];
   i18nLocale: I18nInterface['locale'];
   i18nSubscription: Subscription;
-  constructor(private ref: ChangeDetectorRef, private i18n: I18nService) { }
+  activeBlockInfo;
+  constructor(private ref: ChangeDetectorRef, private i18n: I18nService, private appRef: ApplicationRef) {}
 
   ngOnInit(): void {
     this.i18nText = this.i18n.getI18nText().pagination;
@@ -180,11 +188,13 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
   }
 
   jump() {
-    const pageInput = parseInt(this.jumpPage, 10);
-    if (pageInput) {
-      if (pageInput > 0 && pageInput <= this.totalPage) {
-        this.onPageIndexChange(pageInput);
+    let pageInput = parseInt(this.jumpPage, 10);
+    if (pageInput && (pageInput < this.totalPage || this.pageIndex < this.totalPage)) {
+      if (pageInput > this.totalPage) {
+        this.jumpPage = this.totalPage;
+        pageInput = this.totalPage;
       }
+      this.onPageIndexChange(pageInput);
     }
   }
 
@@ -214,7 +224,7 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
       if (this.lite) {
         this.litePaginatorIndex = {
           value: this.pageIndex,
-          label: `${this.pageIndex}/${this.totalPage}`
+          label: `${this.pageIndex}/${this.totalPage}`,
         };
       }
       this.pageIndexChange.emit(pageIndex);
@@ -231,6 +241,9 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
       }
       this.adjustPaginatorWidth();
     }
+    if (this.dropDownElement) {
+      this.dropDownElement.dropDown.toggle();
+    }
   }
 
   hasPrev(): boolean {
@@ -246,7 +259,8 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const shouldUpdateRanges = PaginationComponent.EFFECT_PAGE_RANGE_KEYS.some(key => !!changes[key]);
+    this.activeBlockInfo = this.activeBlock?.nativeElement.getBoundingClientRect();
+    const shouldUpdateRanges = PaginationComponent.EFFECT_PAGE_RANGE_KEYS.some((key) => !!changes[key]);
     if (shouldUpdateRanges) {
       this.minPageSizeOptions = Math.min(...this.pageSizeOptions);
       this.totalPage = this.getTotalPage();
@@ -259,11 +273,29 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
         this.constructLitePaginatorOptions();
       }
       this.adjustPaginatorWidth();
+      if (this.activeBlockInfo && changes.pageIndex) {
+        this.setActiveAnimation();
+      }
     }
   }
 
   ngAfterViewInit() {
     this.adjustPaginatorWidth();
+  }
+
+  setActiveAnimation() {
+    new Promise((resolve, reject) => {
+      resolve(true);
+    }).then(() => {
+      const curInfo = this.activeBlock.nativeElement.getBoundingClientRect();
+      const element = this.activeBlock.nativeElement;
+      this.activeBlock.nativeElement.style.opacity = 1;
+      element.style.transform = `translate(${this.activeBlockInfo.left - curInfo.left}px)`;
+      setTimeout(() => {
+        element.style.transition = 'transform .25s ease-in-out';
+        element.style.transform = 'translate(0, 0)';
+      });
+    });
   }
 
   private updateShowPageRange() {
@@ -284,13 +316,13 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
     let start = this.pageIndex - 1;
     let end = this.pageIndex + 1;
 
-    const arriveLeftBound = index => index < 1;
+    const arriveLeftBound = (index) => index < 1;
     const arriveRightBound = (index) => index > this.totalPage;
     const fullPageRang = (pages) => pages.length >= this.maxItems - 2;
 
     while (!(fullPageRang(showPages) || (arriveLeftBound(start) && arriveRightBound(end)))) {
       if (!arriveLeftBound(start)) {
-        showPages.unshift((start--));
+        showPages.unshift(start--);
       }
 
       if (!fullPageRang(showPages) && !arriveRightBound(end)) {
@@ -301,33 +333,34 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
   }
 
   private constructLitePaginatorOptions(): void {
-    if (this.litePaginatorOptions.length === 0 ||
-      this.litePaginatorOptions.length !== this.litePaginatorOptionsLengthCache) {
+    if (this.litePaginatorOptions.length === 0 || this.litePaginatorOptions.length !== this.litePaginatorOptionsLengthCache) {
       this.litePaginatorOptions = Array.from({ length: this.totalPage }).map((v, index: number) => {
         return {
           label: `${index + 1}/${this.totalPage}`,
-          value: index + 1
+          value: index + 1,
         };
       });
     }
     this.litePaginatorIndex = {
       value: this.pageIndex,
-      label: `${this.pageIndex}/${this.totalPage}`
+      label: `${this.pageIndex}/${this.totalPage}`,
     };
   }
 
   private adjustPaginatorWidth() {
     if (this.litePaginator && this.litePaginator.nativeElement && this.litePaginatorOptions.length > 0) {
       const lastOption = this.litePaginatorOptions[this.litePaginatorOptions.length - 1];
-      const lastLabel = lastOption ? lastOption['label'] : '';
+      const lastLabel = lastOption ? lastOption.label : '';
       const minWidth = 100;
       const width = lastLabel.length * 4 + 80;
       this.litePaginator.nativeElement.style.width = `${Math.max(minWidth, width)}px`;
     }
   }
+
   onToggle(event) {
     this.rotateDegrees = event ? 180 : 0;
   }
+
   toggleMenu(force: boolean = null) {
     if (force !== null) {
       this.showConfig = force;
@@ -357,7 +390,6 @@ export class PaginationComponent implements OnChanges, AfterViewInit, OnDestroy,
     this.unsubscribeLoseFocusHandler();
     if (this.i18nSubscription) {
       this.i18nSubscription.unsubscribe();
-
     }
   }
 

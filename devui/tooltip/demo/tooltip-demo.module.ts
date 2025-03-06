@@ -11,6 +11,7 @@ import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { BasicComponent } from './basic/basic.component';
 import { DelayComponent } from './delay/delay.component';
 import { TooltipDemoComponent } from './tooltip-demo.component';
+import { TooltipDesignComponent } from './tooltip-design.component';
 
 @NgModule({
   imports: [
@@ -22,7 +23,11 @@ import { TooltipDemoComponent } from './tooltip-demo.component';
     DevUIApiModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '',  redirectTo: 'demo' },
+      { path: '',  redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: TooltipDesignComponent,
+      },
       { path: 'demo', component: TooltipDemoComponent},
       { path: 'api', component: DevUIApiComponent, data: {
         'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
@@ -33,6 +38,7 @@ import { TooltipDemoComponent } from './tooltip-demo.component';
   exports: [TooltipDemoComponent],
   declarations: [
     TooltipDemoComponent,
+    TooltipDesignComponent,
     BasicComponent,
     DelayComponent
   ],

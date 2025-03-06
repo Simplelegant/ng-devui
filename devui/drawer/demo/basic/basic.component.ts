@@ -16,9 +16,9 @@ export class BasicComponent {
   openDrawer() {
     this.results = this.drawerService.open({
       drawerContentComponent: DrawerContentComponent,
-      width: '300px',
+      width: '30%',
       zIndex: 1000,
-      isCover: true,
+      isCover: false,
       fullScreen: true,
       backdropCloseable: true,
       escKeyCloseable: true,

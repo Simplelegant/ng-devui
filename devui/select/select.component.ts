@@ -3,7 +3,9 @@ import {
   CdkOverlayOrigin,
   ConnectedOverlayPositionChange,
   ConnectedPosition,
-  VerticalConnectionPos
+  ScrollStrategy,
+  ScrollStrategyOptions,
+  VerticalConnectionPos,
 } from '@angular/cdk/overlay';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { DOCUMENT } from '@angular/common';
@@ -15,7 +17,7 @@ import {
   ContentChild,
   ElementRef,
   EventEmitter,
-  forwardRef,
+  HostBinding,
   HostListener,
   Inject,
   Input,
@@ -27,19 +29,25 @@ import {
   Renderer2,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
+  forwardRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
 import {
-  addClassToOrigin,
   AppendToBodyDirection,
-  AppendToBodyDirectionsConfig, DevConfigService, fadeInOut,
+  AppendToBodyDirectionsConfig,
+  AppendToBodyScrollStrategyType,
+  DevConfigService,
+  WithConfig,
+  addClassToOrigin,
+  fadeInOut,
   formWithDropDown,
-  removeClassFromOrigin, WithConfig
+  removeClassFromOrigin,
 } from 'ng-devui/utils';
 import { WindowRef } from 'ng-devui/window-ref';
-import { BehaviorSubject, fromEvent, Observable, of, Subscription } from 'rxjs';
+import { differenceBy, isEqual } from 'lodash-es';
+import { BehaviorSubject, Observable, Subscription, fromEvent, of } from 'rxjs';
 import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 
 @Component({
@@ -52,37 +60,13 @@ import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SelectComponent),
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  animations: [
-    fadeInOut
-  ],
+  animations: [fadeInOut],
   preserveWhitespaces: false,
 })
 export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewInit, OnDestroy, OnChanges {
-  get isOpen() {
-    return this._isOpen;
-  }
-
-  set isOpen(value) {
-    this._isOpen = value;
-    this.toggleChange.emit(value);
-    this.setDocumentClickListener();
-    if (this.selectWrapper) {
-      this.dropDownWidth = this.width ? this.width : (this.selectWrapper.nativeElement.offsetWidth);
-    }
-    if (value) {
-      addClassToOrigin(this.selectWrapper);
-      setTimeout(() => {
-        this.startAnimation = true;
-        this.changeDetectorRef.detectChanges();
-      });
-    } else {
-      removeClassFromOrigin(this.selectWrapper);
-      this.onTouch();
-    }
-  }
   /**
    * 【必选】下拉选项资源，支持Array<string>, Array<{key: value}>
    */
@@ -108,6 +92,10 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
    */
   @Input() filterKey: string;
   /**
+   * 【当传入资源（options）类型为Array<{key: value}，可选】选项与选中值类型不一致时用于指定赋值属性
+   */
+  @Input() valueKey: string;
+  /**
    * 【可选】是否支持多选
    */
   @Input() multiple: boolean;
@@ -128,11 +116,10 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
    */
   @Input() appendToBody = false;
   /**
- * 【可选】cdk模式overlay Positions的控制
- */
-  @Input() appendToBodyDirections: Array<AppendToBodyDirection | ConnectedPosition> = [
-    'rightDown', 'leftDown', 'rightUp', 'leftUp'
-  ];
+   * 【可选】cdk模式overlay Positions的控制
+   */
+  @Input() appendToBodyDirections: Array<AppendToBodyDirection | ConnectedPosition> = ['rightDown', 'leftDown', 'rightUp', 'leftUp'];
+  @Input() @WithConfig() appendToBodyScrollStrategy: AppendToBodyScrollStrategyType;
   /**
    * 【可选】cdk模式origin width
    */
@@ -173,47 +160,23 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
   @Input() formatter: (item: any) => string;
   @Input() direction: 'up' | 'down' | 'auto' = 'down';
   @Input() overview: 'border' | 'underlined' = 'border';
-
   /**
    *  【可选】是否开启clear功能（是否开启只对单选生效）
    */
   @Input() allowClear = false;
-
-  get isClearIconShow() {
-    return this.allowClear && !this.multiple && !this.disabled && this.value;
-  }
-
   @Input() color;
   /**
    *  【可选】启用数据懒加载，默认不启用
    */
   @Input() enableLazyLoad = false;
-
   /**
    * 是否虚拟滚动
    */
   @Input() virtualScroll;
-
   /**
    * 非必填，如传入，会忽略ContentChild
    */
   @Input() inputItemTemplate: TemplateRef<any>;
-
-  @ContentChild(TemplateRef) itemTemplate: TemplateRef<any>;
-
-  /**
-   * 输出函数，当选中某个选项项后，将会调用此函数，参数为当前选择项的值。如果需要获取所有选择状态的值，请参考(ngModelChange)方法
-   */
-  @Output() valueChange = new EventEmitter<any>();
-  i18nCommonText: I18nInterface['common'];
-  i18nSubscription: Subscription;
-  /**
-   * select下拉toggle事件，值为true或false
-   */
-  @Output() toggleChange = new EventEmitter<any>();
-
-  @Output() loadMore = new EventEmitter<any>();
-
   @Input() extraConfig: {
     labelization?: {
       // 选中项显示成标签一样，带有删除按钮可以单个删除
@@ -225,6 +188,7 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
        */
       containnerMaxHeight?: string; // 默认值1.8em
       labelMaxWidth?: string; // 默认100%
+      maxTags?: number; // 可点选最大标签数，超出则省略显示
     };
     selectedItemWithTemplate?: {
       // 单选情况下，显示选项使用了template的情况下，顶部选中的内容是否也以template展示
@@ -234,7 +198,6 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     enableFocusFirstFilteredOption?: boolean;
     [feature: string]: any;
   };
-
   /**
    * 【当传入资源（options）类型为Array<{key: value}，必选】针对传入资源options的每项对应字段做禁用操作的key
    */
@@ -256,10 +219,25 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
    * customViewTemplate的方向，支持下方和右方
    */
   @Input() customViewDirection: 'bottom' | 'right' | 'left' | 'top' = 'bottom';
+  @Input() autoScrollIntoActive = false;
   @Input() autoFocus = false;
   @Input() notAutoScroll = false; // 自动聚焦的时候，自动滚动到select位置
   @Input() loadingTemplateRef: TemplateRef<any>;
+  @Input() showItemTitle = false;
   @Input() @WithConfig() showAnimation = true;
+  @Input() @WithConfig() styleType = 'default';
+  @Input() @WithConfig() showGlowStyle = true;
+  @Input() beforeChange: (index, option, action) => boolean | Promise<boolean> | Observable<boolean>;
+  /**
+   * select下拉toggle事件，值为true或false
+   */
+  @Output() toggleChange = new EventEmitter<boolean>();
+  @Output() loadMore = new EventEmitter<any>();
+  /**
+   * 输出函数，当选中某个选项项后，将会调用此函数，参数为当前选择项的值。如果需要获取所有选择状态的值，请参考(ngModelChange)方法
+   */
+  @Output() valueChange = new EventEmitter<any>();
+  @ContentChild(TemplateRef) itemTemplate: TemplateRef<any>;
   @ViewChild('selectWrapper', { static: true }) selectWrapper: ElementRef;
   @ViewChild('selectInput') selectInputElement: ElementRef;
   @ViewChild('selectMenu') selectMenuElement: ElementRef;
@@ -270,60 +248,113 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
   @ViewChild('dropdownUl') dropdownUl: ElementRef;
   @ViewChild(CdkConnectedOverlay) connectedOverlay: CdkConnectedOverlay;
   @ViewChild(CdkVirtualScrollViewport) virtualScrollViewport: CdkVirtualScrollViewport;
-  virtualScrollViewportSizeMightChange = false;
-  showLoading = false;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle() {
+    return this.showGlowStyle;
+  }
+
+  set isOpen(value) {
+    this._isOpen = value;
+    this.toggleChange.emit(value);
+    this.setDocumentClickListener();
+    if (this.selectWrapper) {
+      this.dropDownWidth = this.width ? this.width : this.selectWrapper.nativeElement.offsetWidth;
+    }
+    if (value) {
+      addClassToOrigin(this.selectWrapper);
+      setTimeout(() => {
+        this.startAnimation = true;
+        this.changeDetectorRef.detectChanges();
+        this.resetScrollTop();
+      });
+    } else {
+      this.resetScrollTop(true);
+      removeClassFromOrigin(this.selectWrapper);
+      this.onTouch();
+      if (this.direction === 'auto') {
+        this.clearText();
+      }
+    }
+  }
+
+  get isOpen() {
+    return this._isOpen;
+  }
+
+  get isClearIconShow() {
+    const hasValue = this.multiple ? this.multiItems?.length : this.value;
+    return this.allowClear && !this.disabled && hasValue;
+  }
+
+  get showMoreTags() {
+    return this.multiItems.length > (this.extraConfig?.labelization?.maxTags || 40) && this.isSelectAll && this.virtualScroll;
+  }
+
+  get moreTagsNum() {
+    return `+${this.multiItems.length - 1}`;
+  }
+
+  _inputValue: any;
   _isOpen = false;
-  menuPosition: VerticalConnectionPos = 'bottom';
-  halfChecked = false;
   allChecked = false;
+  halfChecked = false;
   isMouseEvent = false;
-  dropDownWidth: number;
+  showLoading = false;
   startAnimation = false;
-
-  filter = '';
-  activeIndex = -1;
-
-  // for multiple
+  limitMaxHeight = false;
   availableOptions = [];
   multiItems = [];
-
-  popDirection: 'top' | 'bottom';
-
+  value: any;
+  filter = '';
+  activeIndex = -1;
   selectIndex = -1;
-  _inputValue: any;
+  popDirection: 'top' | 'bottom';
+  menuPosition: VerticalConnectionPos = 'bottom';
+  i18nCommonText: I18nInterface['common'];
+  i18nSubscription: Subscription;
   document: Document;
+  dropDownWidth: number;
   scrollHeightNum: number;
+  lastCloseScrollHeight: number;
   minBuffer: number;
   maxBuffer: number;
+  scrollStrategy: ScrollStrategy;
+  cdkConnectedOverlayOrigin: CdkOverlayOrigin;
+  overlayPositions: Array<ConnectedPosition>;
+  virtualScrollViewportSizeMightChange = false;
   virtualScrollItemSize: any = {
     sm: 30,
     normal: 36,
     lg: 50,
-    space: 4
+    space: 4,
   };
+  // 容器边距，虚拟滚动设置高度需考虑上下边距
+  CONTAINER_MARGINS = 12;
+  ANIMATION_DELAY = 300;
 
-  cdkConnectedOverlayOrigin: CdkOverlayOrigin;
-  overlayPositions: Array<ConnectedPosition>;
+  get showSelectAll() {
+    return this.isSelectAll && this.multiple && this.availableOptions.length > 0;
+  }
 
   private sourceSubscription: BehaviorSubject<any>;
   private filterSubscription: Subscription;
-  public value;
   private resetting = false;
-
   private onChange = (_: any) => null;
   private onTouch = () => null;
 
   constructor(
+    @Inject(DOCUMENT) private doc: any,
     private renderer: Renderer2,
     private windowRef: WindowRef,
     private changeDetectorRef: ChangeDetectorRef,
     private i18n: I18nService,
     private ngZone: NgZone,
+    private el: ElementRef,
     private devConfigService: DevConfigService,
-    @Inject(DOCUMENT) private doc: any
+    private scrollStrategyOption: ScrollStrategyOptions
   ) {
-    this.valueParser = item => (typeof item === 'object' ? item[this.filterKey] || '' : (String(item)) ? item.toString() : '');
-    this.formatter = item => (typeof item === 'object' ? item[this.filterKey] || '' : (String(item)) ? item.toString() : '');
+    this.valueParser = (item) => this.getValue(item, this.filterKey);
+    this.formatter = (item) => this.getValue(item, this.filterKey);
+    this.scrollStrategy = this.scrollStrategyOption.reposition();
     this.document = this.doc;
   }
 
@@ -331,14 +362,9 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     if (!this.searchFn) {
       this.searchFn = (term: any) => {
         return of(
-          (this.options ? this.options : [])
+          (this.options || [])
             .map((option, index) => ({ option: option, id: index }))
-            .filter(
-              item =>
-                this.formatter(item.option)
-                  .toLowerCase()
-                  .indexOf(term.toLowerCase()) !== -1
-            )
+            .filter((item) => this.formatter(item.option).toLowerCase().indexOf(term.toLowerCase()) !== -1)
         );
       };
     }
@@ -356,9 +382,13 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     if (this.autoFocus && this.selectBoxElement) {
       setTimeout(() => {
         this.selectBoxElement.nativeElement.focus({
-          preventScroll: this.notAutoScroll
+          preventScroll: this.notAutoScroll,
         });
       });
+    }
+    // 当d-select添加limit-max-height样式类时为devui-dropdown-menu-wrap容器添加最大高度限制样式，避免当窗口高度小于指定下拉最大高度时，下拉内容超出cdk容器
+    if (this.el.nativeElement?.className.includes('limit-max-height')) {
+      this.limitMaxHeight = true;
     }
   }
 
@@ -376,26 +406,38 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes && (changes.searchFn || changes.options)) {
+    const { searchFn, options, appendToBodyDirections, appendToBodyScrollStrategy, disabled } = changes;
+    const globalScrollStrategy = this.devConfigService.getConfigForApi('appendToBodyScrollStrategy');
+    if (searchFn || options) {
       this.resetSource();
       if (this.virtualScroll && this.virtualScrollViewport) {
         this.virtualScrollViewportSizeMightChange = true;
         this.virtualScrollViewport.checkViewportSize();
       }
     }
-    if (changes['appendToBodyDirections']) {
+    if (appendToBodyDirections) {
       this.setPositions();
     }
+    if (this.appendToBodyScrollStrategy && (appendToBodyScrollStrategy || globalScrollStrategy)) {
+      const func = this.scrollStrategyOption[this.appendToBodyScrollStrategy];
+      this.scrollStrategy = func();
+    }
+    if (disabled && this.isOpen) {
+      this.toggle();
+    }
   }
+
   setPositions() {
     if (this.appendToBodyDirections && this.appendToBodyDirections.length > 0) {
-      this.overlayPositions = this.appendToBodyDirections.map(position => {
-        if (typeof position === 'string') {
-          return AppendToBodyDirectionsConfig[position];
-        } else {
-          return position;
-        }
-      }).filter(position => position !== undefined);
+      this.overlayPositions = this.appendToBodyDirections
+        .map((position) => {
+          if (typeof position === 'string') {
+            return AppendToBodyDirectionsConfig[position];
+          } else {
+            return position;
+          }
+        })
+        .filter((position) => position !== undefined);
     } else {
       this.overlayPositions = undefined;
     }
@@ -417,7 +459,7 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
       }
       const scrollHeight = parseInt(this.scrollHight, 10);
       this.scrollHeightNum = height > scrollHeight ? scrollHeight : height;
-      return `${this.scrollHeightNum}px`;
+      return `${this.scrollHeightNum + this.CONTAINER_MARGINS * 2}px`;
     }
   }
 
@@ -446,9 +488,10 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
 
   registerFilterChange(): void {
     this.sourceSubscription = new BehaviorSubject<any>('');
-    this.sourceSubscription.pipe(switchMap(term => this.searchFn(term))).subscribe(options => {
+    this.sourceSubscription.pipe(switchMap((term) => this.searchFn(term))).subscribe((options) => {
       this.availableOptions = options;
       this.setAvailableOptions();
+      this.setAllChecked();
       this.changeDetectorRef.markForCheck();
       if (this.appendToBody) {
         setTimeout(() => {
@@ -457,24 +500,15 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
           }
         });
       }
-      // 显示数据变更，需要判断全选半选状态
-      if (this.isSelectAll) {
-        const selectedItemForFilterOptions = [];
-        this.multiItems.forEach(item => {
-          this.availableOptions.forEach(option => {
-            if (item['id'] === option['id']) {
-              selectedItemForFilterOptions.push(item);
-            }
-          });
-        });
-        this.setChecked(selectedItemForFilterOptions);
-      }
-      if (!this.multiple && (!this.value || this.availableOptions && !this.availableOptions.find(option => option.option === this.value))) {
+      if (
+        !this.multiple &&
+        (!this.value || (this.availableOptions && !this.availableOptions.find((option) => option.option === this.value)))
+      ) {
         this.selectIndex = this.filter && this.availableOptions && this.availableOptions.length > 0 ? 0 : -1;
       }
     });
 
-    this.sourceSubscription.subscribe(term => {
+    this.sourceSubscription.subscribe((term) => {
       if (this.resetting && term === '') {
         this.writeValue(this.value);
         this.resetting = false;
@@ -487,14 +521,15 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
   searchInputValueChangeEvent() {
     if (this.isSearch && this.isOpen && this.filterInputElement) {
       this.filterInputElement.nativeElement.focus();
-      if (!this.filterSubscription || this.appendToBody) { // 避免重复订阅
+      if (!this.filterSubscription || this.appendToBody) {
+        // 避免重复订阅
         this.filterSubscription = fromEvent(this.filterInputElement.nativeElement, 'input')
           .pipe(
             map((e: any) => e.target.value),
-            filter(term => !this.disabled && this.searchFn && term.length >= 0),
-            debounceTime(300) // hard code need refactory
+            filter((term) => !this.disabled && this.searchFn && term.length >= 0),
+            debounceTime(this.ANIMATION_DELAY)
           )
-          .subscribe(term => {
+          .subscribe((term) => {
             this.selectIndex = -1;
             return this.sourceSubscription.next(term);
           });
@@ -502,56 +537,125 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     }
   }
 
-  writeValue(obj: any): void {
-    let objValue = obj;
-    if (obj === null || obj === undefined) {
-      if (this.multiple) {
-        objValue = [];
+  writeValue(value: any): void {
+    if (this.multiple) {
+      this.value = value ?? [];
+      if (this.showMoreTags) {
+        this.value = this.value || [];
+        this.value = Array.isArray(this.value) ? this.value : [this.value];
       } else {
-        objValue = '';
+        this.getMultipleSelectedOption();
+        this.setAllChecked();
+      }
+    } else {
+      this.value = value ?? '';
+      this.getSingleSelectedOption();
+      if (this.autoScrollIntoActive) {
+        this.scrollIntoActive();
       }
     }
-    this.value = objValue;
-
-    if (this.multiple) {
-      this.value = this.value ? this.value : [];
-      this.value = Array.isArray(this.value) ? this.value : [this.value];
-      this.multiItems = this.value.map((option, index) => ({ option: option, id: this.options.indexOf(option) }));
-    } else {
-      const selectedItem = this.availableOptions.find(
-        item => this.formatter(item.option) === this.formatter(this.value)
-      );
-      this.activeIndex = selectedItem ? selectedItem.id : -1;
-      this.selectIndex = this.activeIndex ? this.activeIndex : -1;
-    }
-
     this.writeIntoInput(this.value);
     this.changeDetectorRef.markForCheck();
-    this.setChecked(this.value);
   }
 
   writeIntoInput(value): void {
-    this._inputValue = this.multiple
-      ? (value || []).map(option => this.valueParser(option)).join(', ')
-      : this.valueParser(value);
+    let valueItem = value;
+    if (this.valueKey) {
+      valueItem = this.multiple ? this.multiItems.map((item) => item.option) : this.getOption(this.availableOptions, value, true);
+      valueItem = valueItem ?? '';
+    }
+    this._inputValue = this.multiple ? (valueItem || []).map((option) => this.valueParser(option)).join(', ') : this.valueParser(valueItem);
     this.setAvailableOptions();
+    if (this.showMoreTags) {
+      this.multiItems = this.availableOptions.filter((item) => item.isChecked);
+      this.setAllChecked();
+    }
   }
 
   setAvailableOptions() {
-    if (!this.value || !Array.isArray(this.availableOptions)) {
+    const hasNoValue = this.value === undefined || this.value === '';
+    if (hasNoValue || !Array.isArray(this.availableOptions)) {
       return;
     }
     let _value = this.value;
     if (!this.multiple) {
       _value = [_value];
     }
-    this.availableOptions = this.availableOptions
-      .map((item) => ({
-        isChecked: _value.findIndex(i => JSON.stringify(i) === JSON.stringify(item.option)) > -1, id: item.id, option: item.option
-      }));
+    this.availableOptions = this.availableOptions.map((item) => ({
+      isChecked: _value.findIndex((i) => isEqual(i, this.valueKey ? item.option[this.valueKey] : item.option)) > -1,
+      id: item.id,
+      option: item.option,
+    }));
   }
 
-  choose = (option, index, $event?: Event) => {
+  getMultipleSelectedOption() {
+    this.value = this.value || [];
+    this.value = Array.isArray(this.value) ? this.value : [this.value];
+    this.multiItems = this.valueKey
+      ? this.value.map((value) => this.getOption(this.availableOptions, value)).filter((item) => item)
+      : this.value.map((option) => ({ option: option, id: this.getOptionIndex(option) }));
+  }
+
+  getSingleSelectedOption() {
+    const selectedItem = this.valueKey
+      ? this.getOption(this.availableOptions, this.value)
+      : this.availableOptions.find((item) => this.formatter(item.option) === this.formatter(this.value));
+    this.activeIndex = selectedItem ? selectedItem.id : -1;
+    this.selectIndex = this.activeIndex >= 0 ? this.activeIndex : -1;
+  }
+
+  getOption(data, value, hasOption?) {
+    const hasValue = (value ?? undefined) !== undefined;
+    const valueItem = this.getValue(value, this.valueKey);
+    const result = hasValue ? data.find((item) => this.getValue(item.option, this.valueKey) === valueItem) || '' : '';
+    return hasOption && result ? result.option : result;
+  }
+
+  getOptionIndex(option) {
+    return this.options?.length
+      ? this.options.findIndex((item) => isEqual(item, option))
+      : this.availableOptions.findIndex((item) => isEqual(item.option, option));
+  }
+
+  getValue = (item, key) => {
+    let result = item ?? '';
+    if (typeof item === 'object') {
+      result = item[key] ?? '';
+    }
+    return String(result);
+  };
+
+  scrollIntoActive() {
+    if (this.activeIndex >= 0) {
+      setTimeout(() => {
+        const items = this.dropdownUl?.nativeElement.querySelectorAll('.devui-dropdown-item') || [];
+        if (items[this.activeIndex]) {
+          items[this.activeIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        }
+      }, this.ANIMATION_DELAY);
+    }
+  }
+
+  canChange(option, index, action: string) {
+    let changeResult = Promise.resolve(true);
+
+    if (this.beforeChange) {
+      const result: any = this.beforeChange(index, option, action);
+      if (typeof result !== 'undefined') {
+        if (result.then) {
+          changeResult = result;
+        } else if (result.subscribe) {
+          changeResult = (result as Observable<boolean>).toPromise();
+        } else {
+          changeResult = Promise.resolve(result);
+        }
+      }
+    }
+
+    return changeResult;
+  }
+
+  choose = (option, index, $event?: Event, operate?: string) => {
     if ($event) {
       $event.preventDefault();
       $event.stopPropagation();
@@ -572,38 +676,53 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     if (this.optionDisabledKey && option[this.optionDisabledKey]) {
       return;
     }
+
     if (this.optionImmutableKey && option[this.optionImmutableKey]) {
       return;
     }
 
-    if (this.multiple) {
-      const indexOfOption = this.multiItems.findIndex(item => JSON.stringify(item.option) === JSON.stringify(option));
-      if (indexOfOption === -1) {
-        this.multiItems.push({ id: index, option });
+    this.canChange(option, index, operate || 'select').then((change) => {
+      if (!change) {
+        return;
+      }
+      if (this.multiple) {
+        const indexOfOption = this.multiItems.findIndex((item) => isEqual(item.option, option));
+        if (indexOfOption === -1) {
+          this.multiItems.push({ id: index, option });
+        } else {
+          this.multiItems.splice(indexOfOption, 1);
+        }
+        if (this.keepMultipleOrder === 'origin') {
+          this.multiItems.sort((a, b) => a.id - b.id);
+        }
+        this.value = this.valueKey ? this.multiItems.map((item) => item.option[this.valueKey]) : this.multiItems.map((item) => item.option);
+        this.setAllChecked();
       } else {
-        this.multiItems.splice(indexOfOption, 1);
+        this.value = this.valueKey ? option[this.valueKey] : option;
+        this.activeIndex = index;
+        this.selectIndex = index;
+        this.toggle();
       }
-      if (this.keepMultipleOrder === 'origin') {
-        this.multiItems.sort((a, b) => a.id - b.id);
-      }
-      this.value = this.multiItems.map(item => item.option);
-    } else {
-      this.value = option;
-      this.activeIndex = index;
-      this.selectIndex = index;
-      this.toggle();
-    }
-    this.writeIntoInput(this.value);
-    this.onChange(this.value);
-    this.valueChange.emit(option);
-    this.setChecked(this.value);
+      this.writeIntoInput(this.value);
+      this.onChange(this.value);
+      this.valueChange.emit(option);
+    });
   };
 
   updateCdkConnectedOverlayOrigin() {
     if (this.selectWrapper.nativeElement) {
-      this.cdkConnectedOverlayOrigin = new CdkOverlayOrigin(
-        formWithDropDown(this.selectWrapper) || this.selectWrapper.nativeElement
-      );
+      this.cdkConnectedOverlayOrigin = new CdkOverlayOrigin(formWithDropDown(this.selectWrapper) || this.selectWrapper.nativeElement);
+    }
+  }
+
+  resetScrollTop(isClose = false) {
+    const menuDom = this.selectMenuElement?.nativeElement.querySelector('ul.devui-select-list-unstyled.devui-scrollbar');
+    if (this.enableLazyLoad && menuDom) {
+      if (isClose) {
+        this.lastCloseScrollHeight = menuDom.scrollHeight ?? 0;
+      } else if (menuDom.scrollHeight < this.lastCloseScrollHeight) {
+        menuDom.scrollTop = 0;
+      }
     }
   }
 
@@ -627,7 +746,9 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
 
   toggle() {
     if (this.disabled) {
-      this.isOpen = false;
+      if (this.isOpen) {
+        this.isOpen = false;
+      }
       return;
     }
 
@@ -657,7 +778,8 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
       this.startAnimation = false;
     }
     this.isOpen = !this.isOpen;
-    if (this.virtualScrollViewportSizeMightChange) { // 解决虚拟滚动更新options长度展开前无法获取正确高度影响
+    if (this.virtualScrollViewportSizeMightChange) {
+      // 解决虚拟滚动更新options长度展开前无法获取正确高度影响
       setTimeout(() => {
         if (this.virtualScrollViewportSizeMightChange && this.virtualScrollViewport) {
           this.virtualScrollViewportSizeMightChange = false;
@@ -665,20 +787,19 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
         }
       }, 0);
     }
-    if (this.isSearch && this.isOpen) { // 条件外移减少setTimeout
-      setTimeout(() => {
-        this.searchInputValueChangeEvent();
-      }, 100);
+    if (this.isSearch && this.isOpen) {
+      // 条件外移减少setTimeout
+      setTimeout(() => this.searchInputValueChangeEvent(), 100);
     }
   }
 
   isBottomRectEnough() {
     const selectMenuElement = this.selectMenuElement.nativeElement;
     const selectInputElement = this.selectInputElement || this.selectInputWithLabelElement || this.selectInputWithTemplateElement;
-    const displayStyle =
-      selectMenuElement.style['display'] || (<any>window).getComputedStyle(selectMenuElement).display;
+    const displayStyle = selectMenuElement.style.display || (<any>window).getComputedStyle(selectMenuElement).display;
     let tempStyle;
-    if (displayStyle === 'none') { // 必要， 否则首次展开必有问题， 如果animationEnd之后设置为none也会有问题
+    if (displayStyle === 'none') {
+      // 必要， 否则首次展开必有问题， 如果animationEnd之后设置为none也会有问题
       tempStyle = {
         visibility: selectMenuElement.style.visibility,
         display: selectMenuElement.style.display,
@@ -689,8 +810,7 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
       this.renderer.setStyle(selectMenuElement, 'transform', 'translate(0, -9999)');
     }
     const elementHeight = selectMenuElement.offsetHeight;
-    const bottomDistance =
-      this.windowRef.innerHeight - selectInputElement.nativeElement.getBoundingClientRect().bottom;
+    const bottomDistance = this.windowRef.innerHeight - selectInputElement.nativeElement.getBoundingClientRect().bottom;
     const isBottomEnough = bottomDistance >= elementHeight;
     if (displayStyle === 'none') {
       this.renderer.setStyle(selectMenuElement, 'visibility', tempStyle.visibility);
@@ -738,15 +858,14 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     if (this.isOpen) {
       $event.preventDefault();
       $event.stopPropagation();
-      this.selectIndex =
-        this.selectIndex === this.availableOptions.length - 1 ? 0 : this.selectIndex + 1;
+      this.selectIndex = this.selectIndex === this.availableOptions.length - 1 ? 0 : this.selectIndex + 1;
       this.scrollToActive();
     }
   }
 
   scrollToActive(): void {
     const that = this;
-    setTimeout(_ => {
+    setTimeout(() => {
       try {
         const selectIndex = that.selectIndex + (that.isSelectAll ? 1 : 0); // 多了个全选会导致问题，index需要加1
         const scrollPane: any = that.dropdownUl.nativeElement.children[selectIndex];
@@ -759,19 +878,18 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
             scrollPane.scrollIntoView(false);
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     });
   }
 
-  handleKeyEnterEvent($event) {
+  handleKeyEnterEvent($event, isSearchInput = false) {
     if (this.isOpen) {
       $event.preventDefault();
       $event.stopPropagation();
       const item = this.getSelectedItem();
       if (item) {
         this.choose(item.option, item.id, $event);
-      } else {
+      } else if (!isSearchInput) {
         this.toggle();
       }
     } else {
@@ -786,33 +904,33 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
   };
 
   removeItem(item, $event) {
-    this.choose(item.option, item.id, $event);
+    this.choose(item.option, item.id, $event, 'remove');
   }
 
   selectAll() {
     const mutableOption = this.optionImmutableKey
-      ? this.availableOptions.filter(item => !item.option[this.optionImmutableKey])
+      ? this.availableOptions.filter((item) => !item.option[this.optionImmutableKey])
       : this.availableOptions;
-    const selectedImmutableOption = this.optionImmutableKey
-      ? this.multiItems.filter(item => item.option[this.optionImmutableKey])
-      : [];
+    const selectedImmutableOption = this.optionImmutableKey ? this.multiItems.filter((item) => item.option[this.optionImmutableKey]) : [];
+    const hasNotSelected = differenceBy(mutableOption, this.multiItems, 'id');
 
-    if (mutableOption && mutableOption.length > (this.multiItems.length - selectedImmutableOption.length)) {
-      mutableOption.forEach(item => {
-        const indexOfOption = this.multiItems
-          .findIndex(i => JSON.stringify(i.option) === JSON.stringify(item.option));
+    if (hasNotSelected.length) {
+      mutableOption.forEach((item) => {
+        const indexOfOption = this.multiItems.findIndex((i) => isEqual(i.option, item.option));
         if (indexOfOption === -1) {
           this.multiItems.push({ id: item.id, option: item.option });
         }
       });
-    } else {
+    } else if (mutableOption.length === this.multiItems.length - selectedImmutableOption.length) {
       this.multiItems = [...selectedImmutableOption];
+    } else {
+      this.multiItems = differenceBy(this.multiItems, mutableOption, 'id');
     }
-    this.value = this.multiItems.map(item => item.option);
+    this.value = this.valueKey ? this.multiItems.map((item) => item.option[this.valueKey]) : this.multiItems.map((item) => item.option);
     this.writeIntoInput(this.value);
-    this.onChange(this.value);
+    this.setAllChecked();
+    this.onChange(this.valueKey ? this.multiItems.map((item) => item.option[this.valueKey]) : this.value);
     this.valueChange.emit(this.multiItems);
-    this.setChecked(this.value);
   }
 
   trackByFn(index, item) {
@@ -853,25 +971,24 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
     }
   }
 
-  setChecked(selectedItem) {
-    if (!selectedItem) {
-      return;
-    }
-    if (!this.isSelectAll) {
-      return;
-    }
+  setAllChecked() {
+    this.allChecked = false;
     this.halfChecked = false;
-    if (selectedItem.length === this.availableOptions.length) {
+    if (!this.showSelectAll) {
+      return;
+    }
+    if (!this.multiItems || this.multiItems.length === 0) {
+      return;
+    }
+    // 从当前下拉选项中用 id 排除已选中选项
+    const result = differenceBy(this.availableOptions, this.multiItems, 'id');
+    if (result.length === 0) {
       this.allChecked = true;
-    } else if (selectedItem.length === 0) {
+    } else if (result.length === this.availableOptions.length) {
       this.allChecked = false;
     } else {
       this.halfChecked = true;
     }
-  }
-
-  showSelectAll() {
-    return this.isSelectAll && this.multiple && this.availableOptions.length > 0;
   }
 
   public forceSearchNext() {
@@ -880,14 +997,20 @@ export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewI
 
   valueClear($event) {
     $event.stopPropagation();
-    this.value = null;
+    if (this.multiple) {
+      this.multiItems = [];
+      this.value = [];
+      this.setAllChecked();
+    } else {
+      this.value = undefined;
+    }
     this.resetStatus();
     this.onChange(this.value);
     this.valueChange.emit(this.value);
   }
 
   resetStatus() {
-    this.writeIntoInput('');
+    this.writeIntoInput(this.value);
     if (this.availableOptions && this.availableOptions[this.activeIndex]) {
       this.availableOptions[this.activeIndex].isChecked = false;
     }

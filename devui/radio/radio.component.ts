@@ -1,5 +1,6 @@
-import { Component, forwardRef, HostListener, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, HostBinding, HostListener, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { DevConfigService, WithConfig } from 'ng-devui/utils';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -15,7 +16,7 @@ import { Observable } from 'rxjs';
   ],
   preserveWhitespaces: false,
 })
-export class RadioComponent implements OnInit, ControlValueAccessor {
+export class RadioComponent implements ControlValueAccessor {
   private _name: string;
   private _disabled: boolean;
   private inputValue: string;
@@ -52,30 +53,31 @@ export class RadioComponent implements OnInit, ControlValueAccessor {
   }
 
   @Input() beforeChange: (value) => boolean | Promise<boolean> | Observable<boolean>;
-
-
-  constructor() {}
-
-  _value: any;
-  handleChange: (event: any, value: any) => void;
-
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle() {
+    return this.showGlowStyle;
+  }
   @HostListener('click', ['$event'])
   onRadioChange(event) {
+    event.preventDefault();
     if (this.disabled) {
-      event.preventDefault();
+      return;
     }
-
     this.canChange().then((change) => {
-      if (!change) {
-        event.preventDefault();
+      if (change) {
+        this._value = this.value;
+        this.onChange(this.value);
       }
     });
   }
 
+  _value: any;
+  handleChange: (event: any, value: any) => void;
+
   private onChange = (_: any) => null;
   private onTouched = () => null;
 
-  ngOnInit() {}
+  constructor(private devConfigService: DevConfigService) {}
 
   registerHandleChange(fn: any) {
     this.handleChange = fn;
@@ -99,21 +101,19 @@ export class RadioComponent implements OnInit, ControlValueAccessor {
   }
 
   canChange() {
-    let changeResult = Promise.resolve(true);
-
+    let changeResult: Promise<boolean> | Observable<boolean> = Promise.resolve(true);
     if (this.beforeChange) {
-      const result: any = this.beforeChange(this.value);
+      const result = this.beforeChange(this.value);
       if (typeof result !== 'undefined') {
-        if (result.then) {
-          changeResult = result;
-        } else if (result.subscribe) {
+        if ((result as Promise<boolean>).then) {
+          changeResult = result as Promise<boolean>;
+        } else if ((result as Observable<boolean>).subscribe) {
           changeResult = (result as Observable<boolean>).toPromise();
         } else {
-          changeResult = Promise.resolve(result);
+          changeResult = Promise.resolve(result as boolean);
         }
       }
     }
-
     return changeResult;
   }
 }

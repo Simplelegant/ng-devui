@@ -12,8 +12,10 @@ import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { CarouselDemoAutoPlayComponent } from './autoplay/carousel-demo-autoplay.component';
 import { CarouselDemoBasicComponent } from './basic/carousel-demo-basic.component';
 import { CarouselDemoComponent } from './carousel-demo.component';
+import { CarouselDesignComponent } from './carousel-design.component';
 import { CarouselDemoCustomComponent } from './custom/carousel-demo-custom.component';
 import { CarouselDemoTriggerComponent } from './trigger/carousel-demo-trigger.component';
+import { WithTransitionProgressComponent } from './with-transition-progress/with-transition-progress.component';
 
 @NgModule({
   imports: [
@@ -26,7 +28,11 @@ import { CarouselDemoTriggerComponent } from './trigger/carousel-demo-trigger.co
     DDemoNavModule,
     ButtonModule,
     RouterModule.forChild([
-      {path: '', redirectTo: 'demo'},
+      {path: '', redirectTo: 'demo', pathMatch: 'full'},
+      {
+        path: 'design',
+        component: CarouselDesignComponent,
+      },
       {path: 'demo', component: CarouselDemoComponent},
       {
         path: 'api', component: DevUIApiComponent, data: {
@@ -39,10 +45,12 @@ import { CarouselDemoTriggerComponent } from './trigger/carousel-demo-trigger.co
   exports: [],
   declarations: [
     CarouselDemoComponent,
+    CarouselDesignComponent,
     CarouselDemoBasicComponent,
     CarouselDemoTriggerComponent,
     CarouselDemoAutoPlayComponent,
-    CarouselDemoCustomComponent
+    CarouselDemoCustomComponent,
+    WithTransitionProgressComponent
   ],
 })
 export class CarouselDemoModule {

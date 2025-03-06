@@ -19,7 +19,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { scrollAnimate } from 'ng-devui/utils';
 import { fromEvent, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { throttleTime } from 'rxjs/operators';
 import { NavMenu, SpriteMode, SpriteOption } from './nav-sprite.type';
 
 const DEFAULT_OPTIONS = {
@@ -49,7 +49,7 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @Input() maxLevel = 3; // 最大层级
 
-  @Input() title = 'menu'; // 名称
+  @Input() title; // 名称
 
   @Input() indent = 2; // 缩进
 
@@ -98,6 +98,8 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   timeGap = 60;
 
+  throttleTimeGap = 300;
+
   document: Document;
 
   get baseUrl() {
@@ -129,7 +131,7 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       const container = this.targetContainer === this.document.documentElement ? window : this.targetContainer;
       this.scrollSub = fromEvent(container, 'scroll')
-        .pipe(debounceTime(300))
+        .pipe(throttleTime(this.throttleTimeGap))
         .subscribe(() => {
           this.scrollEventHandler();
         });
@@ -152,7 +154,7 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
       scrollAnimate(
         this.targetContainer,
         this.targetContainer.scrollTop,
-        this.menus[this.activeIndex]?.scrollPosition?.startLine,
+        this.menus[this.activeIndex]?.scrollPosition?.startLine + 1,
         undefined,
         undefined,
         () => {
@@ -182,6 +184,7 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
         level: i.tagName.match(/\d+/)[0],
         label: i.innerText,
         href: this.baseUrl + '#' + i.innerText,
+        element: i,
         scrollPosition: this.getScrollPosition(i),
       };
     });
@@ -204,7 +207,12 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.isToViewByNav) {
       const scrollTop = this.targetContainer.scrollTop;
       const index = this.menus.findIndex((ele, i) => {
-        return scrollTop >= ele.scrollPosition.startLine && scrollTop < this.menus[i + 1].scrollPosition.startLine;
+        if (this.menus[i + 1]) {
+          this.menus[i + 1].scrollPosition = this.getScrollPosition(this.menus[i + 1].element);
+          return scrollTop >= ele.scrollPosition.startLine && scrollTop < this.menus[i + 1]?.scrollPosition.startLine;
+        } else {
+          return false;
+        }
       });
       if (index !== -1 && this.activeIndex !== index) {
         this.activeIndex = index;
@@ -270,13 +278,15 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.activeIndex !== index) {
       this.activeIndex = index;
       const target = this.menus[index];
-      scrollAnimate(this.targetContainer, this.targetContainer.scrollTop, target?.scrollPosition.startLine, undefined, undefined, () => {
-        this.setUrlHash();
-        this.setTargetActive();
-        setTimeout(() => {
-          this.isToViewByNav = false;
-        }, this.timeGap);
-      });
+      target.scrollPosition = this.getScrollPosition(target.element);
+      scrollAnimate(
+        this.targetContainer, this.targetContainer.scrollTop, target?.scrollPosition.startLine + 1, undefined, undefined, () => {
+          this.setUrlHash();
+          this.setTargetActive();
+          setTimeout(() => {
+            this.isToViewByNav = false;
+          }, this.timeGap);
+        });
       this.isToViewByNav = true;
     }
   }
@@ -300,6 +310,31 @@ export class NavSpriteComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
     this.isOpen = true;
+  }
+
+  constrainPosition(userPointerPosition, dragRef, dimensions, pickupPositionInElement) {
+    const point = {
+      x: userPointerPosition.x - pickupPositionInElement.x,
+      y: userPointerPosition.y - pickupPositionInElement.y,
+    };
+
+    if (point.y < 0) {
+      point.y = 0;
+    }
+
+    if (point.x < 0) {
+      point.x = 0;
+    }
+
+    if (point.x > window.innerWidth - dimensions.width) {
+      point.x = window.innerWidth - dimensions.width;
+    }
+
+    if (point.y > window.innerHeight - dimensions.height) {
+      point.y = window.innerHeight - dimensions.height;
+    }
+
+    return point;
   }
 
   ngOnDestroy() {

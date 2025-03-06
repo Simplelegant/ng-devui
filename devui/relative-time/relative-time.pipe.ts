@@ -1,14 +1,14 @@
 import { OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { I18nService } from 'ng-devui/i18n';
 import * as datefns from 'date-fns';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 
 @Pipe({
-  name: 'dRelativeTime'
+  name: 'dRelativeTime',
 })
 export class RelativeTimePipe implements PipeTransform, OnDestroy {
-  private _destroyed$ = new Subject();
+  private _destroyed$ = new Subject<void>();
   constructor(private i18n: I18nService) {}
 
   transform(
@@ -26,7 +26,7 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
       day: 6, // at least 6 days using weeks.
       hour: 6, // at least 6 hours using day.
       minute: 59, // at least 59 minutes using hour.
-      second: 59 // at least 59 seconds using minute.
+      second: 59, // at least 59 seconds using minute.
     };
 
     if (!datefns.isDate(value)) {
@@ -69,19 +69,19 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
         if (absDiffSeconds > limit) {
           return new Date(value);
         }
-        const i18nCommonText = data['relativeTime'];
+        const i18nCommonText = data.relativeTime;
         if (absDiffYears > 0 && absDiffMonths > threshold.month) {
-          return  diffYears > 0 ? i18nCommonText.yearsAgo(absDiffYears) : i18nCommonText.yearsLater(absDiffYears);
+          return diffYears > 0 ? i18nCommonText.yearsAgo(absDiffYears) : i18nCommonText.yearsLater(absDiffYears);
         } else if (absDiffMonths > 0 && absDiffWeeks >= threshold.week) {
-          return  diffMonths > 0 ? i18nCommonText.monthsAgo(absDiffMonths) : i18nCommonText.monthsLater(absDiffMonths);
+          return diffMonths > 0 ? i18nCommonText.monthsAgo(absDiffMonths) : i18nCommonText.monthsLater(absDiffMonths);
         } else if (absDiffWeeks > 0 && absDiffDays > threshold.day) {
-          return  diffWeeks > 0 ? i18nCommonText.weeksAgo(absDiffWeeks) : i18nCommonText.weeksLater(absDiffWeeks);
+          return diffWeeks > 0 ? i18nCommonText.weeksAgo(absDiffWeeks) : i18nCommonText.weeksLater(absDiffWeeks);
         } else if (absDiffDays > 0 && absDiffHours > threshold.hour) {
-          return  diffDays > 0 ? i18nCommonText.daysAgo(absDiffDays) : i18nCommonText.daysLater(absDiffDays);
+          return diffDays > 0 ? i18nCommonText.daysAgo(absDiffDays) : i18nCommonText.daysLater(absDiffDays);
         } else if (absDiffHours > 0 && absDiffMinutes > threshold.minute) {
-          return absDiffHours + (diffHours > 0 ? i18nCommonText.hoursAgo : i18nCommonText.hoursLater);
+          return diffHours > 0 ? i18nCommonText.hoursAgo(absDiffHours) : i18nCommonText.hoursLater(absDiffHours);
         } else if (absDiffMinutes > 0 && absDiffSeconds > threshold.second) {
-          return absDiffMinutes + (diffMinutes > 0 ? i18nCommonText.minutesAgo : i18nCommonText.minutesLater);
+          return diffMinutes > 0 ? i18nCommonText.minutesAgo(absDiffMinutes) : i18nCommonText.minutesLater(absDiffMinutes);
         } else if (diffSeconds || diffSeconds === 0) {
           return diffSeconds >= 0 ? i18nCommonText.justnow : i18nCommonText.later;
         } else {

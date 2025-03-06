@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
-import { from, Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, from } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { IFileOptions, IUploadOptions } from './file-uploader.types';
 
@@ -9,6 +9,7 @@ import { IFileOptions, IUploadOptions } from './file-uploader.types';
 export class SelectFiles {
   NOT_ALLOWED_FILE_TYPE_MSG: string;
   BEYOND_MAXIMAL_FILE_SIZE_MSG: string;
+  BEYOND_MAXIMAL_FILE_COUNT_MSG: string;
   i18nText: I18nInterface['upload'];
   i18nSubscription: Subscription;
   document: Document;
@@ -90,9 +91,16 @@ export class SelectFiles {
     return false;
   };
 
+  beyondMaximumFileCount = (files, maximumCount) => {
+    if (maximumCount) {
+      return files > maximumCount;
+    }
+    return false;
+  };
+
   triggerSelectFiles = (fileOptions: IFileOptions, uploadOptions: IUploadOptions) => {
-    const { multiple, accept, webkitdirectory} = fileOptions;
-    return from(this.selectFiles({ multiple, accept , webkitdirectory})).pipe(mergeMap(file => <any>file));
+    const { multiple, accept, webkitdirectory } = fileOptions;
+    return from(this.selectFiles({ multiple, accept, webkitdirectory })).pipe(mergeMap(file => <any>file));
   };
 
   triggerDropFiles = (fileOptions: IFileOptions, uploadOptions: IUploadOptions, files: any) => {
@@ -107,21 +115,25 @@ export class SelectFiles {
     }
   }
 
-  _validateFiles(file, accept, uploadOptions) {
-    if (!this.isAllowedFileType(accept, <File>file)) {
-      this.NOT_ALLOWED_FILE_TYPE_MSG = this.i18nText.getNotAllowedFileTypeMsg((<File>file).name, accept);
+  _validateFiles(filesLen, currentFile, accept, uploadOptions) {
+    if (!this.isAllowedFileType(accept, <File>currentFile)) {
+      this.NOT_ALLOWED_FILE_TYPE_MSG = this.i18nText.getNotAllowedFileTypeMsg((<File>currentFile).name, accept);
       return { checkError: true, errorMsg: this.NOT_ALLOWED_FILE_TYPE_MSG };
     }
-    if (this.beyondMaximalSize((<File>file).size, uploadOptions.maximumSize)) {
-      this.BEYOND_MAXIMAL_FILE_SIZE_MSG = this.i18nText.getBeyondMaximalFileSizeMsg((<File>file).name, uploadOptions.maximumSize);
+    if (this.beyondMaximalSize((<File>currentFile).size, uploadOptions.maximumSize)) {
+      this.BEYOND_MAXIMAL_FILE_SIZE_MSG = this.i18nText.getBeyondMaximalFileSizeMsg((<File>currentFile).name, uploadOptions.maximumSize);
       return { checkError: true, errorMsg: this.BEYOND_MAXIMAL_FILE_SIZE_MSG };
+    }
+    if (this.beyondMaximumFileCount(filesLen, uploadOptions.maximumCount)) {
+      this.BEYOND_MAXIMAL_FILE_COUNT_MSG = this.i18nText.getBeyondMaximumFileCountMsg(uploadOptions.maximumCount);
+      return { checkError: true, errorMsg: this.BEYOND_MAXIMAL_FILE_COUNT_MSG };
     }
     return { checkError: false, errorMsg: undefined };
   }
 
   simulateClickEvent(input) {
-    const evt = this.document.createEvent('MouseEvents');
-    evt.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+    const evt = new MouseEvent('click');
+    evt.stopPropagation();
     input.dispatchEvent(evt);
   }
 }

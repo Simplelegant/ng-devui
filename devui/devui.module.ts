@@ -24,6 +24,7 @@ import { EditableSelectModule } from 'ng-devui/editable-select';
 import { FormModule } from 'ng-devui/form';
 import { FullscreenModule } from 'ng-devui/fullscreen';
 import { GanttModule } from 'ng-devui/gantt';
+import { IconModule } from 'ng-devui/icon';
 import { ImagePreviewModule } from 'ng-devui/image-preview';
 import { InputNumberModule } from 'ng-devui/input-number';
 import { LayoutModule } from 'ng-devui/layout';
@@ -31,6 +32,7 @@ import { LoadingModule } from 'ng-devui/loading';
 import { MentionModule } from 'ng-devui/mention';
 import { ModalModule } from 'ng-devui/modal';
 import { MultiAutoCompleteModule } from 'ng-devui/multi-auto-complete';
+import { MenuModule } from 'ng-devui/menu';
 import { NavSpriteModule } from 'ng-devui/nav-sprite';
 import { PaginationModule } from 'ng-devui/pagination';
 import { PanelModule } from 'ng-devui/panel';
@@ -61,6 +63,7 @@ import { TransferModule } from 'ng-devui/transfer';
 import { TreeModule } from 'ng-devui/tree';
 import { TreeSelectModule } from 'ng-devui/tree-select';
 import { UploadModule } from 'ng-devui/upload';
+import { UserGuideModule } from 'ng-devui/user-guide';
 import { WindowRefModule } from 'ng-devui/window-ref';
 export * from 'ng-devui/accordion';
 export * from 'ng-devui/alert';
@@ -87,6 +90,7 @@ export * from 'ng-devui/editable-select';
 export * from 'ng-devui/form';
 export * from 'ng-devui/fullscreen';
 export * from 'ng-devui/gantt';
+export * from 'ng-devui/icon';
 export * from 'ng-devui/image-preview';
 export * from 'ng-devui/input-number';
 export * from 'ng-devui/layout';
@@ -124,78 +128,82 @@ export * from 'ng-devui/transfer';
 export * from 'ng-devui/tree';
 export * from 'ng-devui/tree-select';
 export * from 'ng-devui/upload';
+export * from 'ng-devui/user-guide';
 export * from 'ng-devui/window-ref';
 export * from './version';
 
 @NgModule({
   imports: [],
   exports: [
-    AccordionModule,
-    AlertModule,
-    AnchorModule,
-    AutoCompleteModule,
-    AvatarModule,
-    DCommonModule,
-    BadgeModule,
-    BackTopModule,
-    ButtonModule,
-    BreadcrumbModule,
-    CardModule,
-    CarouselModule,
-    CheckBoxModule,
-    DataTableModule,
-    DatepickerModule,
-    DragDropModule,
-    DrawerModule,
-    DropDownModule,
-    EditableSelectModule,
-    FormModule,
-    FullscreenModule,
-    ImagePreviewModule,
-    LoadingModule,
-    LayoutModule,
-    ModalModule,
-    MultiAutoCompleteModule,
-    PaginationModule,
-    PanelModule,
-    PopoverModule,
-    ProgressModule,
-    RadioModule,
-    RateModule,
-    SearchModule,
-    SelectModule,
-    StatusModule,
-    StickyModule,
-    TabsModule,
-    TagsModule,
-    TagsInputModule,
-    ToastModule,
-    ToggleModule,
-    TooltipModule,
-    TimeAxisModule,
-    TreeModule,
-    UploadModule,
-    InputNumberModule,
-    SliderModule,
-    SplitterModule,
-    TreeSelectModule,
-    TransferModule,
-    TextInputModule,
-    TextareaModule,
-    WindowRefModule,
-    StepsGuideModule,
-    GanttModule,
-    QuadrantDiagramModule,
-    TimePickerModule,
-    CascaderModule,
-    CategorySearchModule,
-    DatepickerProModule,
-    MentionModule,
-    NavSpriteModule,
-    ReadTipModule
+  AccordionModule,
+  AlertModule,
+  AnchorModule,
+  AutoCompleteModule,
+  AvatarModule,
+  DCommonModule,
+  BadgeModule,
+  BackTopModule,
+  ButtonModule,
+  BreadcrumbModule,
+  CardModule,
+  CarouselModule,
+  CheckBoxModule,
+  DataTableModule,
+  DatepickerModule,
+  DragDropModule,
+  DrawerModule,
+  DropDownModule,
+  EditableSelectModule,
+  FormModule,
+  FullscreenModule,
+  ImagePreviewModule,
+  LoadingModule,
+  LayoutModule,
+  IconModule,
+  ModalModule,
+  MultiAutoCompleteModule,
+  MenuModule,
+  PaginationModule,
+  PanelModule,
+  PopoverModule,
+  ProgressModule,
+  RadioModule,
+  RateModule,
+  SearchModule,
+  SelectModule,
+  StatusModule,
+  StickyModule,
+  TabsModule,
+  TagsModule,
+  TagsInputModule,
+  ToastModule,
+  ToggleModule,
+  TooltipModule,
+  TimeAxisModule,
+  TreeModule,
+  UploadModule,
+  UserGuideModule,
+  InputNumberModule,
+  SliderModule,
+  SplitterModule,
+  TreeSelectModule,
+  TransferModule,
+  TextInputModule,
+  TextareaModule,
+  WindowRefModule,
+  StepsGuideModule,
+  GanttModule,
+  QuadrantDiagramModule,
+  TimePickerModule,
+  CascaderModule,
+  CategorySearchModule,
+  DatepickerProModule,
+  MentionModule,
+  NavSpriteModule,
+  ReadTipModule
   ],
   declarations: [],
-})
+  })
 export class DevUIModule {
   static forRoot(): ModuleWithProviders<DevUIModule> {
     return {

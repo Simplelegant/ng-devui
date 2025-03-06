@@ -3,6 +3,7 @@
 
 :host {
   &.devui-splitter-bar {
+    // 实际场景为边框，此处使用背景色表现效果更好
     background-color: $devui-dividing-line;
     display: flex;
     position: relative;
@@ -12,7 +13,7 @@
     flex-shrink: 0;
 
     .devui-collapse {
-      background-color: $devui-dividing-line;
+      background-color: $devui-line;
       position: absolute;
       z-index: 15;
       cursor: pointer;

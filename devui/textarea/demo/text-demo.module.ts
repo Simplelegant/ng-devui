@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FormModule } from 'ng-devui/form';
 import { DevUIApiComponent } from 'ng-devui/shared/devui-api/devui-api.component';
@@ -12,6 +13,7 @@ import { BasicComponent } from './basic/basic.component';
 import { CountComponent } from './count/count.component';
 import { ResizeComponent } from './resize/resize.component';
 import { TextDemoComponent } from './text-demo.component';
+import { TextDesignComponent } from './text-design.component';
 
 @NgModule({
   imports: [
@@ -20,10 +22,15 @@ import { TextDemoComponent } from './text-demo.component';
     TextareaModule,
     DevUICodeboxModule,
     DevUIApiModule,
+    FormsModule,
     DDemoNavModule,
     FormModule,
     RouterModule.forChild([
-      { path: '',  redirectTo: 'demo' },
+      { path: '',  redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: TextDesignComponent,
+      },
       { path: 'demo', component: TextDemoComponent},
       { path: 'api', component: DevUIApiComponent, data: {
         'zh-cn': require('!html-loader!markdown-loader!../doc/api-cn.md'),
@@ -34,6 +41,7 @@ import { TextDemoComponent } from './text-demo.component';
   exports: [TextDemoComponent],
   declarations: [
     TextDemoComponent,
+    TextDesignComponent,
     BasicComponent,
     ResizeComponent,
     CountComponent

@@ -39,11 +39,13 @@
           [delay]="delay"
           [dAutoCompleteWidth]="width"
           dAutoComplete
+          [retainInputValue]="retainInputValue"
           [showAnimation]="showAnimation"
           [searchFn]="searchFn"
           [appendToBody]="appendToBody"
           [appendToBodyDirections]="appendToBodyDirections"
           [cdkOverlayOffsetY]="3"
+          [disabledKey]="disabledKey"
           (blur)="inputBlur()"
           (changeDropDownStatus)="changePopUp($event)"
         />

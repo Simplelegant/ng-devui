@@ -6,6 +6,7 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
+  HostBinding,
   Inject,
   Input,
   OnChanges,
@@ -13,15 +14,16 @@ import {
   Output,
   Renderer2,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { DevConfigService, WithConfig } from 'ng-devui/utils';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 
 const INPUT_NUMBER_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => InputNumberComponent),
-  multi: true
+  multi: true,
 };
 
 export type InputSizeType = '' | 'sm' | 'lg';
@@ -33,7 +35,6 @@ export type InputSizeType = '' | 'sm' | 'lg';
   providers: [INPUT_NUMBER_CONTROL_VALUE_ACCESSOR],
   preserveWhitespaces: false,
 })
-
 export class InputNumberComponent implements ControlValueAccessor, OnChanges, OnDestroy, AfterViewInit {
   @Input() step = 1;
   @Input() disabled = false;
@@ -44,6 +45,11 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
   @Input() placeholder = '';
   @Input() maxLength = 0;
   @Input() reg: RegExp | string;
+  @Input() @WithConfig() styleType = 'default';
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle() {
+    return this.showGlowStyle;
+  }
   @Output() afterValueChanged = new EventEmitter<number>();
   @Output() whileValueChanging = new EventEmitter<number>();
   @ViewChild('incButton', { static: true }) incButton: ElementRef;
@@ -81,14 +87,17 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     return this._max;
   }
 
-  private onTouchedCallback = () => {
-  };
+  private onTouchedCallback = () => {};
 
-  private onChangeCallback = (v: any) => {
-  };
+  private onChangeCallback = (v: any) => {};
 
-  constructor(private cdr: ChangeDetectorRef, private el: ElementRef, private renderer: Renderer2,
-              @Inject(DOCUMENT) private doc: any) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private devConfigService: DevConfigService,
+    private el: ElementRef,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private doc: any
+  ) {
     this.document = this.doc;
   }
 
@@ -156,6 +165,8 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
       }
     }
     this.renderer.setProperty(this.inputElement.nativeElement, 'value', value);
+    this.disabledDec = this.value === this.min;
+    this.disabledInc = this.value === this.max;
     this.cdr.detectChanges();
   }
 
@@ -171,12 +182,16 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
         }
       }
     });
-    this.el.nativeElement.addEventListener('click', this.registerBlurListener.bind(this));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (Object.prototype.hasOwnProperty.call(changes, 'min') || Object.prototype.hasOwnProperty.call(changes, 'max')) {
       this.checkRangeValues(this.min, this.max);
+      if (this.value < this.min) {
+        this.setValue(this.min);
+      } else if (this.value > this.max) {
+        this.setValue(this.max);
+      }
     }
   }
 
@@ -200,15 +215,13 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
 
   subscribeIncAction() {
     if (this.incListener && !this.incAction) {
-      this.incAction = this.incListener.subscribe(this.increaseValue.bind(this));
-      this.disabledInc = false;
+      this.incAction = this.incListener.subscribe(this.increaseValue);
     }
   }
 
   subscribeDecAction() {
     if (this.decListener && !this.decAction) {
-      this.decAction = this.decListener.subscribe(this.decreaseValue.bind(this));
-      this.disabledDec = false;
+      this.decAction = this.decListener.subscribe(this.decreaseValue);
     }
   }
 
@@ -233,13 +246,13 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     }
   }
 
-  private increaseValue() {
+  private increaseValue = () => {
     this.inDecreaseValue('increase');
-  }
+  };
 
-  private decreaseValue() {
+  private decreaseValue = () => {
     this.inDecreaseValue('decrease');
-  }
+  };
 
   private inDecreaseValue(type: string) {
     const canContinue = type === 'increase' ? this.canIncrease() : this.canDecrease();
@@ -248,9 +261,15 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
         this.updateValue(0);
       } else {
         const decimals = this.getMaxDecimals(this.value);
-        const floatValue = type === 'increase' ? (this.value + this.step) : (this.value - this.step);
+        const floatValue = type === 'increase' ? this.value + this.step : this.value - this.step;
         if (this.matchReg(String(floatValue))) {
-          this.updateValue(parseFloat(floatValue.toFixed(decimals)));
+          let value;
+          if (floatValue < 0) {
+            value = Math.ceil(floatValue * Number(`1e+${decimals}`) - Number('1e-12')) / Number(`1e+${decimals}`);
+          } else {
+            value = Math.floor(floatValue * Number(`1e+${decimals}`) + Number('1e-12')) / Number(`1e+${decimals}`);
+          }
+          this.updateValue(value);
         }
       }
       this.inputElement.nativeElement.focus();
@@ -267,17 +286,17 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
 
   private canIncrease() {
     if (this.allowEmpty && (this.value === null || this.value === undefined)) {
-      return (this.min + this.step) <= this.max;
+      return this.min + this.step <= this.max;
     } else {
-      return (this.value + this.step) <= this.max;
+      return this.value + this.step <= this.max;
     }
   }
 
   private canDecrease() {
     if (this.allowEmpty && (this.value === null || this.value === undefined)) {
-      return (this.min + this.step) <= this.max;
+      return this.min + this.step <= this.max;
     } else {
-      return (this.value - this.step) >= this.min;
+      return this.value - this.step >= this.min;
     }
   }
 
@@ -285,6 +304,8 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     if (disabled) {
       this.unsubscribeActions();
     } else {
+      this.disabledDec = this.value === this.min;
+      this.disabledInc = this.value === this.max;
       this.subscribeActions();
     }
   }
@@ -294,7 +315,7 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     if (this.disabled) {
       return;
     }
-    const newValue = event.target['value'];
+    const newValue = (event.target as any).value;
     const parseValue = parseFloat(newValue as string);
     let result;
     if (this.allowEmpty && newValue === '') {
@@ -307,6 +328,9 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     result = this.ensureValueInRange(result);
     this.notifyWhileValueChanging(result);
     this.updateValue(result);
+    const blurEvent = new Event('blur', { bubbles: false, cancelable: true });
+    this.el.nativeElement.dispatchEvent(blurEvent);
+    this.onTouchedCallback();
   }
 
   private checkRangeValues(minValue, maxValue) {
@@ -342,16 +366,17 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
     if (this.disabled) {
       return;
     }
-    let value = event.target['value'];
+    const target: any = event.target;
+    let value = target.value;
     let input;
-    let selectionStart = event.target['selectionStart'];
-    let selectionEnd = event.target['selectionEnd'];
-    if (event['clipboardData']) {
-      input = event['clipboardData'].getData('text');
+    let selectionStart = target.selectionStart;
+    let selectionEnd = target.selectionEnd;
+    if ((event as any).clipboardData) {
+      input = (event as any).clipboardData.getData('text');
       value = value.substring(0, selectionStart) + input + value.substring(selectionEnd);
       event.preventDefault();
     } else {
-      input = event['data'];
+      input = (event as any).data;
       if (input === undefined || input === null) {
         return;
       }
@@ -366,14 +391,20 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
       this.setValue(this.lastValue);
       return;
     } else if (
-      value === '-' || value.match(/^\s*(-|\+)?\d+\.$/) || value.match(/^\s*(-|\+)?\d+\.[0-9]*0$/) || value.match(/^\s*(-|\+)0+$/)
+      value === '-' ||
+      value.match(/^\s*(-|\+)?\d+\.$/) ||
+      value.match(/^\s*(-|\+)?\d+\.[0-9]*0$/) ||
+      value.match(/^\s*(-|\+)0+$/)
     ) {
       // indeterminate state
       return;
     } else if (value.match(/^\s*(-|\+)?(\d+|(\d*(\.\d*)))$/)) {
-
       if (this.decimalLimit !== undefined && this.decimalLimit !== null) {
-        value = parseFloat(value).toFixed(this.decimalLimit);
+        if (value < 0) {
+          value = Math.ceil(value * Number(`1e+${this.decimalLimit}`) - Number('1e-12')) / Number(`1e+${this.decimalLimit}`);
+        } else {
+          value = Math.floor(value * Number(`1e+${this.decimalLimit}`) + Number('1e-12')) / Number(`1e+${this.decimalLimit}`);
+        }
       }
       value = parseFloat(value as string);
       if (!isNaN(value)) {
@@ -382,15 +413,15 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
         // updateValue会使输入游标跳到最后，这里设置输入游标归位
         if (input !== null) {
           setTimeout(() => {
-            event.target['setSelectionRange'](selectionStart + input.length, selectionStart + input.length);
+            target.setSelectionRange(selectionStart + input.length, selectionStart + input.length);
           }, 0);
         }
         return;
       }
     } else {
-      this.setValue(this.value);
+      this.setValue(value.slice(0, value.length - 1));
       setTimeout(() => {
-        event.target['setSelectionRange'](selectionStart, selectionStart);
+        target.setSelectionRange(selectionStart, selectionStart);
       }, 0);
     }
   }
@@ -416,10 +447,11 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
   }
 
   handleBackspace(event: KeyboardEvent) {
-    if (event['key'] === 'Backspace') {
-      const oldValue = event.target['value'];
-      const selectionStart = event.target['selectionStart'];
-      const selectionEnd = event.target['selectionEnd'];
+    if (event.key === 'Backspace') {
+      const target: any = event.target;
+      const oldValue = target.value;
+      const selectionStart = target.selectionStart;
+      const selectionEnd = target.selectionEnd;
       let newValue = oldValue.substring(0, selectionStart - 1) + oldValue.substring(selectionEnd);
       if (newValue !== '-' && !newValue.match(/^\s*(-|\+)?\d+\.$/)) {
         newValue = newValue === '' ? null : newValue;
@@ -429,7 +461,7 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
   }
 
   keyBoardControl(event: KeyboardEvent) {
-    const key = event['key'];
+    const key = event.key;
     if (key === 'ArrowUp' || key === 'Up') {
       event.preventDefault();
       this.increaseValue();
@@ -438,22 +470,6 @@ export class InputNumberComponent implements ControlValueAccessor, OnChanges, On
       this.decreaseValue();
     } else if (key === 'Enter') {
       this.inputElement.nativeElement.blur();
-    }
-  }
-
-  registerBlurListener() {
-    this.document.addEventListener('click', this.emitBlurEvent.bind(this), {
-      capture: true,
-      once: true,
-    });
-  }
-
-  emitBlurEvent(event: MouseEvent) {
-    if (!this.disabled && this.el.nativeElement !== event.target && !this.el.nativeElement.contains(event.target)) {
-      const blurEvt = this.document.createEvent('Event');
-      blurEvt.initEvent('blur', false, true);
-      this.el.nativeElement.dispatchEvent(blurEvt);
-      this.onTouchedCallback();
     }
   }
 }

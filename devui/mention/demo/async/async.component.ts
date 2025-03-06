@@ -1,16 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'd-mention-async',
   templateUrl: './async.component.html',
 })
-export class AsyncComponent implements OnInit {
+export class AsyncComponent {
   loading = true;
   suggestions = [];
-
-  constructor() {}
-
-  ngOnInit() {}
 
   onSearchChange({ value }) {
     this.loading = true;
@@ -22,7 +18,7 @@ export class AsyncComponent implements OnInit {
   }
 
   fetchSuggestions(value: string, callback: (suggestions: string[]) => void): void {
-    const users = ['C#', 'C', 'C++', 'Python', 'Java', 'JavaScript', 'Go', 'Python', 'Ruby', 'F#'];
+    const users = ['C#', 'C', 'C++', 'CPython', 'Java', 'JavaScript', 'Go', 'Python', 'Ruby', 'F#'];
     setTimeout(() => {
       return callback(users.filter((item) => item.indexOf(value) !== -1));
     }, 1000);

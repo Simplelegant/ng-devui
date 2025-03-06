@@ -1,5 +1,6 @@
 <cdk-virtual-scroll-viewport
   *ngIf="virtualScroll"
+  class="devui-scrollbar devui-scroll-overlay"
   [itemSize]="itemSize"
   [minBufferPx]="minBufferPx"
   [maxBufferPx]="maxBufferPx"
@@ -94,7 +95,7 @@
           </span>
         </span>
         <span class="devui-tree-node__leaf" *ngIf="(treeNode.data.children || []).length === 0 && !treeNode.data.isParent">
-          <span *ngIf="!iconLeaf" class="devui-leaf-icon-none"></span>
+          <span *ngIf="!iconLeaf" class="devui-leaf-icon-none" [ngStyle]="{ width: indent }"></span>
           <span *ngIf="iconLeaf" [innerHTML]="iconLeaf"></span>
         </span>
         <span
@@ -175,7 +176,7 @@
           </span>
         </span>
         <span class="devui-tree-node__leaf" *ngIf="(treeNode.data.children || []).length === 0 && !treeNode.data.isParent">
-          <span *ngIf="!iconLeaf" class="devui-leaf-icon-none"></span>
+          <span *ngIf="!iconLeaf" class="devui-leaf-icon-none" [ngStyle]="{ width: indent }"></span>
           <span *ngIf="iconLeaf" [innerHTML]="iconLeaf"></span>
         </span>
         <span

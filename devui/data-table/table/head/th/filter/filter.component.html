@@ -10,7 +10,7 @@
     <i
       class="filter-icon"
       [ngClass]="{
-        'filter-icon-active': filterIconActive || filterIconActiveInner,
+        'filter-icon-active': filterIconActive === undefined ? filterIconActiveInner : filterIconActive,
         'filter-icon-visiable': showFilterIcon
       }"
     >
@@ -54,14 +54,14 @@
 <ng-template #filterContentTmplForMultiple let-filterListMultiple="filterListDisplay" let-dropdown="dropdown">
   <div class="data-table-column-filter-content filter-bg filter-font-color" [style.width]="filterBoxWidth" [style.height]="filterBoxHeight">
     <div class="filter-search-container">
-      <input
-        name="select"
-        type="text"
-        autocomplete="off"
+      <d-search
+        [iconPosition]="'left'"
+        [style.width]="filterWidthNum - filterPadding + 'px'"
+        [isKeyupSearch]="true"
+        [styleType]="'gray'"
         [placeholder]="i18nCommonText?.searchPlaceholder"
-        [(ngModel)]="searchText"
-        class="devui-form-control devui-input devui-search-in-dropdown"
-      />
+        (searchFn)="onSearch($event)"
+      ></d-search>
     </div>
     <div class="filter-options">
       <d-checkbox
@@ -95,22 +95,29 @@
       </cdk-virtual-scroll-viewport>
     </div>
     <div class="line"></div>
-    <div style="text-align: center">
-      <span class="button-style" (click)="getFilterDataMultiple(); closeFilter(dropdown)">{{ i18nCommonText?.btnOk }}</span>
+    <div class="filter-operation">
+      <d-button
+        bsStyle="common"
+        class="reset-btn"
+        [disabled]="!isDirty && !filterHalfChecked && !filterAllChecked"
+        (btnClick)="resetFilterData(); closeFilter(dropdown)"
+        >{{ i18nCommonText?.reset }}</d-button
+      >
+      <d-button class="button-style" (click)="getFilterDataMultiple(); closeFilter(dropdown)">{{ i18nCommonText?.btnOk }}</d-button>
     </div>
   </div>
 </ng-template>
 <ng-template #filterContentTmplForRadio let-filterListRadio="filterListDisplay" let-dropdown="dropdown">
   <div class="data-table-column-filter-content filter-bg filter-font-color" [style.width]="filterBoxWidth" [style.height]="filterBoxHeight">
-    <div>
-      <input
-        name="select"
-        type="text"
-        autocomplete="off"
+    <div class="filter-search-container">
+      <d-search
+        [iconPosition]="'left'"
+        [style.width]="filterWidthNum - filterPadding + 'px'"
+        [isKeyupSearch]="true"
+        [styleType]="'gray'"
         [placeholder]="i18nCommonText?.searchPlaceholder"
-        [(ngModel)]="searchText"
-        class="devui-form-control devui-input devui-search-in-dropdown"
-      />
+        (searchFn)="onSearch($event)"
+      ></d-search>
     </div>
     <div class="filter-options" role="menu">
       <div class="normal-filter-list-container devui-scrollbar" role="menuitem" [style.maxHeight]="filterBoxHeight ? 'none' : '350px'">

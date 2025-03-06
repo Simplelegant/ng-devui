@@ -1,36 +1,22 @@
-export const suggestScopeList: Array<string> = [
-  'categorySearch',
-  'datePickerPro',
-  'gantt',
-  'quadrantDiagram',
-  'navSprite',
-  'dataTable'
-];
+export const suggestScopeList: Array<string> = ['categorySearch', 'datePickerPro', 'gantt', 'quadrantDiagram', 'navSprite', 'dataTable'];
 
 export const newScopeList: Array<string> | string = [
-  'breadcrumb',
-  'carousel',
-  'badge',
-  'datatable',
-  'datepicker-pro',
   'dropdown',
-  'editorx',
+  'image-preview',
   'category-search',
+  'common',
+  'data-table',
+  'datepicker-pro',
+  'trend',
+  'popover',
+  'radio',
+  'markdown',
   'modal',
-  'rate',
-  'select',
-  'tags-input',
-  'tags',
-  'splitter',
-  'button',
-  'icon',
-  'pagination',
-  'search',
+  'relative-time',
+  'user-guide',
   'tabs',
-  'form',
-  'search'
+  'textarea',
+  'toast',
 ];
 
-export const sunsetScopeList: Array<string> | string = [
-  'codeMirror', 'echarts' ,'polyfills'
-];
+export const sunsetScopeList: Array<string> | string = ['codeMirror', 'echarts', 'polyfills', 'datepicker'];

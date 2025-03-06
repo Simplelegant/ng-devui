@@ -4,6 +4,7 @@ import {
   ContentChildren,
   EventEmitter,
   forwardRef,
+  HostBinding,
   HostListener,
   Input,
   OnChanges,
@@ -12,6 +13,7 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { DevConfigService, WithConfig } from 'ng-devui/utils';
 import { Observable } from 'rxjs';
 import { RadioComponent } from './radio.component';
 
@@ -29,7 +31,6 @@ import { RadioComponent } from './radio.component';
   preserveWhitespaces: false,
 })
 export class RadioGroupComponent implements ControlValueAccessor, OnChanges, AfterViewInit {
-  constructor() {}
   @Input() name: string;
   @Input() values: any[];
   /**
@@ -40,6 +41,10 @@ export class RadioGroupComponent implements ControlValueAccessor, OnChanges, Aft
   }
   @Input() direction: 'row' | 'column';
   @Input() disabled: boolean;
+  @Input() @WithConfig() showGlowStyle = true;
+  @HostBinding('class.devui-glow-style') get hasGlowStyle() {
+    return this.showGlowStyle;
+  }
   @Input() beforeChange: (value) => boolean | Promise<boolean> | Observable<boolean>;
   @Output() change = new EventEmitter<any>();
   @ContentChildren(RadioComponent) radios: QueryList<RadioComponent> = new QueryList<RadioComponent>();
@@ -49,17 +54,28 @@ export class RadioGroupComponent implements ControlValueAccessor, OnChanges, Aft
   onTouched: () => null;
   @HostListener('click', ['$event'])
   onRadioChange(event) {
-    if (event.target.tagName.toLowerCase() === 'input') {
+    const target = event.target;
+    if (target.tagName.toLowerCase() === 'input') {
+      event.preventDefault();
       if (this.disabled) {
-        event.preventDefault();
+        return;
       }
-      this.canChange().then((change) => {
-        if (!change) {
-          event.preventDefault();
+      let value = target.value;
+      if (this.radios.length) {
+        const result = this.radios.find((item) => item.id === target.id);
+        value = result?.value || value;
+      }
+      this.canChange(value).then((change) => {
+        if (change) {
+          this._value = value;
+          this.onChange(value);
+          this.change.emit(value);
         }
       });
     }
   }
+
+  constructor(private devConfigService: DevConfigService) {}
 
   ngAfterViewInit(): void {
     this.radios.forEach((radio) => {
@@ -105,10 +121,10 @@ export class RadioGroupComponent implements ControlValueAccessor, OnChanges, Aft
     });
   }
 
-  canChange() {
+  canChange(value: any) {
     let changeResult = Promise.resolve(true);
     if (this.beforeChange) {
-      const result: any = this.beforeChange(this.values);
+      const result: any = this.beforeChange(value);
       if (typeof result !== 'undefined') {
         if (result.then) {
           changeResult = result;

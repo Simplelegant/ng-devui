@@ -23,7 +23,7 @@ DevUI Design设计系统包含了DevUI规则、设计语言和最佳实践的资
 
 ## Angular版本
 
-当前支持的angular版本<font color=red>`^13.0.0`</font>
+当前支持的angular版本<font color=red>`^18.0.0`</font>
 
 ## 快速开始
 
@@ -101,9 +101,13 @@ ng serve --open
 | --------- | --------- | --------- | --------- | --------- |
 | Edge| last 2 versions| last 2 versions| last 2 versions| last 2 versions
 
+## 合作项目
+
+- [H5-Dooring - 让H5制作，更简单](http://h5.dooring.cn/)
+
 ## 谁在使用
 
-<p><a href="https://devcloud.huaweicloud.com/" target="_blank" rel="noopener noreferrer"><img alt="DevCloud Logo" src="devcloud-logo.png" width="150" style="max-width:100%;"></a></p>
+<p><a href="https://www.huaweicloud.com/devcloud/" target="_blank" rel="noopener noreferrer"><img alt="CodeArts Logo" src="CodeArts-logo.png" width="150" style="max-width:100%;"></a></p>
 
 ## LICENSE
 

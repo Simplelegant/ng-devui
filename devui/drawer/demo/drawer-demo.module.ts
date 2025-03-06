@@ -12,7 +12,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { BasicComponent } from './basic/basic.component';
 import { DrawerDemoComponent } from './drawer-demo.component';
+import { DrawerDesignComponent } from './drawer-design.component';
 import { DrawerContentComponent } from './drawerContent/drawer-content.component';
+import { ResizeComponent } from './resize/resize.component';
 import { TemplateComponent } from './template/template.component';
 import { UndestroyableComponent } from './undestroyable/undestroyable.component';
 
@@ -28,7 +30,11 @@ import { UndestroyableComponent } from './undestroyable/undestroyable.component'
     DDemoNavModule,
     TextInputModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: DrawerDesignComponent,
+      },
       { path: 'demo', component: DrawerDemoComponent },
       {
         path: 'api',
@@ -41,7 +47,14 @@ import { UndestroyableComponent } from './undestroyable/undestroyable.component'
     ]),
   ],
   exports: [],
-  declarations: [DrawerDemoComponent, BasicComponent, UndestroyableComponent, DrawerContentComponent, TemplateComponent],
-
+  declarations: [
+    DrawerDemoComponent,
+    DrawerDesignComponent,
+    BasicComponent,
+    UndestroyableComponent,
+    DrawerContentComponent,
+    TemplateComponent,
+    ResizeComponent
+  ],
 })
 export class DrawerDemoModule {}

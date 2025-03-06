@@ -25,6 +25,7 @@ import { TransferDataFormat, TransferDirection } from './transfer.types';
 export class TransferComponent implements OnInit, OnChanges, OnDestroy {
   static ID_SEED = 0;
   id: number;
+
   @Input() sourceOption: Array<TransferDataFormat> = [];
   @Input() targetOption: Array<TransferDataFormat> = [];
   @Input() titles = { source: 'source', target: 'target' };
@@ -40,15 +41,17 @@ export class TransferComponent implements OnInit, OnChanges, OnDestroy {
   // 自定义
   @Input() customSourceCheckedLen = 0;
   @Input() customTargetCheckedLen = 0;
-  @ContentChild('sourceTemplate') sourceCustomViewTemplate: TemplateRef<any>;
-  @ContentChild('targetTemplate') targetCustomViewTemplate: TemplateRef<any>;
-  @ViewChild(CdkVirtualScrollViewport) virtualScrollViewport: CdkVirtualScrollViewport;
+  @Input() noResultTemplate: TemplateRef<any>;
 
   @Output() transferToTarget = new EventEmitter<any>();
   @Output() transferToSource = new EventEmitter<any>();
   @Output() searching = new EventEmitter<any>();
   @Output() transferring = new EventEmitter<any>();
   @Output() afterTransfer = new EventEmitter<any>();
+
+  @ContentChild('sourceTemplate') sourceCustomViewTemplate: TemplateRef<any>;
+  @ContentChild('targetTemplate') targetCustomViewTemplate: TemplateRef<any>;
+  @ViewChild(CdkVirtualScrollViewport) virtualScrollViewport: CdkVirtualScrollViewport;
 
   transferDirection: any = TransferDirection;
 
@@ -218,7 +221,7 @@ export class TransferComponent implements OnInit, OnChanges, OnDestroy {
       this.targetCanTransfer = false;
 
       if (this.sourceCustomViewTemplate) {
-        this.transferToTarget.next();
+        this.transferToTarget.next({});
       } else {
         changeData === undefined
           ? this.transferToTarget.next({ sourceOption: this.sourceOption, targetOption: this.targetOption })
@@ -231,7 +234,7 @@ export class TransferComponent implements OnInit, OnChanges, OnDestroy {
       this.sourceCanTransfer = false;
 
       if (this.targetCustomViewTemplate) {
-        this.transferToSource.next();
+        this.transferToSource.next({});
       } else {
         changeData === undefined
           ? this.transferToSource.next({ sourceOption: this.sourceOption, targetOption: this.targetOption })

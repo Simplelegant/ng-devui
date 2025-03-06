@@ -1,13 +1,18 @@
-<div class="progress-container">
-  <d-progress [type]="'circle'" [percentage]="80" [showContent]="false" style="width: 130px; height: 130px"> </d-progress>
+<div class="progress-container circle-type">
+  <d-progress [type]="'circle'" [percentage]="30" [showContent]="false"></d-progress>
 </div>
-<div class="progress-container">
-  <d-progress [type]="'circle'" [percentage]="80" [strokeColor]="'#50D4AB'" [strokeWidth]="8" style="width: 130px; height: 130px">
-  </d-progress>
+<div class="progress-container circle-type">
+  <d-progress
+    [type]="'circle'"
+    [percentage]="percentage"
+    [percentageText]="percentageText"
+    [strokeColor]="strokeColor"
+    [strokeWidth]="8"
+  ></d-progress>
 </div>
-<div class="progress-container">
-  <d-progress [type]="'circle'" [percentage]="80" [strokeColor]="'#50D4AB'" style="width: 130px; height: 130px">
-    <ng-template let-percentage="percentage">
+<div class="progress-container circle-type">
+  <d-progress [type]="'circle'" [percentage]="100" [strokeColor]="'#029931'" [strokeWidth]="8">
+    <ng-template [dPosition]="'center'" let-percentage="percentage">
       <span class="icon-position icon-right"></span>
     </ng-template>
   </d-progress>

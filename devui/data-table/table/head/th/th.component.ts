@@ -1,8 +1,21 @@
 import { DOCUMENT } from '@angular/common';
 import {
-  ChangeDetectorRef, Component, ElementRef, EventEmitter,
-  forwardRef, HostBinding, HostListener, Inject, Input,
-  NgZone, OnChanges, OnDestroy, Output, Renderer2, SimpleChanges, TemplateRef
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  forwardRef,
+  HostBinding,
+  HostListener,
+  Inject,
+  Input,
+  NgZone,
+  OnChanges,
+  OnDestroy,
+  Output,
+  Renderer2,
+  SimpleChanges,
+  TemplateRef
 } from '@angular/core';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 import { FilterConfig, SortDirection, SortEventArg } from '../../../data-table.model';
@@ -12,10 +25,13 @@ import { TABLE_TH } from './th.token';
   /* eslint-disable-next-line @angular-eslint/component-selector*/
   selector: '[dHeadCell]',
   templateUrl: './th.component.html',
-  providers: [{
+  styleUrls: ['./th.component.scss'],
+  providers: [
+    {
     provide: TABLE_TH,
-    useExisting: forwardRef(() => TableThComponent)
-  }],
+      useExisting: forwardRef(() => TableThComponent),
+    },
+  ],
 })
 export class TableThComponent implements OnChanges, OnDestroy {
   @HostBinding('class.resizeable') resizeEnabledClass = false;
@@ -33,7 +49,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
   @Input() customFilterTemplate: TemplateRef<any>;
   @Input() extraFilterTemplate: TemplateRef<any>;
   @Input() searchFn: (term: string) => Observable<Array<any>>;
-  @Input() showFilterIcon = false;
+  @Input() showFilterIcon = true;
   @Input() filterList: Array<FilterConfig>;
   @Input() filterIconActive: boolean;
   @Input() filterMultiple = true;
@@ -46,16 +62,23 @@ export class TableThComponent implements OnChanges, OnDestroy {
     checklist: FilterConfig[];
   }>();
 
+  @HostBinding('class.can-sort')
   @Input() sortable: boolean;
   @Input() sortDirection: SortDirection;
-  @Input() showSortIcon = false;
+  @Input() showSortIcon = true;
   @Output() sortDirectionChange = new EventEmitter<SortDirection>();
   @Output() sortChange = new EventEmitter<SortEventArg>();
 
   @Input() colDraggable: boolean;
 
   @Input() nestedColumn: boolean;
+  /**
+   * @depreted 存在xxs风险，使用方需根据自身场景做好防护
+   */
   @Input() iconFoldTable: string;
+  /**
+   * @depreted 存在xxs风险，使用方需根据自身场景做好防护
+   */
   @Input() iconUnFoldTable: string;
 
   @Input() tableViewRefElement: ElementRef;
@@ -82,10 +105,12 @@ export class TableThComponent implements OnChanges, OnDestroy {
   resizeOverlay: HTMLElement;
   nextElement: any;
   initialWidth: number;
+  initialOffset: number;
   totalWidth: number;
   mouseDownScreenX: number;
   resizeHandleElement: HTMLElement;
   tableElement: HTMLElement;
+  tableHeaderElement: HTMLElement;
 
   // 以下为内部传递参数，不对外暴露
   @Input() childrenTableOpen: boolean;
@@ -94,14 +119,20 @@ export class TableThComponent implements OnChanges, OnDestroy {
   @Input() column: any; // 为配置column方式兼容自定义过滤模板context
   document: Document;
 
-  constructor(element: ElementRef, private renderer2: Renderer2, private zone: NgZone, private cdr: ChangeDetectorRef,
-              @Inject(DOCUMENT) private doc: any) {
+  constructor(
+    element: ElementRef,
+    private renderer2: Renderer2,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef,
+    @Inject(DOCUMENT) private doc: any
+  ) {
     this.element = element.nativeElement;
     this.document = this.doc;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['resizeEnabled']) {
+    const { resizeEnabled, filterable, sortable, colDraggable, filterIconActive, sortDirection, fixedLeft, fixedRight } = changes;
+    if (resizeEnabled) {
       if (this.resizeEnabled) {
         this.resizeEnabledClass = true;
         if (!this.resizeHandleElement) {
@@ -115,7 +146,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
       }
     }
 
-    if (changes['filterable'] || changes['sortable'] || changes['resizeEnabled'] || changes['colDraggable']) {
+    if (filterable || sortable || resizeEnabled || colDraggable) {
       if (this.filterable || this.sortable || this.resizeEnabled || this.colDraggable) {
         this.operableClass = true;
       } else {
@@ -123,7 +154,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
       }
     }
 
-    if (changes['filterIconActive']) {
+    if (filterIconActive) {
       if (this.filterIconActive) {
         this.filterActiveClass = true;
       } else {
@@ -131,7 +162,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
       }
     }
 
-    if (changes['sortDirection']) {
+    if (sortDirection) {
       if (this.sortDirection === SortDirection.ASC || this.sortDirection === SortDirection.DESC) {
         this.sortActiveClass = true;
       } else {
@@ -139,7 +170,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
       }
     }
 
-    if (changes['fixedLeft']) {
+    if (fixedLeft) {
       if (this.fixedLeft) {
         this.stickyLeftClass = true;
         this.stickyLeftStyle = this.fixedLeft;
@@ -148,7 +179,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
         this.stickyLeftStyle = null;
       }
     }
-    if (changes['fixedRight']) {
+    if (fixedRight) {
       if (this.fixedRight) {
         this.stickyRightClass = true;
         this.stickyRightStyle = this.fixedRight;
@@ -183,10 +214,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
     this.filterChange.emit(filterData);
   }
 
-  emitFilterToggle(data: {
-    isOpen: boolean;
-    checklist: FilterConfig[];
-  }) {
+  emitFilterToggle(data: { isOpen: boolean; checklist: FilterConfig[] }) {
     this.filterToggle.emit(data);
   }
 
@@ -214,7 +242,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
       this.resizeStartEvent.emit(event); // emit begin resize event
 
       this.initialWidth = this.element.clientWidth;
-      const initialOffset = this.element.offsetLeft;
+      this.initialOffset = this.element.offsetLeft;
       this.mouseDownScreenX = event.clientX;
       event.stopPropagation();
       this.nextElement = this.element.nextElementSibling;
@@ -233,11 +261,25 @@ export class TableThComponent implements OnChanges, OnDestroy {
       this.renderer2.addClass(resizeBar, 'resize-bar');
 
       this.tableElement = this.tableViewRefElement.nativeElement.querySelector('.devui-scrollbar table');
+
+      if (this.isLastFixedLeft || this.isFirstFixedRight) {
+        this.renderer2.addClass(this.tableViewRefElement.nativeElement, 'd-table-on-resize');
+      }
+
+      this.initialOffset = this.initialOffset - this.tableElement.parentElement.scrollLeft;
       if (this.tableElement) {
         this.renderer2.appendChild(this.tableElement, resizeBar);
         this.renderer2.setStyle(resizeBar, 'display', 'block');
-        this.renderer2.setStyle(resizeBar, 'left', initialOffset + this.initialWidth + 'px');
+        this.renderer2.setStyle(resizeBar, 'left', this.initialOffset + this.initialWidth - 2 + 'px');
         this.resizeBarRefElement = resizeBar;
+      }
+
+      this.tableHeaderElement = this.tableViewRefElement.nativeElement.querySelector('.table-fix-header');
+
+      if (this.tableHeaderElement) {
+        this.renderer2.appendChild(this.tableHeaderElement, resizeBar);
+        this.renderer2.setStyle(resizeBar, 'display', 'block');
+        this.renderer2.setStyle(resizeBar, 'left', this.initialOffset + this.initialWidth - 2 + 'px');
       }
 
       this.renderer2.addClass(this.element, 'hover-bg');
@@ -264,9 +306,15 @@ export class TableThComponent implements OnChanges, OnDestroy {
 
       this.renderer2.removeClass(this.tableViewRefElement.nativeElement, 'table-view-selector');
 
+      this.renderer2.removeClass(this.tableViewRefElement.nativeElement, 'd-table-on-resize');
+
       this.renderer2.removeClass(this.element, 'hover-bg');
       if (this.tableElement) {
         this.renderer2.removeChild(this.tableElement, this.resizeBarRefElement);
+      }
+
+      if (this.tableHeaderElement) {
+        this.renderer2.removeChild(this.tableHeaderElement, this.resizeBarRefElement);
       }
 
       this.resizeEndEvent.emit({ width: finalWidth, beforeWidth: this.initialWidth });
@@ -289,7 +337,7 @@ export class TableThComponent implements OnChanges, OnDestroy {
 
     const finalWidth = this.getFinalWidth(newWidth);
     if (this.resizeBarRefElement) {
-      this.renderer2.setStyle(this.resizeBarRefElement, 'left', `${finalWidth + this.element.offsetLeft}px`);
+      this.renderer2.setStyle(this.resizeBarRefElement, 'left', `${finalWidth + this.initialOffset}px`);
     }
     this.resizingEvent.emit({ width: finalWidth });
   }
@@ -301,7 +349,8 @@ export class TableThComponent implements OnChanges, OnDestroy {
     const overMinWidth = !this.minWidth || newWidth >= minWidth;
     const underMaxWidth = !this.maxWidth || newWidth <= maxWidth;
 
-    const finalWidth = !overMinWidth ? minWidth : !underMaxWidth ? maxWidth : newWidth;
+    const result = !underMaxWidth ? maxWidth : newWidth;
+    const finalWidth = !overMinWidth ? minWidth : result;
     return finalWidth;
   }
 

@@ -2,17 +2,20 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DevuiSourceData } from 'ng-devui/shared/devui-codebox/devui-source-data';
 import { TranslateService, TranslationChangeEvent } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'd-editable-select-demo',
   templateUrl: './editable-select-demo.component.html',
-  styleUrls: [
-    './editable-select-demo.component.scss'
-  ]
+  styleUrls: ['./editable-select-demo.component.scss'],
 })
 export class EditableSelectDemoComponent implements OnInit, OnDestroy {
   BasicSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./basic/with-source.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./basic/with-source.component.ts?raw') },
+  ];
+  ObjectSource: Array<DevuiSourceData> = [
+    { title: 'HTML', language: 'xml', code: require('./object/object-source.component.html?raw') },
+    { title: 'TS', language: 'typescript', code: require('./object/object-source.component.ts?raw') },
   ];
   SearchFnSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./search-function/with-search-function.component.html?raw') },
@@ -30,9 +33,14 @@ export class EditableSelectDemoComponent implements OnInit, OnDestroy {
     { title: 'HTML', language: 'xml', code: require('./lazy-load/lazy-load.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./lazy-load/lazy-load.component.ts?raw') },
   ];
-
+  customAreaSourceData: Array<DevuiSourceData> = [
+    { title: 'HTML', language: 'xml', code: require('./custom-area/custom-area.component.html?raw') },
+    { title: 'TS', language: 'typescript', code: require('./custom-area/custom-area.component.ts?raw') },
+    { title: 'SCSS', language: 'scss', code: require('./custom-area/custom-area.component.scss?raw') },
+  ];
   navItems = [];
   subs: Subscription = new Subscription();
+
   constructor(private translate: TranslateService) {}
 
   ngOnInit() {
@@ -41,7 +49,6 @@ export class EditableSelectDemoComponent implements OnInit, OnDestroy {
         this.setNavValues(res);
       })
     );
-
     this.subs.add(
       this.translate.onLangChange.subscribe((event: TranslationChangeEvent) => {
         const values = this.translate.instant('components.editable-select.anchorLinkValues');
@@ -53,10 +60,12 @@ export class EditableSelectDemoComponent implements OnInit, OnDestroy {
   setNavValues(values) {
     this.navItems = [
       { dAnchorLink: 'basic-usage', value: values['basic-usage'] },
+      { dAnchorLink: 'object-source', value: values['object-source'] },
       { dAnchorLink: 'disable-data-with-source', value: values['disable-data-with-source'] },
       { dAnchorLink: 'with-search-function', value: values['with-search-function'] },
       { dAnchorLink: 'async-data-with-function', value: values['async-data-with-function'] },
       { dAnchorLink: 'lazy-load', value: values['lazy-load'] },
+      { dAnchorLink: 'custom-area-usage', value: values['custom-area-usage'] },
     ];
   }
 

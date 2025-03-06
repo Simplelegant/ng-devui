@@ -12,7 +12,7 @@ import {
   Output,
   SimpleChanges,
   TemplateRef,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { I18nInterface, I18nService } from 'ng-devui/i18n';
 import { fadeInOut } from 'ng-devui/utils';
@@ -153,6 +153,8 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
     lg: 50,
     space: 4,
   };
+  // 容器边距，虚拟滚动设置高度需考虑上下边距
+  CONTAINER_MARGINS = 12;
 
   constructor(private changeDetectorRef: ChangeDetectorRef, private i18n: I18nService) {}
 
@@ -161,7 +163,8 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.options) {
+    const { options, value, eventHandle } = changes;
+    if (options) {
       this.availableOptions = this.options;
       this.setAvailableOptions();
       // 显示数据变更，需要判断全选半选状态
@@ -169,7 +172,7 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
         const selectedItemForFilterOptions = [];
         this.multiItems.forEach((item) => {
           this.availableOptions.forEach((option) => {
-            if (item['id'] === option['id']) {
+            if (item.id === option.id) {
               selectedItemForFilterOptions.push(item);
             }
           });
@@ -189,11 +192,11 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
       }
       this.changeDetectorRef.markForCheck();
     }
-    if (changes.value) {
+    if (value) {
       this.setAvailableOptions();
     }
-    if (changes.eventHandle && changes.eventHandle.currentValue) {
-      const evt = changes['eventHandle'].currentValue;
+    if (eventHandle?.currentValue) {
+      const evt = eventHandle.currentValue;
       const { event, type } = evt;
       switch (type) {
       case 'keydown.esc':
@@ -208,6 +211,7 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
       case 'keydown.enter':
         this.handleKeyEnterEvent(event);
         break;
+      default:
       }
     }
   }
@@ -229,7 +233,8 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
     if (!Array.isArray(this.availableOptions)) {
       return;
     }
-    const _value = this.value ? (this.multiple ? this.value : [this.value]) : [];
+    const result = this.multiple ? this.value : [this.value];
+    const _value = this.value ? result : [];
     this.availableOptions = this.availableOptions.map((item, index) =>
       item.id >= 0 && item.option
         ? {
@@ -410,7 +415,7 @@ export class ToggleMenuListComponent implements OnInit, OnChanges, OnDestroy {
       }
       const scrollHeight = parseInt(this.scrollHeight, 10);
       this.scrollHeightNum = height > scrollHeight ? scrollHeight : height;
-      return `${this.scrollHeightNum}px`;
+      return `${this.scrollHeightNum + this.CONTAINER_MARGINS * 2}px`;
     }
   }
 

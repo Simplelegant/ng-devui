@@ -10,6 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DDemoNavModule } from 'devui-commons/src/demo-nav/d-demo-nav.module';
 import { BasicComponent } from './basic/basic.component';
 import { StatusDemoComponent } from './status-demo.component';
+import { StatusDesignComponent } from './status-design.component';
 
 @NgModule({
   imports: [
@@ -21,7 +22,11 @@ import { StatusDemoComponent } from './status-demo.component';
     DevUIApiModule,
     DDemoNavModule,
     RouterModule.forChild([
-      { path: '', redirectTo: 'demo' },
+      { path: '', redirectTo: 'demo', pathMatch: 'full' },
+      {
+        path: 'design',
+        component: StatusDesignComponent,
+      },
       { path: 'demo', component: StatusDemoComponent },
       {
         path: 'api',
@@ -34,7 +39,7 @@ import { StatusDemoComponent } from './status-demo.component';
     ]),
   ],
   exports: [StatusDemoComponent],
-  declarations: [StatusDemoComponent, BasicComponent],
+  declarations: [StatusDemoComponent, BasicComponent, StatusDesignComponent],
 
 })
 export class StatusDemoModule {}

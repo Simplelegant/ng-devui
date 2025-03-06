@@ -2,7 +2,12 @@
   class="devui-drop{{ popDirection === 'bottom' ? 'down' : 'up' }} 
   {{ size ? 'devui-select-' + size : '' }} 
   devui-dropdown-origin"
-  [ngClass]="[isOpen ? 'open' : '', overview === 'underlined' ? 'devui-select-underlined-border' : '', disabled ? 'disabled' : '']"
+  [ngClass]="{
+    'devui-select-underlined-border': overview === 'underlined',
+    disabled: disabled,
+    open: isOpen,
+    'devui-gray-style': overview !== 'underlined' && styleType === 'gray'
+  }"
   #selectWrapper
 >
   <div
@@ -64,50 +69,46 @@
         {{ placeholder }}
       </div>
       <ul
-        class="devui-select-tag-list {{ extraConfig?.labelization?.overflow }}"
-        [style.maxHeight]="extraConfig?.labelization?.containerMaxHeight || extraConfig?.labelization?.containnerMaxHeight"
         *ngIf="multiItems.length > 0"
+        class="devui-select-tag-list devui-scrollbar {{ extraConfig?.labelization?.overflow }}"
+        [style.maxHeight]="extraConfig?.labelization?.containerMaxHeight || extraConfig?.labelization?.containnerMaxHeight"
       >
         <li
           class="devui-select-tag-item"
-          *ngFor="let item of multiItems; let index = index; trackBy: trackByOptionPointer"
+          *ngFor="let item of showMoreTags ? [multiItems[0]] : multiItems; let index = index; trackBy: trackByOptionPointer"
           [style.maxWidth]="extraConfig?.labelization?.labelMaxWidth"
           [ngClass]="{
             disabled: optionDisabledKey && item.option[optionDisabledKey]
           }"
         >
-          <span class="over-flow-ellipsis" title="{{ valueParser(item.option) }}">{{ valueParser(item.option) }}</span>
-          <a
-            class="devui-select-tag-remove-button"
-            (click)="removeItem(item, $event)"
-            *ngIf="!(disabled || (optionDisabledKey && item.option[optionDisabledKey]))"
-          >
-            <svg
-              width="12px"
-              height="12px"
-              viewBox="0 0 12 12"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-            >
-              <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <path
-                  d="M8.86785321,3.13214679 C9.02624037,3.29053395 9.02624037,3.54733027 8.86785321,3.70571743 L6.573,6 L8.86785321,8.29428257 C9.02624037,8.45266973 9.02624037,8.70946605 8.86785321,8.86785321 C8.70946605,9.02624037 8.45266973,9.02624037 8.29428257,8.86785321 L6,6.573 L3.70571743,8.86785321 C3.54733027,9.02624037 3.29053395,9.02624037 3.13214679,8.86785321 C2.97375963,8.70946605 2.97375963,8.45266973 3.13214679,8.29428257 L5.427,6 L3.13214679,3.70571743 C2.97375963,3.54733027 2.97375963,3.29053395 3.13214679,3.13214679 C3.29053395,2.97375963 3.54733027,2.97375963 3.70571743,3.13214679 L6,5.427 L8.29428257,3.13214679 C8.45266973,2.97375963 8.70946605,2.97375963 8.86785321,3.13214679 Z"
-                  fill-rule="nonzero"
-                ></path>
-              </g>
-            </svg>
-          </a>
+          <d-tag
+            [deletable]="!(disabled || (optionDisabledKey && item.option[optionDisabledKey]))"
+            [maxWidth]="'100%'"
+            [tag]="valueParser(item.option)"
+            (tagDelete)="removeItem(item, $event?.event)"
+          ></d-tag>
+        </li>
+        <li *ngIf="showMoreTags" class="devui-select-tag-item">
+          <d-tag [tag]="moreTagsNum"></d-tag>
         </li>
       </ul>
     </div>
 
     <span class="devui-form-control-feedback devui-input-group-addon" [ngClass]="{ 'devui-clear-icon-show': isClearIconShow }">
-      <span class="devui-select-clear-icon" (mousedown)="$event.preventDefault()" (click)="valueClear($event)"> </span>
+      <span class="devui-select-clear-icon" (mousedown)="$event.preventDefault()" (click)="valueClear($event)">
+        <svg viewBox="0 0 16 16">
+          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+            <path
+              d="M8,1 C11.8659932,1 15,4.13400675 15,8 C15,11.8659932 11.8659932,15 8,15 C4.13400675,15 1,11.8659932 1,8 C1,4.13400675 4.13400675,1 8,1 Z M5.87867966,5.17157288 C5.68341751,4.97631073 5.36683502,4.97631073 5.17157288,5.17157288 C4.99800652,5.34513923 4.97872137,5.61456363 5.11371742,5.80943177 L5.17157288,5.87867966 L7.29218611,7.99929289 L5.17157288,10.1213203 C4.97631073,10.3165825 4.97631073,10.633165 5.17157288,10.8284271 C5.34513923,11.0019935 5.61456363,11.0212786 5.80943177,10.8862826 L5.87867966,10.8284271 L7.99929289,8.70639967 L10.1213203,10.8284271 C10.3165825,11.0236893 10.633165,11.0236893 10.8284271,10.8284271 C11.0019935,10.6548608 11.0212786,10.3854364 10.8862826,10.1905682 L10.8284271,10.1213203 L8.70710678,8 L10.8284271,5.87867966 C11.0236893,5.68341751 11.0236893,5.36683502 10.8284271,5.17157288 C10.6548608,4.99800652 10.3854364,4.97872137 10.1905682,5.11371742 L10.1213203,5.17157288 L8,7.29289322 L5.87867966,5.17157288 Z"
+              fill-rule="nonzero"
+            ></path>
+          </g>
+        </svg>
+      </span>
       <span class="devui-select-chevron-icon" [ngClass]="{ 'devui-select-chevron-icon-animation': showAnimation }">
         <svg
-          width="1em"
-          height="1em"
+          width="16px"
+          height="16px"
           viewBox="0 0 16 16"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
@@ -115,8 +116,7 @@
         >
           <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
             <path
-              d="M12.1464466,6.85355339 L8.35355339,10.6464466 C8.15829124,10.8417088 7.84170876,10.8417088 7.64644661,10.6464466 L3.85355339,6.85355339 C3.65829124,6.65829124 3.65829124,6.34170876 3.85355339,6.14644661 C3.94732158,6.05267842 4.07449854,6 4.20710678,6 L11.7928932,6 C12.0690356,6 12.2928932,6.22385763 12.2928932,6.5 C12.2928932,6.63260824 12.2402148,6.7597852 12.1464466,6.85355339 Z"
-              fill-rule="nonzero"
+              d="M3.64644661,5.64644661 C3.82001296,5.47288026 4.08943736,5.45359511 4.2843055,5.58859116 L4.35355339,5.64644661 L8,9.293 L11.6464466,5.64644661 C11.820013,5.47288026 12.0894374,5.45359511 12.2843055,5.58859116 L12.3535534,5.64644661 C12.5271197,5.82001296 12.5464049,6.08943736 12.4114088,6.2843055 L12.3535534,6.35355339 L8.35355339,10.3535534 C8.17998704,10.5271197 7.91056264,10.5464049 7.7156945,10.4114088 L7.64644661,10.3535534 L3.64644661,6.35355339 C3.45118446,6.15829124 3.45118446,5.84170876 3.64644661,5.64644661 Z"
             ></path>
           </g>
         </svg>
@@ -130,8 +130,10 @@
       [cdkConnectedOverlayWidth]="dropDownWidth"
       [cdkConnectedOverlayOpen]="isOpen"
       [cdkConnectedOverlayPositions]="overlayPositions"
+      [cdkConnectedOverlayScrollStrategy]="scrollStrategy"
       (positionChange)="onPositionChange($event)"
       (backdropClick)="isOpen = false"
+      (detach)="isOpen && (isOpen = false)"
     >
       <ng-template [ngTemplateOutlet]="selectDropdownTpl"></ng-template>
     </ng-template>
@@ -151,8 +153,7 @@
       'devui-custom-right': customViewTemplate && customViewDirection === 'right',
       'devui-custom-left': customViewTemplate && customViewDirection === 'left',
       'devui-custom-top': customViewTemplate && customViewDirection === 'top',
-      'devui-dropdown-menu-multiple': multiple,
-      'devui-reset-min-width': width
+      'devui-dropdown-menu-multiple': multiple
     }"
     [@fadeInOut]="isOpen && startAnimation ? (appendToBody ? menuPosition : popDirection) : 'void'"
     (@fadeInOut.done)="animationEnd($event)"
@@ -165,6 +166,7 @@
       [message]="i18nCommonText?.loading"
       [loadingTemplateRef]="loadingTemplateRef"
       [backdrop]="true"
+      [class.limit-max-height]="limitMaxHeight"
       class="devui-dropdown-menu-wrap {{ size ? 'devui-dropdown-menu-' + size : '' }}"
       (click)="$event.stopPropagation(); $event.preventDefault()"
     >
@@ -181,7 +183,7 @@
             class="devui-form-control devui-select-search devui-select-input"
             (keydown.ArrowUp)="handleKeyUpEvent($event)"
             (keydown.ArrowDown)="handleKeyDownEvent($event)"
-            (keydown.enter)="handleKeyEnterEvent($event)"
+            (keydown.enter)="handleKeyEnterEvent($event, true)"
             (keydown.esc)="onEscKeyup($event)"
           />
           <span class="devui-form-control-feedback">
@@ -244,13 +246,12 @@
           <ng-template [ngTemplateOutlet]="dropdownItemTpl" [ngTemplateOutletContext]="{ item: item, index: index }"></ng-template>
         </ng-container>
       </ul>
-      <li *ngIf="availableOptions.length === 0 && !noResultItemTemplate" class="devui-no-data-tip">
-        <ng-container *ngIf="!filter">{{ i18nCommonText?.noData }}</ng-container>
-        <ng-container *ngIf="filter">{{ i18nCommonText?.noRecordsFound }}</ng-container>
-      </li>
-      <li *ngIf="availableOptions.length === 0 && noResultItemTemplate" class="devui-no-data-tip">
+      <div *ngIf="availableOptions?.length === 0 && !noResultItemTemplate && !this.showLoading" class="devui-no-data-tip">
+        <span>{{ filter ? i18nCommonText?.noRecordsFound : i18nCommonText?.noData }}</span>
+      </div>
+      <div *ngIf="availableOptions?.length === 0 && noResultItemTemplate && !this.showLoading" class="devui-no-data-tip">
         <ng-template [ngTemplateOutlet]="noResultItemTemplate" [ngTemplateOutletContext]="{ options: options }"></ng-template>
-      </li>
+      </div>
     </ul>
     <ng-container *ngIf="customViewTemplate">
       <div class="devui-select-custom-area">
@@ -263,10 +264,12 @@
 <!--虚拟滚动模板-->
 <ng-template #scrollViewTpl>
   <cdk-virtual-scroll-viewport
+    *ngIf="availableOptions?.length > 0"
     [ngStyle]="{
-      height: getVirtualScrollHeight(availableOptions.length, size),
+      height: getVirtualScrollHeight(availableOptions?.length, size),
       width: '100%',
-      'max-height': scrollHight
+      'max-height': scrollHight,
+      'min-height': availableOptions?.length === 0 ? '46px' : showSelectAll ? '100px' : '60px'
     }"
     [itemSize]="realVirtualScrollItemSize"
     [minBufferPx]="minBuffer"
@@ -283,7 +286,7 @@
 
 <!--全选模板-->
 <ng-template #selectAllTpl>
-  <li class="devui-dropdown-item" *ngIf="showSelectAll()" (click)="selectAll()">
+  <li class="devui-dropdown-item" *ngIf="showSelectAll" (click)="selectAll()">
     <span>
       <d-checkbox [label]="i18nCommonText.checkAll" [isShowTitle]="false" [halfchecked]="halfChecked" [(ngModel)]="allChecked"></d-checkbox>
     </span>
@@ -293,7 +296,7 @@
 <!--下拉Item模板-->
 <ng-template #dropdownItemTpl let-item="item" let-index="index">
   <li
-    title="{{ formatter(item.option) }}"
+    [title]="!showItemTitle && (inputItemTemplate || itemTemplate) ? '' : formatter(item.option)"
     [ngClass]="[
       'devui-dropdown-item',
       item.isChecked ? highlightItemClass : '',
@@ -311,7 +314,8 @@
               checked: item.isChecked,
               filterKey: filterKey,
               position: 'list',
-              template: checkBoxItem
+              template: checkBoxItem,
+              index: index
             }
           : {
               option: item.option,
@@ -329,13 +333,14 @@
   {{ formatter(option) }}
 </ng-template>
 
-<ng-template #checkBoxItem let-option="option" let-checked="checked">
+<ng-template #checkBoxItem let-option="option" let-checked="checked" let-index="index">
   <d-checkbox
     [color]="color"
     [label]="formatter(option)"
     [cssClass]="'devui-select-checkbox'"
     [ngModel]="checked"
     [disabled]="option[optionDisabledKey]"
+    [beforeChange]="beforeChange | dBeforeCheckboxChangePipe : option : index"
   >
   </d-checkbox>
 </ng-template>

@@ -13,15 +13,16 @@ import environmentTS from './files/environment';
 import mainTS from './files/main';
 import polyfillTS from './files/polyfill';
 import tsconfigJSON from './files/tsconfig.json';
+import { LinkMap } from '../../../devui-commons/src/constant';
 
 const regConfig = {
   environmentUrl: /(?<=\'|\")src\/environments\/environment(?=\'|\")/,
   selector: /(?<=selector\:.+\'|\").+(?=\'|\")/,
   componentName: /(?<=export\s+class\s+)[a-zA-Z]+/,
-  templateExtension: /(?<=templateUrl\:.+)[a-z]+(?=\'|\")/,
-  templateUrl: /(?<=templateUrl\:.+\'|\").+(?=\'|\")/,
-  styleExtension: /(?<=styleUrls\:.+)[a-z]+(?=\'|\")/,
-  styleUrl: /(?<=styleUrls\:.+\'|\").+(?=\'|\")/,
+  templateExtension: /(?<=templateUrl\:.+)[a-z]+(?=[\'\"\`])/,
+  templateUrl: /(?<=templateUrl\:.+[\'\"\`]).+(?=[\'\"\`])/,
+  styleExtension: /(?<=styleUrls\:.+)[a-z]+(?=[\'\"\`])/,
+  styleUrl: /(?<=styleUrls\:.+[\'\"\`]).+(?=[\'\"\`])/,
 };
 
 @Injectable({
@@ -29,22 +30,23 @@ const regConfig = {
 })
 export class DevuiOnlineIdeService {
   document: Document;
-  template = 'angular-cli';
   dependencies = {
-    '@angular/animations': '^13.0.0',
-    '@angular/cdk': '^13.0.0',
-    '@angular/common': '^13.0.0',
-    '@angular/compiler': '^13.0.0',
-    '@angular/core': '^13.0.0',
-    '@angular/forms': '^13.0.0',
-    '@angular/platform-browser': '^13.0.0',
-    '@angular/platform-browser-dynamic': '^13.0.0',
-    '@angular/router': '^13.0.0',
+    '@angular/animations': '^18.0.0',
+    '@angular/cdk': '^18.0.0',
+    '@angular/common': '^18.0.0',
+    '@angular/compiler': '^18.0.0',
+    '@angular/core': '^18.0.0',
+    '@angular/forms': '^18.0.0',
+    '@angular/platform-browser': '^18.0.0',
+    '@angular/platform-browser-dynamic': '^18.0.0',
+    '@angular/router': '^18.0.0',
+    "@ngx-translate/core": "^15.0.0",
+    "lodash-es": "^4.17.15",
     '@devui-design/icons': '^1.2.0',
     'core-js': '^3.18.3',
     'date-fns': '^2.23.0',
-    'ng-devui': `^${VERSION.full}`,
-    rxjs: '~6.6.2',
+    'ng-devui': `^18.0.0`,
+    rxjs: '~7.5.5',
     tslib: '^2.0.0',
     'zone.js': '~0.11.4',
   };
@@ -58,7 +60,7 @@ export class DevuiOnlineIdeService {
       title: 'DevUI',
       description: 'Angular UI Component Library based on DevUI Design',
       tags: ['devui', 'Angular', 'ng'],
-      template: this.template,
+      template: 'angular-cli',
       dependencies: this.dependencies,
       files: this.getFiles(sourceData),
     });
@@ -72,7 +74,7 @@ export class DevuiOnlineIdeService {
     const form = this.document.createElement('form');
     const parametersInput = this.document.createElement('input');
     form.method = 'POST';
-    form.action = 'https://codesandbox.io/api/v1/sandboxes/define?module=/src/app/app.component.ts';
+    form.action = LinkMap.codesandbox;
     form.target = '_blank';
     parametersInput.name = 'parameters';
     parametersInput.value = parameters;
@@ -83,9 +85,10 @@ export class DevuiOnlineIdeService {
   }
 
   getFiles(sourceData: DevuiSourceData[], ide: 'StackBlitz' | 'CodeSandbox' = 'StackBlitz'): any {
+    console.log(sourceData);
     const _sourceData = sourceData.map((item) => ({ ...item, code: (item.code.default || item.code) as string }));
 
-    //#region 处理Enter文件
+    // #region 处理Enter文件
     let tsCode = _sourceData.splice(
       _sourceData.findIndex((item) => item.language === 'typescript'),
       1
@@ -98,9 +101,16 @@ export class DevuiOnlineIdeService {
       'src/polyfills.ts': polyfillTS,
       'src/environments/environment.ts': environmentTS,
       'src/styles.css': String.raw`/* Add application styles & imports to this file! */
-@font-face { font-family: "devui-icomoon"; src: url('~@devui-design/icons/icomoon/fonts/devui-icomoon.eot?1622620995'); src: url('~@devui-design/icons/icomoon/fonts/devui-icomoon.woff?1622620995') format('woff'), url('~@devui-design/icons/icomoon/fonts/devui-icomoon.ttf?1622620995') format('truetype'), url('~@devui-design/icons/icomoon/fonts/devui-icomoon.svg?1622620995#devui-icomoon') format('svg'); }
+@font-face { font-family: "devui-icomoon";
+src: url('~@devui-design/icons/icomoon/fonts/devui-icomoon.eot?1622620995');
+src: url('~@devui-design/icons/icomoon/fonts/devui-icomoon.woff?1622620995') format('woff'),
+url('~@devui-design/icons/icomoon/fonts/devui-icomoon.ttf?1622620995') format('truetype'),
+url('~@devui-design/icons/icomoon/fonts/devui-icomoon.svg?1622620995#devui-icomoon') format('svg'); }
 `,
     };
+    if(ide === 'CodeSandbox') {
+      files['sandbox.config.json'] = '{"infiniteLoopProtection" : false}';
+    }
     if (/templateUrl\:/.test(tsCode)) {
       const extension = tsCode.match(regConfig.templateExtension)[0];
       tsCode = tsCode.replace(regConfig.templateUrl, `./app.component.${extension}`);
@@ -111,15 +121,17 @@ export class DevuiOnlineIdeService {
     }
     if (/styleUrls\:/.test(tsCode)) {
       const extension = tsCode.match(regConfig.styleExtension)[0];
+      console.log(tsCode);
       tsCode = tsCode.replace(regConfig.styleUrl, `./app.component.${extension}`);
+      console.log('after', tsCode);
       files[`src/app/app.component.${extension}`] = _sourceData.splice(
         _sourceData.findIndex((item) => item.language === 'css'),
         1
       )[0].code;
     }
-    //#endregion
+    // #endregion
 
-    //#region 解析文件结构
+    // #region 解析文件结构
     const importPart: Array<{ reg: RegExp; fileName: string }> = [];
     tsCode.match(/(?<=import\s+\{)[a-zA-Z,\s]+(?=\}\s+from.+\.\/)/g)?.forEach((item) => {
       importPart.push(
@@ -176,7 +188,7 @@ export class DevuiOnlineIdeService {
       });
     files['src/app/app.module.ts'] = appModuleTS(enterComponentName, sharedComponentName);
     files['src/app/app.component.ts'] = tsCode;
-    //#endregion
+    // #endregion
 
     if (ide === 'StackBlitz') {
       return Object.assign(files, {

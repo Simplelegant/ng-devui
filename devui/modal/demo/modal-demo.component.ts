@@ -15,6 +15,12 @@ export class ModalDemoComponent implements OnInit, OnDestroy {
     { title: 'Dialog HTML', language: 'xml', code: require('./modal-test.component.html?raw') },
     { title: 'Dialog TS', language: 'typescript', code: require('./modal-test.component.ts?raw') },
   ];
+  maximizeSource: Array<DevuiSourceData> = [
+    { title: 'HTML', language: 'xml', code: require('./maximize/maximize.component.html?raw') },
+    { title: 'TS', language: 'typescript', code: require('./maximize/maximize.component.ts?raw') },
+    { title: 'Dialog HTML', language: 'xml', code: require('./modal-test.component.html?raw') },
+    { title: 'Dialog TS', language: 'typescript', code: require('./modal-test.component.ts?raw') },
+  ];
   basicUpdateSource: Array<DevuiSourceData> = [
     { title: 'HTML', language: 'xml', code: require('./basic-update/basic-update.component.html?raw') },
     { title: 'TS', language: 'typescript', code: require('./basic-update/basic-update.component.ts?raw') },
@@ -102,6 +108,7 @@ export class ModalDemoComponent implements OnInit, OnDestroy {
   setNavValues(values) {
     this.navItems = [
       { dAnchorLink: 'standard-dialog', value: values['standard-dialog'] },
+      { dAnchorLink: 'maximize-dialog', value: values['maximize-dialog'] },
       { dAnchorLink: 'custom-dialog', value: values['custom-dialog'] },
       { dAnchorLink: 'intercept-dialog-closed', value: values['intercept-dialog-closed'] },
       { dAnchorLink: 'message-hint', value: values['message-hint'] },
@@ -109,7 +116,7 @@ export class ModalDemoComponent implements OnInit, OnDestroy {
       { dAnchorLink: 'configure-button-to-get-focus-automatically', value: values['configure-button-to-get-focus-automatically'] },
       { dAnchorLink: 'template-content', value: values['template-content'] },
       { dAnchorLink: 'template-fixed', value: values['template-fixed'] },
-      { dAnchorLink: 'cases', value: values['cases'] },
+      { dAnchorLink: 'cases', value: values.cases },
     ];
   }
 

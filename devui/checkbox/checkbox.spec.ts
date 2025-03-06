@@ -96,7 +96,7 @@ describe('checkbox', () => {
       labelEl.dispatchEvent(new Event('click'));
 
       fixture.detectChanges();
-      const classList = ['.devui-checkbox', '.halfchecked', '.devui-no-animation'];
+      const classList = ['.devui-checkbox', '.halfchecked'];
       expect(domHelper.judgeStyleClasses(classList)).toBeTruthy();
     });
 

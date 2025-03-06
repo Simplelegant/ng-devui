@@ -119,7 +119,7 @@ export class UploadDirective extends UploadComponent implements OnDestroy {
     let totalFileSize = 0;
     this.fileUploaders.forEach(fileUploader => {
       totalFileSize += fileUploader.file.size;
-      const checkResult = this.selectFiles._validateFiles(fileUploader.file, this.fileOptions.accept, fileUploader.uploadOptions);
+      const checkResult =  this.selectFiles._validateFiles(this.fileUploaders.length,fileUploader.file, this.fileOptions.accept, fileUploader.uploadOptions);
       if (checkResult && checkResult.checkError) {
         super.deleteFile(fileUploader.file);
         this.errorMsg = [{ severity: 'warn', detail: checkResult.errorMsg }];

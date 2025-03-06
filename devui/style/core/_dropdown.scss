@@ -1,8 +1,20 @@
 @import '../theme/color.scss';
 @import '../theme/shadow';
 @import '../theme/corner';
-@import '../core/animation';
+@import '../theme/font';
+@import '../theme/animation';
 @import '../../style/theme/z-index';
+
+@mixin devui-no-data-tip() {
+  cursor: not-allowed;
+  color: $devui-disabled-text;
+  font-size: $devui-font-size;
+  background: $devui-base-bg;
+  line-height: 22px;
+  padding: 0;
+  text-align: center;
+  user-select: none;
+}
 
 .devui-dropdown {
   position: relative;
@@ -41,7 +53,7 @@
 
   &.devui-dropdown-open .devui-dropdown-toggle span {
     &.icon-chevron-down,
-    &.icon-select-arrow {
+    &.icon-chevron-down-2 {
       transform: rotate(180deg);
     }
   }
@@ -64,6 +76,7 @@
 
   &.devui-scrollbar,
   .devui-scrollbar {
+    overflow-x: visible;
     overflow-y: auto;
     overflow-y: overlay;
   }
@@ -147,6 +160,14 @@
       }
     }
   }
+
+  .devui-no-data-tip {
+    @include devui-no-data-tip();
+  }
+}
+
+.devui-dropdown-menu-wrap .devui-no-data-tip {
+  @include devui-no-data-tip();
 }
 
 .devui-form-group.devui-has-feedback {

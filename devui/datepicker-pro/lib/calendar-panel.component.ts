@@ -11,6 +11,7 @@ import { DatepickerProCommonDataService, DatepickerProService } from '../datepic
 import { DevuiCalendarDateItem } from './datepicker-pro.type';
 
 const DAY_DURATION = 24 * 60 * 60 * 1000;
+const HOUR_DURATION = 60 * 60 * 1000;
 
 @Component({
   selector: 'd-calendar-panel',
@@ -31,7 +32,7 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
 
   i18nText: I18nInterface['datePickerPro'];
   i18nSubscription: Subscription;
-  unsubscribe$ = new Subject();
+  unsubscribe$ = new Subject<void>();
 
   allMonthList = [];
   yearAndMonthList = [];
@@ -39,6 +40,7 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
   isListCollopse = false;
   weekHoverRange = [];
   curWeekHoverDate: Date;
+  isSummerTimeZone = false;
 
   get curHoverDate() {
     return this.pickerSrv.curHoverDate;
@@ -114,8 +116,21 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setI18nText();
     this.today = new Date();
+    this.isSummerTimeZone = this.judgeIsSummerTimeZone();
     this.initDataList();
     this.initObservable();
+  }
+
+  // 判断当前时区是否需要夏令时变换
+  private judgeIsSummerTimeZone() {
+    const Jan1 = new Date(2023, 0);
+    const Jul1 = new Date(2023, 6);
+    // 两个日期之间在非夏令时地区相差181天整
+    if ((Jul1.getTime() - Jan1.getTime()) / DAY_DURATION !== 181) {
+      return true;
+    };
+
+    return false;
   }
 
   private initObservable() {
@@ -124,6 +139,8 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
     ).subscribe(isOpen => {
       if (isOpen) {
         setTimeout(() => {
+          this.scrollBodyCmp.checkViewportSize();
+          this.scrollListCmp.checkViewportSize();
           this.goToDate(this.curDate || new Date(), 'auto');
         });
 
@@ -159,7 +176,10 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
         this.goToDate(this.selectedRangeDate[0] || this.selectedRangeDate[1] || new Date());
       } else {
         if (!this.selectedRangeDate[1] && this.selectedRangeDate[0]) {
-          this.updateRangeDate([this.selectedRangeDate[0], this.selectedRangeDate[0]]);
+          this.updateRangeDate([
+            this.selectedRangeDate[0],
+            new Date(new Date(this.selectedRangeDate[0].getTime()).setHours(23, 59, 59))
+          ]);
         }
         this.goToDate(this.selectedRangeDate[1] || this.selectedRangeDate[0] || new Date());
       }
@@ -233,7 +253,11 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
     for (let i = 0; i < 6; i++) {
       const startWeekDate = startDate.getTime() + i * 7 * DAY_DURATION;
       const weekDays = new Array(7).fill(0).map((value, index) => {
-        const currentDate = new Date(startWeekDate + index * DAY_DURATION);
+        let currentDate = new Date(startWeekDate + index * DAY_DURATION);
+        // 夏令时区检测出错误的冬令时时间，加快一小时
+        if (this.isSummerTimeZone && currentDate.getHours() === 23) {
+          currentDate = new Date(startWeekDate + index * DAY_DURATION + HOUR_DURATION);
+        }
         return {
           day: this.fillLeft(currentDate.getDate()),
           date: currentDate,
@@ -341,8 +365,9 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
         this.pickerSrv.currentActiveInput = 'end';
       } else if (this.pickerSrv.currentActiveInput === 'end' && !this.selectedRangeDate[0]) {
         this.selectedRangeDate[0] = this.curDate;
+        this.pickerSrv.currentActiveInput = 'start';
       } else {
-        this.pickerSrv.closeDropdownEvent.next();
+        this.pickerSrv.closeDropdownEvent.next(false);
       }
     }
     this.pickerSrv.selectedDateChange.next({
@@ -360,7 +385,7 @@ export class CalendarPanelComponent implements OnInit, OnDestroy {
     }
 
     if (this.pickerSrv.closeAfterSelected) {
-      this.pickerSrv.closeDropdownEvent.next();
+      this.pickerSrv.closeDropdownEvent.next(false);
     }
   }
 

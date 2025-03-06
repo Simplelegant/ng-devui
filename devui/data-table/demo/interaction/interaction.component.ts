@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DataTableComponent, SortDirection, SortEventArg, TableWidthConfig } from 'ng-devui/data-table';
-import { originSource, SourceType } from '../mock-data';
+import { DataTableComponent, SortDirection, SortEventArg, TableWidthConfig, tableResizeFunc } from 'ng-devui/data-table';
+import { SourceType, originSource } from '../mock-data';
 
 @Component({
   selector: 'd-interaction',
   templateUrl: './interaction.component.html',
-  styleUrls: ['./interaction.component.scss']
+  styleUrls: ['./interaction.component.scss'],
 })
 export class InteractionComponent implements OnInit {
   @ViewChild(DataTableComponent, { static: true }) datatable: DataTableComponent;
@@ -14,39 +14,41 @@ export class InteractionComponent implements OnInit {
     {
       name: 'Clear',
       value: 'Clear',
-    }, {
+    },
+    {
       name: 'Male',
       value: 'Male',
-    }, {
+    },
+    {
       name: 'Female',
       value: 'Female',
-    }
+    },
   ];
 
   firstFilterList = [
     {
       name: 'Mark',
-      value: 'Mark'
+      value: 'Mark',
     },
     {
       name: 'Jacob',
-      value: 'Jacob'
+      value: 'Jacob',
     },
     {
       name: 'Danni',
-      value: 'Danni'
+      value: 'Danni',
     },
     {
       name: 'green',
-      value: 'green'
+      value: 'green',
     },
     {
       name: 'po',
-      value: 'po'
+      value: 'po',
     },
     {
       name: 'john',
-      value: 'john'
+      value: 'john',
     },
 
   ];
@@ -55,94 +57,56 @@ export class InteractionComponent implements OnInit {
   tableWidthConfig: TableWidthConfig[] = [
     {
       field: 'checkbox',
-      width: '30px'
+      width: '41px',
     },
     {
       field: '$index',
-      width: '200px'
+      width: '100px',
     },
     {
       field: 'firstName',
-      width: '200px'
+      width: '100px',
     },
     {
       field: 'lastName',
-      width: '200px'
+      width: '100px',
     },
     {
       field: 'gender',
-      width: '200px'
+      width: '100px',
     },
     {
       field: 'dob',
-      width: '200px'
+      width: '100px',
     },
     {
       field: 'description',
-      width: '200px'
-    }
+      width: '100px',
+    },
   ];
-
-  _totalWidth = 0;
-  lastWidth = 0;
-  firstResize = true;
 
   lastNameSortDirection = SortDirection.ASC;
   genderSortDirection = SortDirection.default;
-  sortParams = {field: 'lastName', direction: this.lastNameSortDirection};
+  sortParams = { field: 'lastName', direction: this.lastNameSortDirection };
   checkboxList = [];
   allChecked = false;
   halfChecked = false;
   filterIconActive = false;
 
-  constructor(
-    private ref: ChangeDetectorRef,
-    private ele: ElementRef
-  ) { }
+  constructor(private ref: ChangeDetectorRef, private ele: ElementRef) {}
   ngOnInit() {
     this.checkboxList = JSON.parse(JSON.stringify(originSource.slice(0, 6)));
-    this.sortableDataSource[0]['$checkDisabled'] = true;
+    (this.sortableDataSource[0] as any).$checkDisabled = true;
   }
 
   onSortChange(event: SortEventArg, field) {
     this.sortParams = {
       field: field,
-      direction: event.direction
+      direction: event.direction,
     };
   }
 
-  onResize({ width, beforeWidth }, field) {
-    const index = this.tableWidthConfig.findIndex((config) => {
-      return config.field === field;
-    });
-    if (index > -1) {
-      if (this.firstResize) {
-        this.firstResize = false;
-        const ratio = beforeWidth / parseInt(this.tableWidthConfig[index].width, 10);
-        this.tableWidthConfig.forEach(t => {
-          t.width = parseInt(t.width, 10) * ratio + 'px';
-        });
-        this._totalWidth = this.ele.nativeElement.querySelector('.table-wrap').offsetWidth;
-        this.lastWidth = parseInt(this.tableWidthConfig.slice(-1)[0].width);
-      }
-      this.tableWidthConfig[index].width = width + 'px';
-
-      let newWidthTotal = 0;
-      this.tableWidthConfig.forEach(t => {
-        newWidthTotal += parseInt(t.width, 10);
-      });
-
-      const lastCol = this.tableWidthConfig[this.tableWidthConfig.length - 1];
-      const lastColWidth = parseInt(lastCol.width, 10);
-      const changeValue = newWidthTotal - this._totalWidth;
-      if (changeValue < 0) {
-        lastCol.width = lastColWidth + this._totalWidth - newWidthTotal + 'px';
-      } else if (lastColWidth > this.lastWidth) {
-        const lastChange = (lastColWidth - this.lastWidth) > changeValue ? changeValue : (lastColWidth - this.lastWidth);
-        lastCol.width = lastColWidth - lastChange + 'px';
-      }
-    }
-  }
+  onResize = tableResizeFunc(this.tableWidthConfig, this.ele);
 
   filterChangeRadio($event) {
     if ($event.name === 'Clear') {
@@ -151,7 +115,7 @@ export class InteractionComponent implements OnInit {
     }
     const filterList = $event.name;
     const dataDisplay = [];
-    JSON.parse(JSON.stringify(originSource.slice(0, 6))).map(item => {
+    JSON.parse(JSON.stringify(originSource.slice(0, 6))).forEach((item) => {
       if (filterList.includes(item.gender)) {
         dataDisplay.push(item);
       }
@@ -160,9 +124,9 @@ export class InteractionComponent implements OnInit {
   }
 
   onFirstFilterChange($event) {
-    const filterList = $event.map(item => item.name);
+    const filterList = $event.map((item) => item.name);
     const dataDisplay = [];
-    JSON.parse(JSON.stringify(originSource.slice(0, 6))).map(item => {
+    JSON.parse(JSON.stringify(originSource.slice(0, 6))).forEach((item) => {
       if (filterList.includes(item.firstName)) {
         dataDisplay.push(item);
       }
@@ -183,7 +147,7 @@ export class InteractionComponent implements OnInit {
       rowIndex: rowIndex,
       nestedIndex: nestedIndex,
       rowItem: rowItem,
-      checked: checked
+      checked: checked,
     });
   }
 
@@ -192,7 +156,7 @@ export class InteractionComponent implements OnInit {
   }
   setHalfChecked() {
     this.halfChecked = false;
-    const chosen = this.checkboxList.filter(item => item.chosen);
+    const chosen = this.checkboxList.filter((item) => item.chosen);
     if (chosen.length === this.checkboxList.length) {
       this.allChecked = true;
     } else if (chosen.length > 0) {
@@ -204,7 +168,7 @@ export class InteractionComponent implements OnInit {
   }
 
   filterSource(dropdown) {
-    this.sortableDataSource = this.checkboxList.filter(item => item.chosen);
+    this.sortableDataSource = this.checkboxList.filter((item) => item.chosen);
     this.filterIconActive = true;
     dropdown.toggle();
   }
