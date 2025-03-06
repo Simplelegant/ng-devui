@@ -39,19 +39,19 @@ export class AppComponent implements OnInit, OnDestroy {
               private i18n: I18nService, @Inject(DEVUI_LANG) private appLang) {
     translate.addLangs([ZH_CN, EN_US]);
     translate.setDefaultLang(this.appLang ? this.appLang : ZH_CN);
-    const oldHandler = this.router.errorHandler;
-    this.router.errorHandler = (err: any) => {
-      // 加载失败的时候刷新重试一次
-      if (err.stack && err.stack.indexOf('Error: Loading chunk') >= 0) {
-        if (localStorage.getItem('lastChunkError') !== err.stack) {
-          localStorage.setItem('lastChunkError', err.stack);
-          window.location.reload();
-        } else {
-          console.error(`We really don't find the chunk...`);
-        }
-      }
-      oldHandler(err);
-    };
+    // const oldHandler = this.router.errorHandler;
+    // this.router.errorHandler = (err: any) => {
+    //   // 加载失败的时候刷新重试一次
+    //   if (err.stack && err.stack.indexOf('Error: Loading chunk') >= 0) {
+    //     if (localStorage.getItem('lastChunkError') !== err.stack) {
+    //       localStorage.setItem('lastChunkError', err.stack);
+    //       window.location.reload();
+    //     } else {
+    //       console.error(`We really don't find the chunk...`);
+    //     }
+    //   }
+    //   oldHandler(err);
+    // };
   }
   ngOnInit(): void {
     this.currentLang = localStorage.getItem('lang') || this.appLang;
