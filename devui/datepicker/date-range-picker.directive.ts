@@ -36,20 +36,21 @@ import { SelectDateRangeChangeEventArgs, SelectDateRangeChangeReason } from './d
 import { DateRangePickerComponent } from './date-range-picker.component';
 
 @Component({
-  /* eslint-disable-next-line @angular-eslint/component-selector*/
-  selector: '[dDateRangePicker]',
-  providers: [
-    {
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => DateRangePickerDirective),
-      multi: true,
-    },
-  ],
-  exportAs: 'dateRangePicker',
-  templateUrl: './date-range-picker.directive.html',
-  styleUrls: ['./date-range-picker.component.scss'],
-  animations: [fadeInOut],
-  preserveWhitespaces: false,
+    /* eslint-disable-next-line @angular-eslint/component-selector*/
+    selector: '[dDateRangePicker]',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => DateRangePickerDirective),
+            multi: true,
+        },
+    ],
+    exportAs: 'dateRangePicker',
+    templateUrl: './date-range-picker.directive.html',
+    styleUrls: ['./date-range-picker.component.scss'],
+    animations: [fadeInOut],
+    preserveWhitespaces: false,
+    standalone: false
 })
 // tslint:disable-next-line: component-class-suffix
 export class DateRangePickerDirective implements OnInit, ControlValueAccessor, OnDestroy {

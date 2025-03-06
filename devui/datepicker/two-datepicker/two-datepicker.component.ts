@@ -20,12 +20,13 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { DatePickerConfigService as DatePickerConfig } from '../date-picker.config.service';
 
 @Component({
-  /* eslint-disable-next-line @angular-eslint/component-selector*/
-  selector: '[dTwoDatePicker]',
-  exportAs: 'twoDatePicker',
-  templateUrl: 'two-datepicker.component.html',
-  styleUrls: ['./two-datepicker.component.scss'],
-  animations: [fadeInOut],
+    /* eslint-disable-next-line @angular-eslint/component-selector*/
+    selector: '[dTwoDatePicker]',
+    exportAs: 'twoDatePicker',
+    templateUrl: 'two-datepicker.component.html',
+    styleUrls: ['./two-datepicker.component.scss'],
+    animations: [fadeInOut],
+    standalone: false
 })
 export class TwoDatePickerComponent implements OnInit, OnDestroy {
   @Input() locale: string;

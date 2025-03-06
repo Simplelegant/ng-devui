@@ -51,20 +51,21 @@ import { BehaviorSubject, Observable, Subscription, fromEvent, of } from 'rxjs';
 import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 
 @Component({
-  selector: 'd-select',
-  templateUrl: './select.component.html',
-  styleUrls: [`./select.component.scss`],
-  exportAs: 'select',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => SelectComponent),
-      multi: true,
-    },
-  ],
-  animations: [fadeInOut],
-  preserveWhitespaces: false,
+    selector: 'd-select',
+    templateUrl: './select.component.html',
+    styleUrls: [`./select.component.scss`],
+    exportAs: 'select',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => SelectComponent),
+            multi: true,
+        },
+    ],
+    animations: [fadeInOut],
+    preserveWhitespaces: false,
+    standalone: false
 })
 export class SelectComponent implements ControlValueAccessor, OnInit, AfterViewInit, OnDestroy, OnChanges {
   /**

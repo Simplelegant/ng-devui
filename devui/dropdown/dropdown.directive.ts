@@ -25,9 +25,10 @@ import { debounceTime, delay, filter, mapTo, tap } from 'rxjs/operators';
 import { DropDownService } from './dropdown.service';
 
 @Directive({
-  selector: '[dDropDown]',
-  exportAs: 'd-dropdown',
-  providers: [DropDownService],
+    selector: '[dDropDown]',
+    exportAs: 'd-dropdown',
+    providers: [DropDownService],
+    standalone: false
 })
 export class DropDownDirective implements OnDestroy, OnChanges, AfterContentInit {
   @ContentChildren(forwardRef(() => DropDownDirective), { descendants: true }) dropdownChildren: QueryList<DropDownDirective>;

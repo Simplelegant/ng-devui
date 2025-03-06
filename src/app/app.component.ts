@@ -7,11 +7,12 @@ import { VERSION } from '../../devui/version';
 import { LinkMap } from '../../devui-commons/src/constant';
 
 @Component({
-  selector: 'd-app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  encapsulation: ViewEncapsulation.None
-  })
+    selector: 'd-app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
+})
 export class AppComponent implements OnInit, OnDestroy {
   version;
   clickSub: Subscription = new Subscription();
